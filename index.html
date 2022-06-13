@@ -110,7 +110,8 @@
         <tr>
           <td>Cloud Computing</td>
           <td>
-            - Regions are composed of two or more Availability Zones<br />
+            - Regions are independent geographical areas composed of two or more Availability Zones. You are charged for data transferred between
+            regions.<br />
             - Availability Zones are composed of one or more discrete data centers with redundant power, networking, and connectivity<br />
             - Software as a Service (SaaS) = Manage everything and provides you with a client to interact with the service <br />
             - Platform as a Service (PaaS) = Manage Applications and Data<br />
@@ -163,7 +164,9 @@
             AWS PowerShell as if you are working in a machine<br />
             <br />
             <b>IAM Roles</b><br />
-            They are used to assign permissions to AWS services in order to perform action on your behalf<br />
+            They are used to assign permissions to AWS services in order to perform action on your behalf. A role can be used by either an IAM user in
+            the same AWS account as the role or a user in a different AWS account. A role can also be used by a web service that AWS offers; a prime
+            example is Amazon EC2.<br />
             <br />
             <b>Identities</b> <br />
             They are the IAM resource objects that are used to identify and group. You can attach a policy to an IAM identity. These include users,
@@ -209,7 +212,14 @@
             <b>AWS Budget</b><br />
             Allows you to set a limit to your bill<br />
             You can set alarms via email, based on (budget) thresholds of your current or forecasted cost<br />
-            You can also set actions when the thresholds are exceeded<br />
+            You can also set actions when the thresholds are exceeded <br />
+            You can create the following types of budget:
+            <ul>
+              <li>Creating a cost budget</li>
+              <li>Creating a usage budget</li>
+              <li>Creating a Savings Plans budget</li>
+              <li>Creating a reservation budget</li>
+            </ul>
             <br />
             <b>EC2 instance types</b><br />
             - General porpuse: ideal for web servers. Good balance between compute, memory and networking.<br />
@@ -377,7 +387,7 @@
             </ul>
             <br />
             Also there is an S3 Intelligent-Tiering, which is a service with an additional fee that moves objects automatically between classes
-            (Access Tiers) based on usage:
+            (Access Tiers) based on usage. You cana dd rules to modify this behavior with an S3 Lifecycle policy:
             <ul>
               <li>Frequent access tier (automatic): default tier</li>
               <li>Infrequent access tier (automatic): objects not accessed for 30 days</li>
@@ -439,16 +449,21 @@
                 <b>Relational Database Service - RDS: </b> it runs in a EC2 instance but is fully managed by AWS (its performance is better than a
                 customer-managed database instance). Probably the only con of RDS in relation with your own EC2 instance is that you cannot connect
                 via SSH to RDS. On the other hand, it gives you continuous backups, automated OS patching, monitoring dashborad, read replicas, multi
-                AZ for disaster recovery an scaling capability. Supports reservation to optimize costs.<br />
+                AZ for disaster recovery an scaling capability. Supports reservation to optimize costs. RDS runs on EC2 instances, so much like an EC2
+                instance, you are charged based on how long the RDS instances are running, how much storage they have provisioned, and the requests
+                they're processing. <br />
+                <br />
                 <b>RDS Deployments: </b><br />
-                - Read Replicas: scale the read workload of your DB creating up to 5 read replicas. Data is only written to the main DB. Read Replicas
-                are an example of horizontal scaling of resources. <br />
-                - Multi AZ: has a failover DB in case the AZ of the main DB fails. The failover is passive until the main DB fails. <br />
-                - Multi Region: has the same behavior of the Read Replicas deployment but in multiple regions not only one.
+                &nbsp;&nbsp; - Read Replicas: scale the read workload of your DB creating up to 5 read replicas. Data is only written to the main DB.
+                Read Replicas are an example of horizontal scaling of resources. <br />
+                &nbsp;&nbsp; - Multi AZ: has a failover DB in case the AZ of the main DB fails. The failover is passive until the main DB fails.
+                <br />
+                &nbsp;&nbsp; - Multi Region: has the same behavior of the Read Replicas deployment but in multiple regions not only one.
               </li>
               <li>
                 <b>Aurora: </b> is a propietary technology of AWS optimized for the cloud (performance improvement - 5x over MySQL and 3x over
-                PostgreSQL). Is 20% more expensive than RDS but also more efficient. Its storage grows automatically in increments of 10GB up to 64TB.
+                PostgreSQL). Only supports MySQL and PostgreSQL. It doesn't support MariaDB. Is 20% more expensive than RDS but also more efficient.
+                Its storage grows automatically in increments of 10GB up to 64TB.
               </li>
               <li><b>Elasticache: </b> is to get managed Redis or Memcached. Is a managed in-memory DB with high performance and low latency</li>
               <li>
@@ -460,12 +475,14 @@
                 table on every region and DynamoDB manage the rewrites in the other regions of the table.
               </li>
               <li>
-                <b>RedShift: </b> is a data warehouse (DB) based on PostgreSQL intended for data analytical processing. It has a columnar storage
-                instead of row based. Offers a SQL interface and a Massive Parallel Query Execution (MPP) capability. BI Tools integrates with it
+                <b>RedShift: </b> is a data warehouse (DB) based on PostgreSQL intended for data analytical processing. It is designed for storing
+                petabytes of data. It has a columnar storage instead of row based. Offers a SQL interface and a Massive Parallel Query Execution (MPP)
+                capability. BI Tools integrates with it
               </li>
               <li>
-                <b>Elactic MapReduce - EMR: </b> is not an actual DB. It helps creating Hadoop clusters (Big Data) to analyze and process vast amount
-                of data. Some of their use cases are: data processing, machine learning, web indexing and big data.
+                <b>Elactic MapReduce - EMR: </b> AWS service is specifically designed to assist you in processing large datasets. Is not an actual DB.
+                It helps creating Hadoop clusters (Big Data) to analyze and process vast amount of data. Some of their use cases are: data processing,
+                machine learning, web indexing and big data.
               </li>
               <li><b>Athena: </b> is a serverless SQL query service to perform analytics against S3 objects</li>
               <li>
@@ -534,8 +551,9 @@
             transpile it to a cloud formation template. It supports at least typescript, python, java and DotNet <br />
             <b>- Beanstalk: </b> is a fully managed Patflorm as a Services (not serverless) that takes care of the provision of the infrastructure you
             need based on the 3-tier architecture, this way you are able to focus just on your code. It's free, AWS only charges you for the resources
-            that beanstalk uses. Beanstalk provisions servers so it is not a serverless service. <br />
-            <b>- CodeDeploy: </b> this services consist of a deploy agent that allows you to deploy your apps on EC2 or on-presises servers. The
+            that beanstalk uses. Beanstalk provisions servers so it is not a serverless service. Beanstalk monitors application health via a health
+            dashboard.<br />
+            <b>- CodeDeploy: </b> this services consist of a deploy agent that allows you to deploy your apps on EC2 or on-premises servers. The
             servers must be provisioned and configured ahead of time. <br />
             <b>- CodeCommit: </b> is the equivalent for github or gitlab repository on AWS. <br />
             <b>- CodeBuild: </b> code building service that has a pay-as-you-go pricing model.<br />
@@ -631,11 +649,13 @@
             own custom events or receive and enroute events from other sources. The model event schema for EventBridge is defined in the Schema
             Resgistry.
             <br />
-            <b>- CloudTrail: </b> is a per region service that helps to log the API calls in your AWS account for as long as 90 days (to persist
-            events for a longer time you have to sent them to an S3 bucket and then query it with Athena). It shows you the info of the events in the
-            CloudTrail console but also can send it to an S3 bucket or create an EventBridge event. By default, the log files delivered by CloudTrail
-            to your S3 bucket are encrypted using server-side encryption with Amazon S3–managed encryption keys (SSE-S3). There are three types of
-            CloudTrail events:
+            <b>- CloudTrail: </b> is a per region service that helps to log the API calls in your AWS account (event history) for as long as 90 days.
+            CloudTrail delivers log files within 15 minutes of account activity. It registers at least the username of the author of the action and
+            the region that the request was made to. With CloudTrail, you can create a trail that either applies to one Region or to all Regions. To
+            persist events for a longer time you have to sent them to an S3 bucket and then query it with Athena. It shows you the info of the events
+            in the CloudTrail console but also can send it to an S3 bucket or create an EventBridge event. By default, the log files delivered by
+            CloudTrail to your S3 bucket are encrypted using server-side encryption with Amazon S3–managed encryption keys (SSE-S3). There are three
+            types of CloudTrail events:
             <ul>
               <li>
                 Management events: operations that are performed on resources in your AWS account. CloudTrail log this events by default. Also, it can
@@ -683,9 +703,9 @@
             <b>- Network Access Control List - NACL: </b> it is a firewall which controls traffic from and to subnet and are attached at a subnet
             level (rules only apply to IP addresses). It can have ALLOW and DENY rules. It's a stateless service, meaning you need to set rules for
             inbound and outbound traffic. <br />
-            <b>- Security Group: </b> it is a firewall that controls traffic to and from an EC2 instance. Rules includes IP addresses and other
-            security groups. Can have only ALLOW rules. It's a stateful service, menaing you only need to set rules for inbound traffic and it allows
-            outbound traffic for the same request.<br />
+            <b>- Security Group: </b> it is a built-in firewall that controls traffic to and from an EC2 instance. Rules includes IP addresses and
+            other security groups. Can have only ALLOW rules. It's a stateful service, meaning you only need to set rules for inbound traffic and it
+            allows outbound traffic for the same request.<br />
             <b>- VPC Flows Logs: </b> It captures information about IP traffic going into your interfaces (VPC, subnets, load balancers, ElastiCache,
             RDS, etc) helping to monitor and troubleshoot connectivity issues. VPC Flow Logs data can go to an S3 bucket or CloudWatch Logs. <br />
             <b>- VPC Peering: </b> it allows you to connect two VPC privately using AWS's network, making them behave like if they were in the same
@@ -744,7 +764,7 @@
                 AWS Shield Standard: is a managed DDoS protection service that safeguards websites and applications, for all customer at no additional
                 cost. It doesn't offers automated application layer (Layer 7) traffic monitoring.
               </li>
-              <li>AWS Shield Advanced: 24/7 premium DDoS protetion. It costs 3000 dollars per month.</li>
+              <li>AWS Shield Advanced: 24/7 premium DDoS protetion. It offers network flow monitoring. It costs 3000 dollars per month.</li>
               <li>
                 AWS Web Application Firewall (WAF): filter specific requests based on rules. Is a paid service that offers protection from commom web
                 exploits at layer 7. It helps to prevent exploits like SQL Injection or Cross Site Scripting.
@@ -755,8 +775,9 @@
               </li>
             </ul>
             <b>- Penetration testing: </b> is the kind of tests performed to detect security vulnerabilities. AWS allows you to run penetration test
-            against a limited number of services (see image). The following activities are prohibited: DDoS, port flooding, protocol flooding and
-            request flooding. To include some services in (and some kind of test) you need to contact the AWS support to
+            against a limited number of services (see image). The Customer Service Policy for Penetration Testing is the policy that provides
+            information on performing penetration testing on your EC2 instances. The following activities are prohibited: DDoS, port flooding,
+            protocol flooding and request flooding. To include some services in (and some kind of test) you need to contact the AWS support to
             aws-security-simulated-event@amazon.com. <br />
             <b>-Key Management Service (KMS): </b> is a regional service that secure management of encryption and decryption of your data. Anytime you
             heard "encryption" for AWS services it's most li kely KMS. This service manage the encryption keys for us.<br />
@@ -829,12 +850,12 @@
           </td>
         </tr>
         <tr>
-          <td>Account Management, Billing and Support</td>
+          <td>Account Management and Governance, Billing and Support</td>
           <td>
             <b>- AWS Landing Zone: </b> is a solution that helps customers more quickly setup a secure, multi-account AWS environment based on AWS
             best practices.<br />
-            <b>- AWS organizations: </b> allows you to manage multiple AWS accounts and aggregate costs to gain discounts. The main account is the
-            master account and the others in the organization are child accounts.
+            <b>- AWS organizations: </b> allows you to manage multiple AWS accounts (even add ne ones) and aggregate costs to gain discounts. The main
+            account is the master account and the others in the organization are child accounts.
             <ul>
               <li>Each part of an AWS organization is called Organizational Unit (OU).</li>
               <li>
@@ -858,10 +879,12 @@
             <b>- Saving Plans: </b> commit a certain amount of dollars per hour for 1 or 3 years. It's easier to setup because you can decide based on
             dollars per hour instead o AWS resouces capacity<br />
             <b>- AWS Compute Optimizer: </b> helps you identify the optimal AWS resource configurations, such as Amazon EC2 instance types, Amazon EBS
-            volume configurations, and AWS Lambda function memory size. It reduce costs and improve performance by recommending optimal AWS resources
-            for your workloads with ML. It can lower your costs by up to 25% and its recommendations can be exported to S3. <br />
+            volume configurations (EBS is NOT a compute service), and AWS Lambda function memory size. It reduce costs and improve performance by
+            recommending optimal AWS resources for your workloads with ML. It can lower your costs by up to 25% and its recommendations can be
+            exported to S3. <br />
             <b>- AWS Pricing/TCO Calculator: </b> estimates the cost for your solution architecture or use case. Allows you to get an estimate for the
-            cost of AWS services, comparing service costs per Region is a common use case.<br />
+            cost of AWS services, comparing service costs per Region is a common use case. When a question in the exam ask about you been instructed
+            to provide an estimate of your AWS bill, refers to AWS Pricing/TCO Calculator.<br />
             <b>- Migration Evaluator (Formerly TSO Logic): </b> is a complimentary service to create data-driven business cases for AWS Cloud planning
             and migration. Migration Evaluator quickly provides a business case to make sound AWS planning and migration decisions. With Migration
             Evaluator, your organization can build a data-driven business case for AWS, gets access to AWS expertise, visibility into the costs
@@ -909,7 +932,7 @@
               <li>
                 <b>Business:</b> 100$/month. trusted advisor full set of checks. Unlimited supports contacts. Provides 24x7 phone, email and chat
                 access to technical support and architectural guidance in the context of your specific use-cases. Also, you can get access to
-                Infrastructure Event Management for an additional fee.
+                Infrastructure Event Management for an additional fee. Minimum AWS Support plan needed if you have production workloads.
               </li>
               <li>
                 <b>Enterprise:</b> 15000$/month. access to a DESIGNATED Technical Account Manager (TAM), a Concierge Support Team (for billing and
@@ -965,21 +988,38 @@
           <td>Other Concepts and Services</td>
           <td>
             <b>CONCEPTS</b> <br />
+            <b>- AWS Free Tier: </b> offers some services for free for the first 12 months after signing up for an AWS account. It also offers free
+            short-term trials of selected AWS services.
+            <b>- Total Cost of Ownership (TCO): </b>
+            Is the cost to buy something plus the cost to operate it over its useful life. The idea is to take into consideration the total cost that
+            a business will incur to operate an asset (in this case, run its workloads on AWS), not just the upfront acquisition cost. <br />
             <b>- Agility: </b>
             in the world of cloud computing, "Agility" refers to the ability to rapidly develop, test and launch software applications that drive
             business growth. AWS provides a massive global cloud infrastructure that allows you to quickly innovate, experiment and iterate. Instead
             of waiting weeks or months for hardware, you can instantly deploy new applications. This ability is called Agility. <br />
             <b>- Elasticity: </b>
-            refers to the ability to acquire resources as you need and release when they are no longer needed. <br />
+            <ul>
+              <li>Refers to the ability to acquire resources as you need and release when they are no longer needed.</li>
+              <li>Can also refer to the ability to scale computing resources OUT or IN easily, while only paying for the resources used.</li>
+              <li>
+                With elasticity, you do not have to plan ahead of time how much capacity you need. You can provision only what you need, and then grow
+                and shrink based on demand.
+              </li>
+            </ul>
             <b>- Reliability: </b> refers to the ability of a system to recover from infrastructure or service disruptions, by dynamically acquiring
             computing resources to meet demand, and mitigate disruptions. <br />
             <b>- Scalability: </b> is the measurement of a system's ability to grow to accommodate an increase in demand, or shrink down to a
-            diminishing demand. <br />
+            diminishing demand. It provides consistent performance as a system handles growing workload requirements.<br />
             <b>- Important Global Services:</b> IAM, Route53, CloudFront, SNS and SES. <br />
             <b>- Right Sizing: </b> is the process of matching instance types and sizes to your workload performance and capacity. <br />
+            <b>- AWS Infrastructure Event Management: </b> offers architecture guidance and operational support during the preparation and execution
+            of planned events, such as shopping holidays, product launches, and migrations. It can also help assessing your operational readiness and
+            identifying and mitigating risks. <br />
             <br />
 
             <b>SERVICES</b> <br />
+            <b>- Resource Groups: </b> You can use resource groups to organize your AWS resources. Resource groups make it easier to manage and
+            automate tasks on large numbers of resources at one time. <br />
             <b>- AWS Serverless Application Repository: </b> managed repository for serverless applications. Allows teams, businesses and individual
             developers to storage and share reusable applications and easily implement serverless application in a modern and powerful manner. Each
             application is packaged with an AWS Serverless Application Model (SAM) template that define the resources needed in the AWS cloud. The
@@ -1050,10 +1090,13 @@
             <b>- AWS Ecosystem: </b>
             <ul>
               <li>Free resources: AWS blogs, AWS forums, AWS whitepapers and guides, AWS quick starts</li>
-              <li>AWS marketplace: you can buy/sell custom AMI and others.</li>
-              <li>AWS trainning offers trainning and certifications.</li>
+              <li>AWS marketplace: helps you to buy, sell, test and deploy custom AMI and others.</li>
+              <li>AWS trainning: offers trainning and certifications.</li>
               <li>AWS Partner Network (APN): is a network of people that AWS know are good with the cloud.</li>
-              <li>AWS Professional services: is a global team of experts. They work along your team and a chosen member of the APN.</li>
+              <li>
+                AWS Professional services: is a global team of experts that helps enterprise customers move to a cloud-based operating model. They
+                work along your team and a chosen member of the APN.
+              </li>
               <li>APN Technology Partners: provides hardware, conectivity and software. They help more on the physical infrastructure side.</li>
               <li>AWS Consulting Partner: professional services firm to help build on/migrate to AWS</li>
               <li>AWS Training Partner: find who can help you learn AWS</li>
@@ -1089,6 +1132,104 @@
             <span>Sustainability Pillar</span>
             <img src="./assets/45.-AWS-Pillars-6.png" alt="Sustainability Pillar" />
           </td>
+        </tr>
+        <tr>
+          <td>Tricky Questions:</td>
+          <td>
+            <ul style="list-style-type: none">
+              <li>
+                <br />
+                <br />
+                <b>
+                  Q: A telecommunications company has his hired you as a consultant to develop a business case for moving its IT applications and
+                  infrastructure to AWS. The company's leadership understands the agility value of the cloud, but the finance group is not interested
+                  in shifting capital expense to operating expense due to the company's tax structure. What will you include in the business case to
+                  attempt to satisfy everyone at the company?
+                </b>
+                <br />
+                <br />
+                <b>R:</b> Suggest that the company make Reserved Instance purchases and capitalize them. <br />
+
+                <b>EXPLANATION:</b> Many companies capitalize Reserved Instance purchases, especially those with 3-year terms.
+              </li>
+              <li>
+                <hr />
+                <br />
+                <br />
+                <b>
+                  Q: In the AWS Global Infrastructure, which components are physically separated and connected through low-latency links, enabling
+                  fault tolerance and high availability?
+                </b>
+                <br />
+                <br />
+                <b>R:</b> Availability Zones <br />
+
+                <b>EXPLANATION:</b> Availability Zones (AZs) are connected among themselves in a single Region. They are physically separated,
+                connected through low-latency links, fault tolerant, and allow high availability. <br />
+                NOT Regions because they are geographic locations fully independent and isolated as well as resource- and service-specific. Regions
+                contain Availability Zones (AZs).
+              </li>
+              <li>
+                <hr />
+                <br />
+                <br />
+                <b>Q: What are the 3 cloud computing models?</b> <br />
+                <br />
+                <b>R:</b> <br />
+                - Software as a Service (SaaS) <br />
+                - Infrastructure as a Service (IaaS) <br />
+                - Platform as a Service (PaaS)
+              </li>
+              <li>
+                <hr />
+                <br />
+                <br />
+                <b>Q: Which services can host a MariaDB database?</b> <br />
+                <br />
+                <b>R:</b> EC2 and RDS <br />
+                <b>EXPLANATION:</b> NOT Aurora. Aurora is a relational database compatible with MySQL and PostgreSQL that was created by AWS.
+              </li>
+              <li>
+                <hr />
+                <br />
+                <br />
+                <b>
+                  Q: A company would like to automate the configuration of its servers and deploy code to servers in the cloud and on-premises. Which
+                  service meets the requirement?
+                </b>
+                <br />
+                <br />
+                <b>R:</b> OpsWorks <br />
+                <b>EXPLANATION:</b> NOT CodeDeploy
+              </li>
+              <li>
+                <hr />
+                <br />
+                <br />
+                <b> Q: Which of the following support plans features a < 4-hour response time in the event of an impaired production system? </b>
+                <br />
+                <br />
+                <b>R:</b> Business and Enterprise <br />
+                <b>EXPLANATION:</b> Both the Business and Enterprise support levels offer a < 4-hour response time in the event of an impaired
+                production system.
+              </li>
+              <li>
+                <hr />
+                <br />
+                <br />
+                <b>
+                  Q: A company on the Business Support plan currently runs all their applications in a single Region. They have made the decision to
+                  expand to multiple Regions. What is the process to start deploying their applications to the new Regions?
+                </b>
+                <br />
+                <br />
+                <b>R:</b> Just start deploying the applications to the new Regions. <br />
+                <b>EXPLANATION:</b> You are free to deploy your applications to new Regions. Don't forget: CloudFormation can make the process of
+                provisioning resources easier and repeatable.
+              </li>
+            </ul>
+          </td>
+          <td></td>
         </tr>
       </tbody>
     </table>
