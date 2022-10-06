@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Cloud Practitioner</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      div {
+        margin: 0.2em 0;
+        padding: 0;
+      }
+      table {
+        width: 100%;
+      }
+
+      table,
+      td,
+      tr,
+      th {
+        position: relative;
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+
+      th {
+        padding: 0.8em;
+        text-transform: uppercase;
+        background-color: black;
+        color: white;
+      }
+      tbody > tr:nth-child(odd) {
+        background-color: gray;
+      }
+      tbody > tr:nth-child(even) {
+        background-color: gray;
+        opacity: 0.8;
+      }
+      tbody > tr:hover {
+        background-color: white;
+      }
+      #inputCuenta {
+        width: 30%;
+        margin: 0;
+        padding: 0.5em 0;
+      }
+      #inputDetalle {
+        width: 60%;
+        margin: 0;
+        padding: 0.5em 0;
+      }
+      button {
+        width: 9%;
+        margin: 0;
+        padding: 0.5em 0;
+      }
+      tr > td:first-child {
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: bold;
+        width: 17.5%;
+      }
+      tr > td:last-child {
+        width: 32.5%;
+      }
+      tr > td {
+        padding: 1em;
+      }
+      tr > td > img {
+        width: 100%;
+        object-fit: contain;
+      }
+      ul {
+        margin: 0;
+      }
+      span {
+        padding: 0.5em;
+        font-weight: bold;
+      }
+
+      span:hover {
+        color: white;
+        background-color: black;
+      }
+      .big-image {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        height: 80%;
+        background: white;
+        z-index: 99999;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th>Seccion</th>
+          <th>Conceptos</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="cuentas">
+        <tr>
+          <td>Cloud Computing</td>
+          <td>
+            - Regions are independent geographical areas composed of two or more Availability Zones. You are charged for data transferred between
+            regions.<br />
+            - Availability Zones are composed of one or more discrete data centers with redundant power, networking, and connectivity<br />
+            - Software as a Service (SaaS) = Manage everything and provides you with a client to interact with the service <br />
+            - Platform as a Service (PaaS) = Manage Applications and Data<br />
+            - Pricing Model = Pay as you go<br />
+            - The 3 pricing fundamentals of AWS are Compute, Storage and Data transfer out of the AWS Cloud<br />
+            <b>- AWS Compute Services: </b> EC2, Lightsail, Lambda, Batch, Elastic Beanstalk, Serverless Application Repository, AWS Outposts, EC2
+            Image Builder. <br />
+            <b> - Types of Cloud Computing Deployments:</b>
+            <ul>
+              <li>Public Cloud - AWS, Azure, GCP</li>
+              <li>Hybrid - Mixture of public and private</li>
+              <li>Private Cloud (or On Premise) - you manage it in your datacenter</li>
+            </ul>
+            <b>- Advantages of Cloud Computing:</b>
+            <ul>
+              <li>
+                Trade Capital Expense (CapEx) for variable expense: pay only when you consume resources instead of invest in data centers. No sunk
+                cost.
+              </li>
+              <li>Benefit from massive economies of scale</li>
+              <li>Stop guessing about capacity</li>
+              <li>Increase speed and agility: develop faster and focus only in your code</li>
+              <li>Go global in minutes</li>
+            </ul>
+            <b>- The costumer is responsible for the security IN the cloud: </b> security groups, IAM users, patching EC2 Operating System, patching
+            DBs running in EC2,etc. <br />
+            <b>- AWS is responsible for the security OF the cloud: </b> management of data centers, security cameras, cabling, patching RDS operating
+            system, etc. <br />
+          </td>
+          <td>
+            <img src="../assets/01-shared-responsibility-model.jpg.png" alt="Shared responsibiliity model" />
+          </td>
+        </tr>
+        <tr>
+          <td>IAM - Identity and Access Management</td>
+          <td>
+            A user can belong to one or many groups<br />
+            The policies define the permissions of the user, groups or roles<br />
+            When a policy is attached to an individual user is called an inline policy<br />
+            <br />
+            <b>MFA</b><br />
+            Virtual MFA Device = Google Authenticator o Authy<br />
+            U2F security key = physical USB device<br />
+            <br />
+            <b>How to manage AWS</b><br />
+            AWS Console = UI accesible via web browser<br />
+            AWS SDK = package that allow a programming language to communicate with AWS<br />
+            AWS CLI = You need to install the AWS CLI and it allows you to do everything you can do in the web (AWS console).<br />
+            AWS CloudShell = Is an AWS CLI that you can launch in the web browser (when you are logged in). You can upload and download files to your
+            AWS PowerShell as if you are working in a machine<br />
+            <br />
+            <b>IAM Roles</b><br />
+            They are used to assign permissions to AWS services in order to perform action on your behalf. A role can be used by either an IAM user in
+            the same AWS account as the role or a user in a different AWS account. A role can also be used by a web service that AWS offers; a prime
+            example is Amazon EC2.<br />
+            <br />
+            <b>Identities</b> <br />
+            They are the IAM resource objects that are used to identify and group. You can attach a policy to an IAM identity. These include users,
+            groups, and roles.<br />
+            <br />
+            <b>Entities</b> <br />
+            They are the IAM resource objects that AWS uses for authentication. These include IAM users, federated users, and assumed IAM roles.<br />
+            <br />
+            <b>Principal</b> <br />
+            It is a person or application that uses the AWS account root user, an IAM user, or an IAM role to sign in and make requests to AWS. <br />
+            <br />
+            <b>Security Tools</b><br />
+            IAM Credentials Report (account-level) = a report (excel) that lists all your account's users and the status of their various
+            credentials<br />
+            IAM Access Advisor (user-level) = shows the services permissions granted to a user and when those services were last accessed<br />
+          </td>
+          <td>
+            <img src="../assets/02-iam-users-groups.jpg" alt="User groups" />
+            <hr />
+            <img src="../assets/03-iam-policy.jpg" alt="Policies" />
+            <hr />
+            <span>What includes the Credentials Report</span>
+            <img src="../assets/46.-credentials-report-what includes.png" alt="What includes the Credentials Report" />
+          </td>
+        </tr>
+        <tr>
+          <td>EC2 - Elastic Compute Cloud</td>
+          <td>
+            <b>- Budget: </b> create budget and send alarms when costs (current or forecasted) exceed the budget. Allows you to set a limit to your
+            bill. You can also set actions when the thresholds are exceeded. Budget could be of three types: usage, costs or reservation.<br />
+            <br />
+            - This services is considered Infrastructure as a Service (IaaS). <br />
+            - You can comunicate with an EC2 instance via SSH with your prefered SSH client or with the option "EC2 Instance Connect" in the console
+            (web browser).<br />
+            - The minimum charge for an EC2 instance is 60 seconds <br />
+            <b>- Instance metadata: </b> is data about your instance that you can use to configure or manage the running instance (even
+            programatically). <br />
+            <br />
+            <b>- EC2 user data: </b> instance bootstraping script <br />
+            <br />
+            <b>Amazon Machine Image (AMI)</b><br />
+            docker like images to be run in EC2 instances. The AMI must be in the same region as that of the EC2 instance to be launched. If the AMI
+            exists in a different region, you can copy that AMI to the region where you want to launch the EC2 instance. The region of AMI has no
+            bearing on the performance of the EC2 instance. You can create a new AMI from an existing EC2 instance.<br />
+            <br />
+            - EC2 Image Builder. Is a free service that help you to attach packages, roles and config other options to create a custom AMI.<br />
+            <br />
+            <b>EC2 instance types</b><br />
+            - General porpuse: ideal for web servers. Good balance between compute, memory and networking.<br />
+            - Compute optimized: great for compute-intensive tasks that require high performance processors.<br />
+            - Memory optimized: fast performance for workloads that process large data sets in memory.<br />
+            <br />
+            <b>Security groups</b><br />
+            - It is (kind of) a firewall that can be attached to any EC2 instance.<br />
+            - It controls how traffic is allowed into or out of our EC2 instances. Can only contain ALLOW rules.<br />
+            - You can attach several security groups to an EC2 instance.<br />
+            - By default a security group deny any inbound traffick and allow any outbound traffic.<br />
+            <br />
+            <b>EC2 Purchasing options/Launch types</b><br />
+            <b>- On-Demand: </b> pay as you go<br />
+            <b>- Reserved: </b> (up to 70% discount) you commit to use the instance for one or three years with no, partial or all upfront payment:
+            <ul>
+              <li>Standard: you cannot change the type of instance</li>
+              <li>Convertible: you can change the type of instance</li>
+              <li>
+                Scheduled: you reserved only a specific period of the day, week or month. This is not a valid response on the exam. AWS currently has
+                this messages in its web: "You cannot purchase Scheduled Reserved Instances at this time".
+              </li>
+            </ul>
+            <b>- Spot: </b> the most cost-efficient (up to 90% discount). They use available resources of other instances thus they can be destroyed
+            without prior notification.<br />
+            <b>- Dedicated Instance: </b>hardware dedicated to your use but you don't have control over instance placement.<br />
+            <b>- Dedicated Host: </b>physical server fully dedicated to your use. You need to commit for a 3 years period. Any question that talks
+            about special licensing requirements refers to this instance type.<br />
+            <br />
+          </td>
+          <td>
+            <img src="../assets/04-EC2-instance-types.png" alt="EC2 instance types" />
+            <hr />
+            <img src="../assets/05-ec2-purchasing-options.png" alt="EC2 purchase options" />
+            <hr />
+            <img src="../assets/47.-EC2-instance-types-table.png" alt="EC2 instance types table" />
+            <hr />
+            <img src="../assets/48.-EC2-instance-types-Mnemonic.png" alt="EC2 instance types Mnemonic" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <script>
+      const imgNodeList = document.querySelectorAll('img')
+
+      Array.from(imgNodeList).forEach(function (imgNode) {
+        imgNode.addEventListener('click', toggleBigImage)
+      })
+
+      function toggleBigImage(e) {
+        e.target.classList.toggle('big-image')
+      }
+    </script>
+  </body>
+</html>
