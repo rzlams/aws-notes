@@ -255,9 +255,20 @@
           <td>
             <b>EBS - Elastic Block Storage</b><br />
             - Is a network drive you can attach to your instances while they run (might be a bit of latency)<br />
+            - The first EBS volumen attached to an EC2 instance is considered a root volume and its default behaviour is to be deleted on EC2 instance
+            termination. If you have more tha one EBS volume attached t the same instance the default behaviour (delete volume) is only applied to the
+            root volume. <br />
             - Is a recommended storage option when you run databases on an instance <br />
             - Can be attached to only one EC2 instance at a time but one instance can have several EBS volumes attached<br />
-            - Only work in one availability zone. You can create a snapshot to migrate a volume from one AC to another<br />
+            - Only work in one availability zone. You can create a snapshot to migrate a volume from one AZ to another<br />
+            - About volume type: gp2 and gp3 are general porpuse volumes. io1 and io2 are great for operations that needs high I/O operations per
+            second. HDD is good if you are looking for a cheaper solution and the performance is not your main concern. <br />
+            - Only EBS volume types gp2, gp3, io1 and io2 can be used as boot volumes <br />
+            - Multi-attach: an io1 or io2 EBS volume can be attached to multiple instances in the same AZ. Can attach up to 16 instances at a time.
+            Must use a filesystem that is cluster aware<br />
+            - gp2 and gp3 increase its I/O when storage size is increased. io1 and io2 increase its I/O independently. <br />
+            - You can create an encrypted EBS volume (all the encryption is handled by AWS leveraging KMS keys) which means encryption of data inside
+            the volume, all data in-flight between volume and instance, snapshot and volumes created from an ecrypted snapshot. <br />
             - Amazon EBS Snapshots are a point in time copy of your block data. For the first snapshot of a volume, Amazon EBS saves a full copy of
             your data to Amazon S3. EBS Snapshots are stored incrementally, which means you are billed only for the changed blocks stored. <br />
             <br />
@@ -266,10 +277,11 @@
             <br />
             <b>EFS - Elastic File System</b><br />
             - Is an elastic file system for Linux-based workloads <br />
+            - No upfront payments. You pay for the amount of data (per GB) that you use <br />
             - Can be mounted in hundreds of EC2 instances even if they belong to multiple AZs.<br />
             - Can be directly used with on-premises systems. <br />
-            - Offers high availability, scalability but at a higher cost. EC2 instances can access files on an EFS file system across many
-            Availability Zones, Regions and VPCs<br />
+            - Offers high availability, scalability but at a higher cost (3x expensive than EBS gp2). EC2 instances can access files on an EFS file
+            system across many Availability Zones, Regions and VPCs<br />
             - It has an Infrequent Access storage Class that is cost-optimized for files accessed less frequently. Data stored on the Infrequent
             Access storage class costs less than Standard and you will pay a fee each time you read from or write to a file. <br />
             <br />
@@ -279,8 +291,17 @@
             can scale to hundreds of GB/s.
           </td>
           <td>
+            <span>EBS snapshot features</span>
+            <img src="../assets/61.-ebs-snapshot-features.png" alt="EBS snapshot features" />
+            <hr />
             <span>EBS drive type</span>
             <img src="../assets/49.-EBS-drive-types.png" alt="EBS drive type" />
+            <hr />
+            <span>EFS storage classes</span>
+            <img src="../assets/62.-efs-storage-classes.png" alt="EFS storage classes" />
+            <hr />
+            <span>EFS performance classes</span>
+            <img src="../assets/63.-efs-performance-classes.png" alt="EFS performance classes" />
             <hr />
             <img src="../assets/06-EC2-storage.png" alt="EC2 purchase options" />
           </td>
