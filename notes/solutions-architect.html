@@ -748,6 +748,115 @@
             <img src="../assets/76.-route53-geoproximity-routing-policy.png" alt="Geoproximity routing policy" />
           </td>
         </tr>
+        <tr>
+          <td>Classic Solutions Architecture Discussions</td>
+          <td>
+            <b>- WhatIsTheTime.com (stateless app)</b> The idea here is to describe the way that an application could change when the requirements
+            changes. It starts as a small app an scale to a mature architecture step by step guided by the users demand<br />
+            - Starts with a t2.micro EC2 instance wiht an elastic IP in case case that we need to restart the EC2 instance and preserve the same
+            public IP <br />
+            - Then our app is getting more traffic <br />
+            - We make our EC2 instance an m5.large (vertical scale). We need to terminate the instance an create a new one with the new type,
+            therefore we experience a downtime while upgrading the instance <br />
+            - Then the app become really popular and we decide to scale horizontally. Let's say 3 EC2 instances with their own elastic IP attached.
+            Support the current traffic but it's hard to continue scaling <br />
+            - We decided to change the elastic IP approach adding a domain for our app and routing the traffic with Route53 (A record with TTL of 1
+            hour <br />
+            - We have the problem that when one of our instances is not available the clients still try to get to the instance beacause of the TTl of
+            1 hour. <br />
+            - To solve the issue we decide to group all the instances in a single AZ with a security group (private) that is only accesible by a load
+            balancer + health checks thta we also add for this purpose <br />
+            - Then we found out that add and remove instances manually is really hard. To deal with this, we decide to add an auto-scaling group
+            <br />
+            - We fear that our app will be down due to a disaster. Therefore, we decide to move our instances to different AZs with a multi-AZ load
+            balancer <br />
+            - After some time running the app in production, we notice that most of the time we can operate with just 2 EC2 instances up. This lead us
+            to change the type of two instances to reserved instance for cost savings <br />
+            <br />
+            <b>- MyClothes.com (stateful app)</b> It's basically a shopping cart where users have their details. The goal is to scale the app keeping
+            it as stateless as possible <br />
+            - The architecture of the app includes several EC2 instances with an auto-scaling group fronted by a load balancer <br />
+            - The users have the problem that their data is lost on each request beacause the state is managed by instance and the load balancer route
+            the request to different EC2 instances <br />
+            - The first proposed solution for this issue was to use sticky sessions (session affinity) on the load balancer. This approach solve th
+            issue until an EC2 instance is terminated <br />
+            - In order to address this last problem, we decide to go one step further and manage all the cart info with cookies, so the client always
+            has the info available a sends it to our backend on each request. This way our app is stateless but as the cart grows the requests become
+            heavier
+            <br />
+            - We need a way to take off the load of the cart data on the client side and therefore manage this info in the backend. We decide to
+            establish server sessions with cookies and leveraging a cache (ElastiCache) where we keep up to date the cart data for each user. See
+            Image <br />
+            - The last solutions works great so we decide to change the storage to something more robust like an RDS <br />
+            - Then the traffic to our apps increase a lot, because of that we set a couple of read replicas <br />
+            - We also consider a "write through" approach with a cache (hit the cache at first, if the cache has an entry it returns the info but if
+            not the query goes to the RDS and update the info in the cache) but it has the downside of maintaining the cache which is always hard
+            <br />
+            - Afterward, we decide that we need to be ready for a disaster in our current AZ, and that's why we setup a multi-AZ load balancer <br />
+            - Our last concern was the security. We decided to improve the cnfigurations of our security group so they can only allow connections from
+            one party. EC2 instances only allows traffic from the load balancer and the ElastiCache and RDS instances only allow traffic from/to the
+            EC2 instances <br />
+            <br />
+            <b>- MyWordPress.com</b> The conclusion for this case is that EBS volumes are great for a single instanc but they don't scale very wel.
+            For distributed application (our EC2 instances behind a load balancer) is a better option an EFS with an ENI configured in each EC2
+            instance to point to our EFS storage <br />
+            <br />
+            <b>- Instantiating Applications Quickly:</b> this can be achieved with a combination of a Golden AMI and EC2 User Data (the script that
+            runs on intance bootstrap). When it comes to databases and EBS volumes, the best approach is to restore from a snapshot. <br />
+            <b>- Golden AMI: </b> is an AMI that you standardize through configuration, consistent security patching, and hardening. It also contains
+            agents you approve for logging, security, performance monitoring, etc. <br />
+            <br />
+            <b>Elastic Beanstalk:</b> it's a managed service that uses different resources (EC2, ASG, ELB, RDS, etc) to deploy an application handling
+            automatically capacity provisioning, load balancing, scaling, application health monitoring, etc. With Elastic Beanstalk just the
+            application code is the responsibility of the developer. Beanstalk is free, you only pay for the underlying resources it provision. Behind
+            the scenes it leverages CLoudFormation to create a stack for your application
+          </td>
+          <td>
+            <span>ElastiCache Solution</span>
+            <img src="../assets/77.-my-clothes-case-cache.png" alt="ElastiCache Solution" />
+            <hr />
+            <span>Beanstalk Components</span>
+            <img src="../assets/78.-beanstalk-components.png" alt="Beanstalk Components" />
+            <hr />
+            <span>Beanstalk Webserver Tier vs Worker Tier</span>
+            <img src="../assets/79.-beanstalk-webserver-tier-vs-worker-tier.png" alt="Beanstalk Webserver Tier vs Worker Tier" />
+          </td>
+        </tr>
+        <tr>
+          <td>Amazon S3</td>
+          <td>
+            - The bucket's name must be globally unique. The naming convention comprehends: no uppercase, no undescore, 3-63 characters long and not
+            an IP address. <br />
+            - S3 is a globla service but the buckets are defined at the region level <br />
+            - The buckets are private by default. You need you make it publicly accesible attaching it a policy (that can be created with the Policy
+            Generator). <br />
+            - The objects has some limits: max size of 5TB. Must be a "multi-part upload" if uploading more than 5GB <br />
+            - Each object has metadata, a list of text key/vaue pairs with system or user metadata. The objects can also have up to 10 tags (that can
+            be used to manage security or lifecycle) and a verdion id (if versioning is enabled). <br />
+            - S3 versioning: allows you to maintain a history of the files stored in S3, so you can rollback any unintended change. Any file that is
+            not versioned prior to enabling versionnig will have version "null". <br />
+            - S3 cross / same region replication (CRR/SRR): must give proper IAM permissions and enable versioning in order to use this S3 feature
+            (the version IDs are replicated). It basically replicates the data from one S3 bucket into another bucket that can even be in a different
+            account. Copying is asynchronous. It's worth mentioning that files that already exist in the bucket before enabling the replication aren't
+            going to be copied to the new bucket. To replicate existing objects you can use S3 Batch Replication (the console gives you the option
+            when enabling replication). The replication feature has no "chaining" of replication; it means that if bucket 1 is replicated into bucket
+            2, which has replication into bucket 3, then object created in bucket 1 are not replicated in bucket 3. If you want to restore an
+            versioned object you can do so deleting the "delete marker" version, by defualt the delete markers are not replicated but you can enable
+            the delete markers to be replicated (this doesn't apply to a permanent delete of an object)<br />
+            - Amazon S3 security options:
+            <ul>
+              <li>IAM policies (user-based): which API calls should be allowed for a specific user from IAM</li>
+              <li>Bucket Policies: bucket wide rules. Allowe cross-account rules</li>
+              <li>Object Access Control List (ACL): finer grain control (can be disabled)</li>
+              <li>Bucket Access Control List (ACL): less common (can be disabled)</li>
+              <li>Encryption: encrypt the objects using encryption keys</li>
+            </ul>
+          </td>
+          <td>
+            <span>S3 Bucket Policy</span>
+            <img src="../assets/80.-s3-bucket-policy.png" alt="S3 Bucket Policy" />
+          </td>
+        </tr>
       </tbody>
     </table>
     <script>
