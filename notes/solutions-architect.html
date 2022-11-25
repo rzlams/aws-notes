@@ -825,6 +825,9 @@
         <tr>
           <td>Amazon S3</td>
           <td>
+            - Durability: represents how many times an object is going to be lost. S3 has a very hiygh durability 99,99999999999% (eleven 9s). It
+            means that if you store 10.000.000 objects in amazon S3 you loss (on average) 1 object in 10.000 years <br />
+            - Availability: measures how ready a service is for respond to requests. In S3 the availability varies depending on storage class <br />
             - The bucket's name must be globally unique. The naming convention comprehends: no uppercase, no undescore, 3-63 characters long and not
             an IP address. <br />
             - S3 is a globla service but the buckets are defined at the region level <br />
@@ -846,15 +849,235 @@
             - Amazon S3 security options:
             <ul>
               <li>IAM policies (user-based): which API calls should be allowed for a specific user from IAM</li>
-              <li>Bucket Policies: bucket wide rules. Allowe cross-account rules</li>
+              <li>
+                Bucket Policies: bucket wide rules. Allow cross-account rules. Explicit DENY in an IAM Policy will take precedence over an S3 bucket
+                policy.
+              </li>
               <li>Object Access Control List (ACL): finer grain control (can be disabled)</li>
               <li>Bucket Access Control List (ACL): less common (can be disabled)</li>
               <li>Encryption: encrypt the objects using encryption keys</li>
+            </ul>
+            - S3 storage classes:
+            <ul>
+              <li>
+                General porpuse: used for frequently accesed data (offers low latency and high throughput). Can sustain two concurrent facility
+                failures (99,99% availability)
+              </li>
+              <li>
+                Infrequent Access: used for data that is less frequentlly accesed but requires rapid access when needed. There two types of IA
+                storage: <br />
+                - Standard-IA: 99,9% availability. Good for disaster recovery and backups. <br />
+                - One Zone-IA: 99,5% availability. Stored in only one AZ so the data is lost when the AZ is destroyed (earthquake, etc)
+              </li>
+              <li>
+                - Glacier: low-cost object storage meant for archiving/backup. Pricing is calculated for storage + object retrieval cost. Within this
+                storage class AWS offers three tiers: <br />
+                - Instant Retrieval: milisecond retrieval, great for data accesed once a quarter. Minimum storage duration is 90 days<br />
+                - Flexible Retrieval: this tier offers three retrieval types. Expedited (1 to 5 minutes), Standard (3 to 5 hours) and Bulk(5 to 12
+                hours). Minimum storage duration is 90 days<br />
+                - Deep Archive: his tier offers two retrieval types. Standar(12 hours), and Bulk (48 hours - the retrieval of these objects is free).
+                Minimum storage duration is 180 days
+              </li>
+              <li>
+                Inteligent Tiering: has an small monthly monitoring and auto-tiering fee. Moves objects automatically between access tiers based on
+                usage. See image for default config.
+              </li>
             </ul>
           </td>
           <td>
             <span>S3 Bucket Policy</span>
             <img src="../assets/80.-s3-bucket-policy.png" alt="S3 Bucket Policy" />
+            <hr />
+            <span>S3 Inteligent Tiering</span>
+            <img src="../assets/81.-s3-inteligent-tiering.png" alt="S3 Inteligent Tiering" />
+            <hr />
+            <span>S3 Storage Classes Comparison</span>
+            <img src="../assets/82.-s3-storage-classes-comparison.png" alt="S3 Storage Classes Comparison" />
+          </td>
+        </tr>
+        <tr>
+          <td>AWS SDK, IAM Roles and Policies</td>
+          <td>
+            <b>IAM Roles and Policies</b> <br />
+            - The way of read a policy statement is the following: The "principal" is Allow/Deny ("effect") to perform the specified "action" on the
+            specified "resource" <br />
+            - You can create a policy with the help of the AWS Policy Generator. https://awspolicygen.s3.amazonaws.com/policygen.html <br />
+            - You can attach an existing policy or create a new one. <br />
+            - When it comes to Roles and Users, you can attach inline policies unless is a better solution to declare the policy globally an then
+            attach it to the entity (Role or User). <br />
+            - AWS Policy Simulator: you can test and troubleshoot identity-based policies, IAM permissions boundaries, Organizations service control
+            policies (SCPs), and resource-based policies <br />
+            - EC2 instance metadata: it's possible to make an API request from, and only from, an EC2 instance to know their metadata. It can be done
+            requesting the url http://169.254.169.254/latest/meta-data. It works as if you are navigating a folders structure, the results you receive
+            from the request can have a forward slash at the end, meaning that have more info inside it (kindof a folder). You can retrieve the IAM
+            Role name from the metadata, but you cannot retrieve the IAM Policy <br />
+            <br />
+            <b>AWS SDK:</b> <br />
+            - We have to use an SDK when coding against AWS Services such as DynamoDB <br />
+            - Fun fact... The AWS CLI uses the Python SDK (Boto3) <br />
+            - If you don't specify or configure a default region when using an SDK, then us-east-1 will be chosen by default
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>S3 Advanced</td>
+          <td>
+            <b>Lifecycle Rules</b> <br />
+            Is a set of rules that define actions that Amazon S3 applies to a group of objects, so that they are stored cost effectively throughout
+            their lifecycle. A good first step to put together or improve lifecycle rules is the S3 analytics, it helps you decide when transition
+            objects to the right storage class, the report is update daily (24 to 48 hours to start seeing data analysis) with recommendations for
+            Standard and Standard-IA (does NOT work for One Zone-IA or Glacier). There are two types of action for lifecycle rules:
+            <ul>
+              <li>
+                Transition actions: these actions define when objects transition to another storage class. For example, you might choose to transition
+                objects to the S3 Standard-IA storage class 30 days after creating them, or archive objects to the S3 Glacier Flexible Retrieval
+                storage class one year after creating them.
+              </li>
+              <li>Expiration actions: these actions define when objects expire. Amazon S3 deletes expired objects on your behalf.</li>
+            </ul>
+            <br />
+            <b>S3 Requester Pays</b> <br />
+            In genral, bucket owners pay for all Amazon S3 storage and data transfer cost associated with their bucket. With requester pays buckets,
+            the requester instead of the owner pays the cost of the request and the data download from the bucket. Helpful when you want to share
+            large datasets with other accounts. The requester must be authenticated in AWS (cannot be anonymous) <br />
+            <br />
+            <b>S3 Event Notification</b> <br />
+            You can use the Amazon S3 Event Notifications feature to receive notifications when certain events happen in your S3 bucket (e.g.
+            S3:ObjectCreated). This feature allows name (or path) filtering. You canc reate as many notifications as desired. The notification is
+            tipically delivered within seconds but can sometimes take a minute or longer. The destination for the notifications can be SNS, SQS o
+            Lambda. There is another destination option which is EventBridge. <br />
+            <br />
+            <b>S3 Performance (see images)</b> <br />
+            <br />
+            <b>S3 Select and Glacier Select</b> <br />
+            Amazon S3 Select le permite utilizar instrucciones de lenguaje de consulta estructurada (SQL) simples para filtrar el contenido de los
+            objetos de Amazon S3 y recuperar exactamente el subconjunto de datos que necesita (up to 400% faster and 80% cheaper). Si utiliza Amazon
+            S3 Select para filtrar estos datos, puede reducir la cantidad de datos que Amazon S3 transfiere, lo que reduce también los costos y la
+            latencia para recuperarlos. <br />
+            Amazon S3 Select funciona con objetos almacenados en formato CSV, JSON o Apache Parquet. También funciona con objetos comprimidos con GZIP
+            o BZIP2 (solo para objetos CSV y JSON), así como con objetos cifrados del lado del servidor. Puede especificar el formato de los
+            resultados como CSV o JSON, y también puede determinar cómo se delimitan los registros en los resultados. <br />
+            <br />
+            <b>Amazon S3 Inventory</b> <br />
+            It's one of the tools Amazon S3 provides to help manage your storage. You can use it to audit and report on the replication and encryption
+            status of your objects for business, compliance, and regulatory needs. Amazon S3 Inventory does not use the List API to audit your objects
+            and does not affect the request rate of your bucket. Amazon S3 Inventory provides comma-separated values (CSV), Apache optimized row
+            columnar (ORC) or Apache Parquet output files that list your objects and their corresponding metadata on a daily or weekly basis for an S3
+            bucket or a shared prefix (that is, objects that have names that begin with a common string). You can configure multiple inventory lists
+            for a bucket and what metadata to include in each one <br />
+            <br />
+            <b>S3 Batch Operations</b> <br />
+            Perform bulk operations on existing S3 objects with a single request. You can do any kind of operation (modify object metadata or
+            properties, encrypt/unencrypt objects, invoke lambda functions to perform custom actions on each object, etc) on a list of objects. A job
+            consist of a list of objects, the action to perform, and optional parameters. S3 batch operations manages retries, tracks progress, sends
+            completion notifications, geenrate reports, etc. You can use S3 Inventory to get object list and use S3 Select to filter your objects
+          </td>
+          <td>
+            <span>S3 Lifecycle Rules - Example 1</span>
+            <img src="../assets/83.-s3-lifecycle-rule-example-1.png" alt="S3 Lifecycle Rules - Example 1" />
+            <hr />
+            <span>S3 Lifecycle Rules - Example 2</span>
+            <img src="../assets/84.-s3-lifecycle-rule-example-2.png" alt="S3 Lifecycle Rules - Example 2" />
+            <hr />
+            <span>S3 Baseline Performance</span>
+            <img src="../assets/85.-s3-baseline-performance.png" alt="S3 Baseline Performance" />
+            <hr />
+            <span>S3 Performance Optimizations</span>
+            <img src="../assets/86.-s3-performance-optimizations.png" alt="S3 Performance Optimizations" />
+            <hr />
+            <span>S3 byte-range fetches</span>
+            <img src="../assets/87.-s3-byte-range-fetches.png" alt="S3 byte-range fetches" />
+          </td>
+        </tr>
+        <tr>
+          <td>S3 Security</td>
+          <td>
+            <b>Object Encryption:</b> <br />
+            Encryption in transit (SSL/TLS): S3 exposes two methods, HTTP (unencrypted) and HTTPS (encryption in flight). Of course HTTPS is
+            recommended. One way to force encryption is to use a bucket policy and refuse ay API call to PUT an S3 object without ecnryption. Another
+            way to force encryption is to use the default encryption optio in S3. Bucket policies are evaluated before default encryption, so if you
+            set both your request is going to be denied because the default encryption will never be reached<br />
+            You can encrypt objects in S3 buckets using one of 4 methods:
+            <ul>
+              <li>
+                SSE-S3: encryption using keys handled, managed, and owned by AWS. Object is encrypted server-side. Encryption type is AES-256. Must
+                set header "x-amz-server-side-encryption":"AES256" to request S3 to encrypt the object with AES256 mechanism
+              </li>
+              <li>
+                SSE-KMS: encryption keys handled and managed by AWS KMS (Key Managemet Service). Two of the main KMS advantages are user control and
+                the ability to audit key usage using CloudTrail. You have full control over the rotation policy of the encryption key. Object is
+                encrypted server side. Must set header "x-amz-server-side-encryption":"aws:kms" to request S3 to encrypt the object with KMS
+                mechanism. Using KMS you may be impacted by the KMS limits. When you upload (call GenerateDataKey KMS API) or download (call Decrypt
+                KMS key) an object, the requests to KMS count toward the KSM quota per second (5.500, 10.000 or 30.000 req/s based on region) which
+                can throws an throttle exception
+              </li>
+              <li>
+                SSE-C: encryption using keys fully managed by the customer outside of AWS. AWS does NOT store the encryption key you provide. HTTPS
+                must be used because the encryption key must be sent in HTTP headers for every request. HTTPS is mandatory for SSE-C
+              </li>
+              <li>
+                Client Side Encryption: use client libraries such as Amazon S3 Client-Side Encryption Library. Clients must encrypt data themselves
+                before sending to S3 and decrypt data themselves when retrieve data from S3. The customer fully manages the keys and encryption cycle
+              </li>
+            </ul>
+            <br />
+            <b>MFA Delete:</b> <br />
+            The multi factor authentication forces user to generate a code on a device before doing important operations. MFA will be required to
+            permanently delete an object version or suspend versionig on the bucket, but it won't be required to less critical actions like enable
+            versioning or list deleted versions. To use MFA Delete, versioning must be enabled on the bucket. In the AWS console the enabled/diabled
+            indicator for MFA Delte is in the Bucket versioning section. Only the bucket owner (root account) can enable/disable MFA Delete.
+            Currently, the MFA Delete for S3 can only be enabled via AWS CLI. <br />
+            <br />
+            <b>S3 Access Logs (Server Access Logging):</b> <br />
+            For audit porpuses, you may want to log all access to your S3 bucket. Any request made to S3, from any account, authorized or denied, will
+            be logged into another S3 bucket. The data can be analyzed using data analysis tolls such as Amazon Athena, The target logging bucket must
+            be in the same AWS region. The logging bucket must be a different bucket, if you set the same bucket as loggin bucket you create an
+            infinite loop <br />
+            <br />
+            <b>S3 Presigned url:</b> <br />
+            A presigned url can be generated using the S3 Console, AWS CLI or SDK. Users given a pre-signed url inherit the permissions of the user
+            that generated the URL for GET / PUT. The url expiration varies denpending on where you create it: S3 Console (1 minute up to 720 minutes
+            - 12 hours), and for AWS CLI or an SDK (1 minute up to 604.800 seconds - 168 hours - default 3600 seconds) <br />
+            <br />
+            <b>S3 Glacier Vault:</b> <br />
+            Adopt a WORM model (Write Once Read Many). To activate it you need to create a Vault Lock Policy and then lock the policy itself (can no
+            longer be changed or deleted). Helpful for compliance and data retention <br />
+            <br />
+            <b>S3 Object Lock:</b> <br />
+            Versioning must be enabled. Adopt a WORM model (Write Once Read Many) but this time you don't need to lock a policy. It block a single
+            object version deletion for a specified amount of time. You need to set a retention period that specify the amoun of time that you protect
+            an object (it can be extended). There are two retention modes:
+            <ul>
+              <li>
+                Compliance: object versions can't be overwritten or deleted by any user, including the root user. Object retentions mode can't be
+                changed and retention periods can't be shortened
+              </li>
+              <li>
+                Governance: most users can't overwrite or delete an object version or alter its lock settings. Some users have special permissions
+                (given through IAM) to change the retention or deleete the object
+              </li>
+              <li>
+                Legal Hold: protect the object indefenitely, regardless of the retention mode you choose (independent from the retention mode). Can be
+                freely placed and removed using the s3:PuObjectLegalHold IAM permission
+              </li>
+            </ul>
+            <br />
+            <b>S3 Access Point (see image):</b> it'a layer that you configure on top of your S3 bucket to manage access to the specified prefixes
+            <br />
+            <br />
+            <b>S3 Object Lambda:</b> <br />
+            Use AWS Lambda Functions to change the object before it is rettrieved by the caller application. Only one S3 bucket is needed, on top of
+            which we create S3 Access Point and S3 Object lambda Access Point
+          </td>
+          <td>
+            <span>S3 Access Point</span>
+            <img src="../assets/88.-s3-access-point.png" alt="S3 Access Point" />
+            <br />
+            <span>S3 Access Point</span>
+            <img src="../assets/88.-s3-access-point.png" alt="S3 Access Point" />
+            <br />
+            <span>S3 Object Lambda</span>
+            <img src="../assets/89.-s3-object-lambda.png" alt="S3 Object Lambda" />
           </td>
         </tr>
       </tbody>
