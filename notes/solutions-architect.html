@@ -1080,6 +1080,293 @@
             <img src="../assets/89.-s3-object-lambda.png" alt="S3 Object Lambda" />
           </td>
         </tr>
+        <tr>
+          <td>CloudFront & AWS Global Accelerator</td>
+          <td>
+            <b>CloudFront</b> <br />
+            - It's a Content Delivery Network (CDN) <br />
+            - Improves read performance, content is cached at the edge. Improves users experience. <br />
+            - The CDN is made of 216 points of presence (edges locations) globally <br />
+            - Offers DDoS protection leveraging AWS Shield and AWS Application Firewall <br />
+            - You can use CloudFront in front of:
+            <ul>
+              <li>
+                <b>S3 Bucket</b>
+                <ul>
+                  <li>For distributing files and caching them at the edge</li>
+                  <li>Enhanced security with CloudFront Origin Access Control (OAC). OAC is replacing Origin Access Identity (OAI)</li>
+                  <li>CloundFront can be used as an ingress (to upload files to S3)</li>
+                </ul>
+              </li>
+              <li>
+                <b>Custom Endpoint (HTTP)</b>
+                <ul>
+                  <li>Application Load Balance</li>
+                  <li>EC2 Instance</li>
+                  <li>S3 Website</li>
+                  <li>Any HTTP backend you want</li>
+                </ul>
+              </li>
+            </ul>
+            - EC2 as an origin: EC2 instances must be public because there is no connectivity from a CloudFront distribution to a VPC. We also need to
+            allow all the CloudFront IPs in the security groups <br />
+            - ALB as an origin: with this pattern the EC2 instances can be private because the ALB has connectivity to a private VPC but the ALB must
+            be public and allow the CloudFront IPs in its security group <br />
+            - CloudFront Geo Restriction: you can restrict who can access your distribution by creating a list of countries to allows o deny access.
+            The list can be an allowlist (whitelist) or a blocklist (blacklist). The country of the client is determined using a 3rd party Geo-IP
+            database <br />
+            - CloudFront Prices Classes: the cost of data outs per edge zone can vary. You can reduce the number of edge location of your distribution
+            for cost reduction and this can be done with price classes:
+            <ul>
+              <li><b>Price Class All: </b>all regions - best performance</li>
+              <li><b>Price Class 200: </b>most regions, but excludes the most expensive regions</li>
+              <li><b>Price Class 100: </b>only the least expensive regions</li>
+            </ul>
+            - CloudFront Cache Invalidation: in case you update the backend origin, CloudFront doesn't now about it and will only get the refreshed
+            content after the TTL has expired. However, you can force an entire or partial cache refresh (thus bypassing the TTL) by performing a
+            lLoudFront Invalidation. You can invalidate all files (*) or a specific path (images/*)<br />
+            <br />
+            <b>AWS Global Accelerator</b> <br />
+            - Unicast IP: one server holds one IP address. <br />
+            - Anycast IP: all the servers hold the same IP address and the client is routed to the nearest one. <br />
+            - AWS Global Accelerator uses anycast IP. It leverage the AWS global network (via edge locations) to route your application. <br />
+            - When you enable AWS Global Accelerator, 2 Anycat IPs are created for your application. Anycast IP will send the traffic to directly to
+            the closest edge location of your users, then the edge locations sends the traffic to your application. <br />
+            - It allow "client affinity" that is a kind of sticky session <br />
+            - Offers support for health checks <br />
+            - Support 4 enpoint types: Application Load Balancer, Network Load Balancer, EC2 instance and Elastic IP address. <br />
+            - You can assign a weight for each endpoint (a number from 0 to 255)
+          </td>
+          <td>
+            <span>CloudFront</span>
+            <img src="../assets/90.-cloudfront.png" alt="CloudFront" />
+            <br />
+            <span>CloudFront vs S3 Cross Region Replication</span>
+            <img src="../assets/91.-cloudfront-vs-S3-CRR.png" alt="CloudFront vs S3 Cross Region Replication" />
+            <br />
+            <span>CloudFront Price Classes</span>
+            <img src="../assets/92.-cloudfront-price-class.png" alt="CloudFront Price Classes" />
+            <br />
+            <span>AWS Global Accelerator Pros</span>
+            <img src="../assets/93.-global-accelerator-pros.png" alt="AWS Global Accelerator Pros" />
+            <br />
+            <span>CloudFront vs AWS Global Accelerator</span>
+            <img src="../assets/94.-cloudfront-vs-global-accelerator-pros.png" alt="CloudFront vs AWS Global Accelerator" />
+          </td>
+        </tr>
+        <tr>
+          <td>AWS Storage Extras</td>
+          <td>
+            <b>AWS Snow Family</b> <br />
+            - The rule of thumb for this services is: if it takes more than a week to transfer over the network, use SnowB Devices (Offline devices to
+            perform data migrations) <br />
+            - Highly-secure, portable devices to collect and process data at the edge, and migrate data into and out of AWS <br />
+            - The client request the device. AWS deliver the device to the client's facility and then he shipped back the device <br />
+            - All the Snow devices can run EC2 instances and AWS Lambdas functions (using AWS IoT Greengrass). Useful for edge computing <br />
+            - Offer long-term deployment options. 1 or 3 years discounted pricing <br />
+            - To apply for a Snow Family device you must create a "job" (could be to import to S3, export from S3 or for local compute and storage).
+            You need to add your shipping preferences, choose the type of device you need, security preferences (create service roles, enable
+            encryption, etc) and notification preferences (sns topic to receive emails about the status of your job) <br />
+            - Snow devices cannot import directly into S3 Glacier. You must use an S3 first, in combination with an S3 lifecyvle policy <br />
+            - AWS OpsHub: historically to use Snow Family devices you needed a CLI. For these cases you can use AWS OpsHub (a software to install on
+            your computer/laptop) to manage your Snow Family devices. It helps you with: unlocking and configuring single or clustered devices,
+            transfering files, launching and managing instances running on Snow Family devices, monitor device metrics (storage capacity, active
+            instances on your device), launch compatible AWS services on your devices (ex: EC2 instances, AWS DataSync, Network File System - NFS,
+            etc) <br />
+            - The following are the types of devices that AWS Snow Family offers:
+            <ul>
+              <li>
+                <b>SnowCone:</b> 2CPUs, 4GB of memory (RAM), wired or wireless access, USB-C power using cord or the optional battery. recommended for
+                use cases that needs up to 24 TB (online or offline). Smaller than SnowBall Edge (just 4.5 pounds or 2.1Kg). Small, portable
+                computing, anywhere, rugged and secure, withstands harsh environments. Device used for edge computing, storage, and data transfer. 8TB
+                of usable storage. Must provide your own battery and cables. Can be sent back to AWS offline, or connect it to internet and use AWS
+                DataSync (pre-installed) to send data.
+              </li>
+              <li>
+                <b>SnowBall Edge:</b> physical data transfer solution. Mover Tbs or PBs of data in or out of AWS. It's an alternative to moving data
+                over the network. You pay per data transfer job. Provide block storage and Amazon S3-compatible object storage. With this device you
+                can possibly process the data while it's in transit. It comes in two flavours:
+                <ul>
+                  <li>
+                    <b>SnowBall Edge Storage Optimized:</b> up to 40 vCPUs, 80 GiB of RAM, 80TB of HDD capacity for block volume and S3 compatible
+                    object storage
+                  </li>
+                  <li>
+                    <b>SnowBall Edge Compute Optimized:</b> 52 vCPUs, 208 GiB of RAM, 42TB of HDD capacity for block volume and S3 compatible object
+                    storage
+                  </li>
+                  <li><b>SnowBall Edge Compute Optimized With GPU:</b> useful for video processing or machine learning</li>
+                </ul>
+              </li>
+              <li>
+                <b>SnowMobile: </b> better option if you are trying to transfer more than 10PB. It's an actual truck used to transfer exabytes of data
+                (1EB = 1.000PB = 1.000.000TB). Each SnowMobile (truck) has 100PB of capacity and you can use several of them in parallel. Offer high
+                security, temperature controlled, GPS monitoring, 24/7 video surveillance
+              </li>
+            </ul>
+            <br />
+            <b>Amazon FSx</b> <br />
+            - It's a fully managed services for launch 3rd party high performance file systems on AWS. <br />
+            - You can choose the throughput per unit of storage, encryption, logging options, and backup and maintenance options when creating an FSx
+            resource <br />
+            - FSx deployment options:
+            <ul>
+              <li>
+                <b>Scratch File System:</b> temporary storage where data is not replicated (doesn't persist if file server fails. It support high
+                burst (6x faster, 200MBps per TiB)
+              </li>
+              <li><b>Persistent File System:</b> long term storage. Data is replicated within same AZ. Replace failed files within minutes</li>
+            </ul>
+            - The following are the FSx types:
+            <ul>
+              <li>
+                <b>FSx for Windows (File Server):</b> <br />
+                - It's a fully managed windows file system share drive <br />
+                - Support SMB protocol and windows NFTS <br />
+                - Support integration with Microsoft Active Directory (useful to manage ACLs and user quotas) <br />
+                - Can be mounted on linux EC2 instances <br />
+                - Supports Microsoft's Distributed File System (DFS) Namespaces (group files across multiple FS) <br />
+                - Scale up to tens of GB/s, millions of IOPS and hundreds of PBs of data <br />
+                - Can be accessed from on-premises infrastructure (VPN or Direct Connect) <br />
+                - Can be configured to be multi-AZ (high availability) <br />
+                - Data is backed up daily to S3 <br />
+                - Storage options:
+                <ul>
+                  <li><b>SSD:</b> latency sensitive workloads (databases, media processing, data analytics, etc)</li>
+                  <li><b>HDD:</b> broad spectrum of workloads (home directory, CSM, etc)</li>
+                </ul>
+              </li>
+              <li>
+                <b>FSx for Lustre:</b> <br />
+                . Lustre is a type of distributed POSIX compliant file system, for large scale computing <br />
+                - The name Lustre is derived from linux and cluster <br />
+                - Good for machine learning and High Permoformance Computing (HPC) <br />
+                - Sclaes up to hundreds of GB/s, millions of IOPS and sub-ms latency <br />
+                - Can be accessed from on-premises infrastructure (VPN or Direct Connect) <br />
+                - Seamless integration with S3. Can read S3 as a file system (through FSx). Can write the output of the computations back to S3
+                (through FSx) <br />
+                - Storage options:
+                <ul>
+                  <li><b>SSD:</b> low latency. Good for OPS intensive workloads (small and random file operations)</li>
+                  <li><b>HDD:</b> throughput intensive workloads (large and secuential file operations)</li>
+                </ul>
+              </li>
+              <li>
+                <b>FSx for NetApp ONTAP:</b> <br />
+                - It's managed NetApp ONTAP on AWS <br />
+                - NetApp is a provider for specialized storage solutions. They offer solutions for different sectors, including the cloud. <br />
+                - ONTAP is NetApp's internal operating system, specially optimized for storage functions at both high and low levels <br />
+                - File System compatible with NFS, SMB, and iSCSI protocols <br />
+                - Move workload running on ONTAP or NAS (Network-Attached Storage) to AWS <br />
+                - Works with: Linux, Windows, MacOS, VMware Cloud on AWS, Amazon Workspaces & AppStream 2.0, Amazon EC2, ECS and EKS <br />
+                - Storage shrinks or grows automatically <br />
+                - Support snapshots, replication, compression and data-deduplication at a low cost <br />
+                - Offers point-in-time instantaneous cloning (helpful for testing new workloads)
+              </li>
+              <li>
+                <b>FSx for OpenZFS:</b> <br />
+                - Managed OpenZFS sile system on AWS <br />
+                - OpenZFS is a CDDL licensed open-source storage platform that encompasses the functionality of traditional filesystems and volume
+                manager <br />
+                - File system compatible with NFS protocol (v3, v4, v4.1, v4.2) <br />
+                - Used to move workloads running on ZFS to AWS <br />
+                - Works with: Linux, Windows, MacOS, VMware Cloud on AWS, Amazon Workspaces & AppStream 2.0, Amazon EC2, ECS and EKS <br />
+                - Scales up to one million IOPS with less than 0.5ms latency <br />
+                - Support snapshots, compression at low cost <br />
+                - Offers point-in-time instantaneous cloning (helpful for testing new workloads)
+              </li>
+            </ul>
+            <br />
+            <b>Storage Gateway</b> <br />
+            - Useful for hybrid clouds. Your infrastructure has a part on the cloud and other on-premises <br />
+            - The storage cloud native options are: block storage (EBS, EC2 instance store), file storage (EFS, FSx) and object storage (S3 and
+            Glacier) <br />
+            - Storage Gateway is a bridge between on-premises data an cloud data <br />
+            - Use cases: disaster recovery, backup and restore, tiered storage (ex: more frequently used data on-promise and less frequently used data
+            on the cloud) <br />
+            - Hardware Appliance: using Storage Gateway means you need on-premises virtualization. Otherwise, you can use Storage Gateway Hardware
+            Appliance (you can buy it on amazon.com). Works with File Gateway, Volume Gateway and Tape Gateway. Has the required CPU, memory, network
+            and SSD cache resources to function correctly. Helpful for daily NFS backups in small data centers <br />
+            - Types of Storage Gateway:
+            <ul>
+              <li>
+                <b>S3 File Gateway:</b> <br />
+                - Uused to expose S3 objects to your on-premises <br />
+                - It uses NFS or SMB protocol (basically translates these protocols to S3) <br />
+                - SMB protocol has integration with Active Directory (AD) fro user authentication <br />
+                - Most recently data is cached in the S3 File Gateway <br />
+                - Supports S3 Standard, S3 Standard IA, S3 One Zone and S3 Inteligent Tiering <br />
+                - Need to create IAM roles for each S3 File Gateway to allow access to the target S3 bucket <br />
+                - Allows transition to S3 Glacier using a lifecycle policy
+              </li>
+              <li>
+                <b>FSx File Gateway:</b> <br />
+                - Native access to Amazon FSx for Windows File Server <br />
+                - You are able to connect to AWS FSx from your on-premises but the FSx File Gateway offers you local cache for frequently accessed
+                data <br />
+                - Windows native compatibility (SMB, NTFS, Active Directory, etc) <br />
+                - Useful for group file shares and home directories
+              </li>
+              <li>
+                <b>Volume Gateway:</b> <br />
+                - Block storage using iSCSI protocol backed by S3 <br />
+                - Your storage is backed up by EBS snapshots which can help on-premises volumes <br />
+                - There are two types of Volume Gateway:
+                <ul>
+                  <li><b>Cached volumes: </b> low latency access to most recent data</li>
+                  <li><b>Stored volumes: </b> entire dataset is on premise with scheduled backups to S3</li>
+                </ul>
+              </li>
+              <li>
+                <b>Tape Gateway:</b> <br />
+                - Tape Gateway is used to backup data using existing tape-based processes (and iSCSI interface) <br />
+                - Some companies have backup processes using physical tapes. With Tape Gateway, companies use the same processes but in the cloud.
+                <br />
+                - A virtual tape library (VTL) is a data storage virtualization technology used typically for backup and recovery purposes. A VTL
+                presents a storage component (usually hard disk storage) as tape libraries or tape drives for use with existing backup software <br />
+                - Virtual tape library (VTL) backed by S3 and Glacier <br />
+                - Works with leading backup software vendors <br />
+              </li>
+            </ul>
+            <br />
+            <b>AWS Transfer Family</b> <br />
+            - Fully managed service for file transfers into and out of Amazon S3 or Amazon EFS usinf the FTP protocol <br />
+            - Supported protocols: File Transfer Protocol (FTP), File Transfer Protocol over SSL (FTPS), Secure File Transfer Protocol (SFTP) <br />
+            - You pay per provisioned endpoint per hour + data transfers (in and out) in GB <br />
+            - You can store and manage users' credentials within the service or integrate with existing authentication systems (Microsoft Active
+            Directory, LDPA, Okta, Amazon Cognito, or other custom system) <br />
+            <br />
+            <b>AWS DataSync</b> <br />
+            - Used to move large amounts of data to and from: on-premises or other clouds to AWS (using NFS, SMB, HDFS, S3 API, etc) - needs agent
+            installation, AWS to AWS (different storage services) - no agent needed. <br />
+            - Can synchronize to: Amazon S3 (any storage classes, including Glacier), Amazon EFS and Amazon FSx (any FSx type) <br />
+            - Replication tasks can be scheduled hourly, daily or weekly <br />
+            - File permissions and metadata are preserved on destiny <br />
+            - One agent task can use 10Gbps. You can setup a bandwidth limit.
+          </td>
+          <td>
+            <span>Snow Family Data Migrations</span>
+            <img src="../assets/95.-snow-family-data-migrations.png" alt="Snow Family Data Migrations" />
+            <hr />
+            <span>FSx Deployment Options - Scratch (top) and Persistent (bottom)</span>
+            <img src="../assets/96.-fs-deployment-options.png" alt="FSx Deployment Options - Scratch (top) and Persistent (bottom)" />
+            <hr />
+            <span>Storage Gateway - Volume Gateway</span>
+            <img src="../assets/97.-storage-gateway-volume-gateway.png" alt="Storage Gateway - Volume Gateway" />
+            <hr />
+            <span>Storage Gateway - Tape Gateway</span>
+            <img src="../assets/98.-storage-gateway-tape-gateway.png" alt="Storage Gateway - Tape Gateway" />
+            <hr />
+            <span>Storage Gateway use cases</span>
+            <img src="../assets/99.-storage-gateway-use-cases.png" alt="Storage Gateway use cases" />
+            <hr />
+            <span>Transfer Family</span>
+            <img src="../assets/100.-transfer-family.png" alt="Transfer Family" />
+            <hr />
+            <span>DataSync from on-premises to AWS</span>
+            <img src="../assets/101.-datasync-from-onpremise.png" alt="DataSync from on-premises to AWS" />
+          </td>
+        </tr>
       </tbody>
     </table>
     <script>
