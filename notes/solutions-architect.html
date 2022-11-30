@@ -1367,6 +1367,166 @@
             <img src="../assets/101.-datasync-from-onpremise.png" alt="DataSync from on-premises to AWS" />
           </td>
         </tr>
+        <tr>
+          <td>Decoupling applications: SQS, SNS, Kinesis, Active MQ</td>
+          <td>
+            <b>Simple Queue Service - SQS</b> <br />
+            - It's the oldes offering of AWS (over 10 years old) <br />
+            - Fully managed service used to decouple applications <br />
+            - The ones that put messages in the queue are called Producers. The ones that read the messages from the queue are called Consumer <br />
+            - The consumers poll (long or short polling) SQS for messages and receive up to 10 messages at a time <br />
+            - Consumer receive and process message in parallel <br />
+            - Offers in-flight encryption using HTTPS API, at rest enryption using KMS keys and client side encryption if the client wants to perform
+            encryption/decryption itself <br />
+            - You can use IAM policies to regulate access to the SQS API or SQS Access Policies (similar to S3 bucket policies) <br />
+            - Message Visibility Timeout: when a messages is polled by a consumer, it becomes invisible to other consumers. The default values is 30
+            seconds. The consumer can call the CHangeVisibilityTimeout API in order to modify the visibility timeout set to the queue. The maximum
+            visibility timeout is 12 hours from the time that Amazon SQS receives the ReceiveMessage request <br />
+            - Short polling: by default, queues use short polling. With short polling, the ReceiveMessage request queries only a subset of the servers
+            (based on a weighted random distribution) to find messages that are available to include in the response. Amazon SQS sends the response
+            right away, even if the query found no messages. Short polling occurs when the WaitTimeSeconds parameter of a ReceiveMessage request is
+            set to 0 in one of two ways: The ReceiveMessage call sets WaitTimeSeconds to 0 or the ReceiveMessage call doesn’t set WaitTimeSeconds, but
+            the queue attribute ReceiveMessageWaitTimeSeconds is set to 0. <br />
+            - Long polling: recommended over short polling because it helps reduce the cost of using Amazon SQS. With long polling, the ReceiveMessage
+            request queries all of the servers for messages. Amazon SQS sends a response after it collects at least one available message, up to the
+            maximum number of messages specified in the request. Amazon SQS sends an empty response only if the polling wait time expires. Long
+            polling decreases the number of API calls made to SQS while increasing the efficiency and latency of your application. A consumer can long
+            poll messages from 1 second up to 20 seconds. <br />
+            - SQS with Auto Scaling Group (ASG): using SQS as a buffer for your EC2 instaces fleet with an ASG you can manage the scaling via
+            CloudWatch alerts (see image)
+            <b>Standard Queues:</b> <br />
+            - Unlimited throughput and unlimited number of messages in the queue <br />
+            - Default retention period of messages is 4 days. Maximum is 14 days <br />
+            - Limit of 256KB per message sent. You are charged by API calls to the SQS service. Each 64KB sent to the SQS is considered an API call,
+            so you you are charged with 4 API calls when sent a 256KB message <br />
+            - Can have duplicate messages (at leats one delivery, occasionally) <br />
+            - Can have out of order messages (best effort ordering) <br />
+            <b>FIFO Queues:</b> <br />
+            - Messages are processed in order by the consumer <br />
+            - Limited throughput 300msg/s without batching or 3000msg/s with batching <br />
+            - Exactly once send capability (by removing duplicates) <br />
+            - The name of the queue must end with ".fifo" <br />
+            - The deduplication (remove duplicates) is applied for messages received in the last 5 minutes <br />
+            - You can group messages assignning a Group ID. This way the FIFO SQS control the order for each message group separately. Each message
+            group can have only one consumer. This is helpful when you need to scale the consumers <br />
+            <br />
+            <b>Standard Queues:</b> <br />
+            - SNS can send email, SMS, mobile notifications (push notifications) or point to and HTTP/HTTPS endpoint <br />
+            - A lot of AWS services can send data directly to SNS <br />
+            - Offers in-flight encryption using HTTPS API, at rest enryption using KMS keys and client side encryption if the client wants to perform
+            encryption/decryption itself <br />
+            - You can use IAM policies to regulate access to the SNS API <br />
+            - You can use SQS Access Policies (similar to S3 bucket policies). useful for cross account access to SNS and for allowing other services
+            to write to an SSN topic <br />
+            - The producer only sends the message to one SNS topic and the message can be read for all the subscribers (consumers) of the topic,
+            unless they apply a filter to the subscription. <br />
+            - A topic can have up to 12.500.000 subscriptions <br />
+            - Limit account is 100.000 topics <br />
+            - Fan Out Pattern: push one message in SNS then receive in al SQS subscribed to the SNS topic. Allow you to fully decouple you application
+            with no data loss because SQS offers data persistence, delayed processing and retries. Make sure your SQS queue access policy allow for
+            SNS to write to the queue. It's possible to have cross-region delivery (SNS in one regions and SQS in another region) <br />
+            - FIFO Topic: can only have SQS FIFO as subscribers. Offers the same ordering and dedupications feaures of SQS FIFO queues and has the
+            same throughput limits <br />
+            - Message filtering: JSON policy used to filter messages sent to SNS topic's subscriptions. If a subscription doesn't have a filter
+            policy, it receives every message <br />
+            <br />
+            <b>Amazon Kinesis:</b> <br />
+            - Make it easy to collect, process, analyze streaming data in rela-time <br />
+            - Ingest real-time data such as: application logs, metrics, website clickstremas, IoT telemetry data, etc <br />
+            - A shard is a uniquely identified sequence of data records in a stream. A stream is composed of one or more shards, each of which
+            provides a fixed unit of capacity. <br />
+            <b>Amazon Kinesis Data Streams:</b> <br />
+            - Capture process and store data stream <br />
+            - Can have many producers and consumers <br />
+            - The producers creater records to a Kinesis Data Stream <br />
+            - A record is made of a Partition Key (determine in which shard place the record) and a data blob (the value or body of the record) that
+            contain up to 1MB <br />
+            - A producer (AWS SDK, Kinesis Producer Library - KPL, Kinesis Agent) can send data at a 1MB/s or 1000msg/s per shard <br />
+            - A consumer (your own custom consumer using Kinesis Client Library - KCL or AWS SDK. Or a managed consumer like AWS Lambda, Kinesis Data
+            Firehose, Kinesis Data Analytics) receives a record that contains a partitio key, a sequence number (represents where the record was in
+            the shard), and the data blob <br />
+            - Retention can be set between 1 day and 365 days <br />
+            - Ability to reprocess (replay) data <br />
+            - Once data is inserted in Kinesis it can't be deleted (inmutability) <br />
+            - Data that shares the same partition, goes to the same shard (ordering) <br />
+            - Offers in-flight encryption using HTTPS API, at rest enryption using KMS keys and client side encryption if the client wants to perform
+            encryption/decryption itself <br />
+            - You can use IAM policies to regulate access / authorization and monitor API calls using CloudTrail <br />
+            - VPC endpoints available for Kinesis to access within VPC <br />
+            - There are two consumption modes:
+            <ul>
+              <li><b>Shared Mode:</b> 2MB/s shared for all the consumers</li>
+              <li><b>Enhanced Mode:</b> 2MB/s per shard per consumer</li>
+            </ul>
+            - Capacity modes:
+            <ul>
+              <li>
+                <b>Provisioned mode:</b> <br />
+                - You choose then number of shards provisioned, scale manually or using API <br />
+                - Each shard gets 1MB/s IN (or 1000 records per second) <br />
+                - Each shard gets 2MB/s OUT (classic or enhanced fan-out consumer) <br />
+                - You pay per shard provisioned per hour
+              </li>
+              <li>
+                <b>On-demand mode:</b> <br />
+                - No need to provision or manage the capacity <br />
+                - Default capacity provisioned (4MB/s IN or 4000 records per second) <br />
+                - Scales automatically based on observed throughput peak during the last 30 days <br />
+                - pay per stream per hour and data IN / OUT per GB
+              </li>
+            </ul>
+            <b>Amazon Kinesis Firehose:</b> <br />
+            - Fully managed serverless service to load data streams into data stores <br />
+            - Support many data format, conversions, transformartions and compression <br />
+            - Allow data transformation with AWS Lambda functions before perform (bacth) writes <br />
+            - A record can have up to 1MB <br />
+            - Near real time: 60 seconds latency minimum for non full batches or minimum 1MB of data at a time <br />
+            - You can setup a backup S3 bucket to send failed data that can't be store in its destination <br />
+            - EXAM QUESTION: When to use Kinesis Data Streams vs Kinesis Data Firehose? -> see image <br />
+            - Can write data on the following destinies:
+            <ul>
+              <li>
+                <b>AWS Destinations:</b> <br />
+                - S3 Buckets <br />
+                - Amazon Redshift (first PUT in S3 and then COPY through S3) <br />
+                - Amazon ElasticSearch (OpenSearch Service)
+              </li>
+              <li><b>3rd Party Destinations:</b> Datadog, New Relic, Splunk, MongoDB, etc</li>
+              <li><b>Custom Destinations:</b> HTTP endpoints</li>
+            </ul>
+            <b>Amazon Kinesis Data Analytics:</b> analyze data streams with SQL of Apache Flink (an open-source, unified stream-processing and
+            batch-processing framework developed by the Apache Software Foundation) <br />
+            <b>Amazon Kinesis Video Streams:</b> capture, process, and store video streams <br />
+            <br />
+            <b>Amazon MQ</b> <br />
+            - Managed message broker services that support open source messaging protocols like MQTT, AMQP, STOMP, Openwire, and WSS <br />
+            - Helpful when you are migrating (that use, for example: RabbitMQ or ActiveMQ) to the cloud and don't want to re-engineer your application
+            to use SQS and SQS <br />
+            - It doesn't scale as much as SQS and SNS <br />
+            - It runs in severs and can run in multi-AZ with failover <br />
+            - Amazon MQ has both queue feature (SQS) and topic featuew (SNS) <br />
+            - When you seetup Multi-AZ (high availability) for Amazon MQ, you have one AZ as "active" and the other one as "standby"
+          </td>
+          <td>
+            <span>SQS with Auto Scaling Group</span>
+            <img src="../assets/102.-sqs-asg.png" alt="SQS with Auto Scaling Group" />
+            <hr />
+            <span>Kinesis Data Streams</span>
+            <img src="../assets/103.-kinesis-data-streams.png" alt="Kinesis Data Streams" />
+            <hr />
+            <span>Kinesis Data Firehose</span>
+            <img src="../assets/104.-kinesis-data-firehose.png" alt="Kinesis Data Firehose" />
+            <hr />
+            <span>Kinesis Data Streams vs Kinesis Data Firehose</span>
+            <img src="../assets/105.-kinesis-data-streams-vs-firehose.png" alt="Kinesis Data Streams vs Kinesis Data Firehose" />
+            <hr />
+            <span>SQS vs SNS vs Kinesis</span>
+            <img src="../assets/106.-sqs-vs-sns-vs-kinesis.png" alt="SQS vs SNS vs Kinesis" />
+            <hr />
+            <span>Amazon MQ - Multi AZ</span>
+            <img src="../assets/107.-amazon-mq-multi.az.png" alt="Amazon MQ - Multi AZ" />
+          </td>
+        </tr>
       </tbody>
     </table>
     <script>
