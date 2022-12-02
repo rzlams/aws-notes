@@ -1527,6 +1527,120 @@
             <img src="../assets/107.-amazon-mq-multi.az.png" alt="Amazon MQ - Multi AZ" />
           </td>
         </tr>
+        <tr>
+          <td>Containers on AWS: ECS, Fargate, ECR and EKS</td>
+          <td>
+            <b>Elastic Container Registry - ECR:</b> <br />
+            - It's the AWS version of docker hub. It's used to store and manage docker images on AWS <br />
+            - With ECR you can have your own private repository or public repository (AWS ECR Public Gallery) <br />
+            - Fully integrated with ECS and backed by S3 <br />
+            - Access is controlled through IAM <br />
+            - Support image vulnerability scanning, versioning, image tags, image lifecycle, etc <br />
+            <br />
+            <b>Elasctic Container Service - ECS:</b> <br />
+            - Amazon's own container platform <br />
+            - Launch docker containers on AWS = Launch ECS Tasks on ECS Clusters <br />
+            - An ECS Task consumes resources to run containers based on the configuration in a task definition. Tasks may or may not be long-lived,
+            and expose several attributes to help you monitor their state <br />
+            - You can assign IAM roles to EC2 instances (EC2 instance profile). You can also attach an IAM role to each task you define (task role).
+            See ECS IAM Roles image <br />
+            - ECS Service Auto Scaling: Automatically increase/decrease the desired number of ECS tasks. ECS Service Auto Scaling uses AWS Application
+            Auto Scaling and we have 3 metrics we can scale on using this service: ECS Service Average CPU Utilization, ECS Service Average Memory
+            (RAM) Utilization, and ALB Request Count Per Target (metric comming from the ALB). You can setup different kind of auto scaling:
+            <ul>
+              <li><b>Target Tracking:</b> scale based on target value for a specific CloudWacth metric</li>
+              <li><b>Step Scaling:</b> scale based on a specified CloudWatch alarm</li>
+              <li><b>Scheduled Scaling:</b> scale based on a specified date/time. Useful for predictable changes</li>
+            </ul>
+            - It's worth noticing that ECS Service Auto Scaling (task level) is not the same as EC2 Auto Scaling (EC2 instance level) <br />
+            - EC2 Instance Launch Type Auto Scaling: can be done with EC2 auto scaling group but htere is another (recommended) option called ECS
+            Cluster Capacity Provider. The ECS Cluster Capacity Provider is able to automatically provision and scale the infrastructure for your ECS
+            Tasks, Capacity Provider is paired with your auto scaling group adding EC2 instances when you missing capacity (CPU, RAM, etc) <br />
+            - Fargate Launch Type Auto Scaling: is easier to implement because is serverless (you don't manage infrastructure) <br />
+            - You can use a load balancer with ECS. See image <br />
+            - If you want to share storage among several ECS containers, the recommended option is EFS. It supports both, EC2 and Fargate launch
+            types. Useful for multi-AZ deployments. Amazon S3 cannot be mounted as a file system. See ECS Data Volumes image <br />
+            - It has two launch type:
+            <ul>
+              <li>
+                <b>EC2 Launch Type:</b> <br />
+                - You must provision and maintain the infrastructure (EC2 instances) <br />
+                - Each EC2 instance must run the ECS Agent to register in the ECS Cluster <br />
+                - AWS takes care of start/stop the containers <br />
+              </li>
+              <li>
+                <b>AWS Fargate:</b> <br />
+                - Amazon's own serverless container platform. Works with ECS and EKS <br />
+                - You do not need to provision the infrastructure (no EC2 instances to manage) <br />
+                - You just create task definitions and then AWS just runs ECS tasks for you based on CPU / RAM you need. Therefore, to scale you can
+                just increase the number of tasks (without manage any EC2 instance)
+              </li>
+            </ul>
+            <br />
+            <b>Elasctic Kubernetes Service - EKS:</b> <br />
+            - Amazon's managed kubernetes clusters (open source). Kubernetes is cloud agnostic <br />
+            - It's an alternative to ECS. Similar goal but different API <br />
+            - It also supports the same launch types as ECS: EC2 instance and Fargate <br />
+            - EKS can take advantage of Auto Scaling Groups <br />
+            - You can have different node types:
+            <ul>
+              <li>
+                <b>Managed Node Groups:</b> EKS create and manages nodes (EC2 instances) for you, Nodes are part of an ASG managed by EKS. Support for
+                on-demand and spot instances
+              </li>
+              <li>
+                <b>Self-managed Nodes:</b> nodes created by you and registered to the EKS cluster and managed by an ASG. You can use prebuilt AMI
+                (Amazon EKS Optimized AMI) or use your own AMI. Support for on-demand and spot instances
+              </li>
+              <li><b>AWS Fargate:</b> No maintenance required and no nodes management</li>
+            </ul>
+            - You can attach data volumes to your EKS cluster: You need to specify a StorageClass in your manifest EKS Cluster. This leverages a
+            Container Storage Interface (CSI) compliant driver. It supports EBS volumes, Amazon EFS (the only one that works with Fargate), Amazon Fsx
+            for Lustre, and Amazon FSx for NetApp ONTAP <br />
+            <br />
+            <b>AWS App Runner</b> <br />
+            - Fully manages services that makes it easy to deploy web applications and APIs at scale. You can have rapid deployment <br />
+            - No infrastructure experiences required. The idea is that anyone can deploy to AWS <br />
+            - Start with your source code or container image <br />
+            - You just configure some settings and it automatically builds and deploy the web app. See image <br />
+            - Offers auto scaling, highly availability, load balancing, and encryption <br />
+            - Support VPC access, database connections, cache and message queue services <br />
+          </td>
+          <td>
+            <span>ECS IAM Roles</span>
+            <img src="../assets/108.-ecs-tasks-roles.png" alt="ECS Tasks Roles" />
+            <hr />
+            <span>ECS with Load Balancer</span>
+            <img src="../assets/109.-ecs-load-balancer.png" alt="ECS with Load Balancer" />
+            <hr />
+            <span>ECS Data Volumes - EFS</span>
+            <img src="../assets/110.-ecs-data-volumes.png" alt="ECS Data Volumes - EFS" />
+            <hr />
+            <span>Architecture example - ECS Task invoked by EventBridge to transform an image</span>
+            <img
+              src="../assets/111.-architecture-example-ecs-eventbridge.png"
+              alt="Architecture example - ECS Task invoked by EventBridge to transform an image"
+            />
+            <hr />
+            <span>Architecture example - ECS Task invoked by EventBridge Scheduled rule to do batch processing</span>
+            <img
+              src="../assets/112.-architecture-example-ecs-eventbridge-scheduled.png"
+              alt="Architecture example - ECS Task invoked by EventBridge Scheduled rule to do batch processing"
+            />
+            <hr />
+            <span>Architecture example - ECS Task poll an SQS and auto scale based on the number of messages in the queue</span>
+            <img
+              src="../assets/113.-architecture-example-ecs-sqs.png"
+              alt="Architecture example - ECS Task poll an SQS and auto scale based on the number of messages in the queue"
+            />
+            <hr />
+            <span>Elastic Kubernetes Service - EKS</span>
+            <img src="../assets/114.-eks.png" alt="Elastic Kubernetes Service - EKS" />
+            <hr />
+            <span>AWS App Runner</span>
+            <img src="../assets/115.-aws-app-runner.png" alt="AWS App Runner" />
+          </td>
+        </tr>
       </tbody>
     </table>
     <script>
