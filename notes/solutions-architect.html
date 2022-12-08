@@ -1641,6 +1641,200 @@
             <img src="../assets/115.-aws-app-runner.png" alt="AWS App Runner" />
           </td>
         </tr>
+        <tr>
+          <td>Serverless Overviews</td>
+          <td>
+            - Serverless is new paradigm in which the developers don't have to provision or manage servers. They just deploy code <br />
+            - Serverless services in AWS: AWS Lambda, DynamoDB, AWS Cognito, AWS API Gateway, Amazon S3, SNS, SQS, Kinesis Data Firehose, Aurora
+            Serverless, Step Functions, and Fargate <br />
+            <br />
+            <b>AWS Lambda</b> <br />
+            - Virtual functions (no servers to manage) that runs your code <br />
+            - Limited by time. The max time execution is 15 minutes or 900 seconds <br />
+            - Run on demand. You are change only when your lambda runs <br />
+            - Scales automatically <br />
+            - You can add up to 4 KB in environments variables <br />
+            - The default concurrency limit per lambda is 1000. It can be increased <br />
+            - The default disk capacity in the "function container" (in /tmp) is 512 MB. It can be increased up to 10 GB <br />
+            - Easy pricing, pay per request and compute time. Free tier of 1 million executions and 400.000 GBs of compute time <br />
+            - Easy moitoring with CludWatch and integration with the whole AWS suite of services <br />
+            - You can provision from 128 MB up to 10240 MB of RAM per function in increments of 1 MB. Increase RAM will also improve CPU and network
+            <br />
+            - Lambda support different runtimes laguages (see image). You can also deploy your code to lambda using the Lambda Container Image which
+            is an AMI (container image) that implements the Lambda Runtime API. If your container image doesn't implement the Lambda Runtime API you
+            need ECS/Fargate to deploy it <br />
+            - Deployment limit: max size for compressed .zip files is 50 MB. Max size for uncompressed deployments (code + dependencies) is 250 MB. In
+            case you need to load big files at startup you can use the /tmp directory. <br />
+            <b>Edge Functions:</b> <br />
+            - Useful when you need to execute some logic at the edge. It means code that you write an attach to a CloudFront Distribution (runs close
+            to your users t minimize latency) <br />
+            - CloudFront provides two types of edge functions:
+            <ul>
+              <li>
+                <b>CloudFront Functions:</b> <br />
+                - Lightweught functions written in JavaScript <br />
+                - Used for high-scale, latency-sensitive CDN customizations <br />
+                - Gives you sub-ms startup times and support millions of request per second <br />
+                - Native feature of CloudFront. Manage code entirely within CloudFront <br />
+                - Use cases: cache key normalization (transform request attributes), request authentication, url rewrites <br />
+                - Used to change viewer requests ans responses (see image):
+                <ul>
+                  <li><b>Viewer request:</b> after CloudFront receives a request from a viewer</li>
+                  <li><b>Viewer response:</b> before CloudFront forwards the response to the viewer</li>
+                </ul>
+              </li>
+              <li>
+                <b>Lambda@Edge</b> <br />
+                - Similar to ClouFront Functions but allows you to modify also the origin request and response <br />
+                - Lambda function written in NodeJS or Python <br />
+                - Scales to thousands of request per second <br />
+                - You author your function in one AWS Region (us-east-1), then CloudFront replicates to its locations <br />
+                - Used to change viewer and origin requests/responses (see image):
+                <ul>
+                  <li><b>Viewer request:</b> after CloudFront receives a request from a viewer</li>
+                  <li><b>Origin request:</b> before CloudFront forwards the response to the origin</li>
+                  <li><b>Origin response:</b> after CloudFront receives the response from the origin</li>
+                  <li><b>Viewer response:</b> before CloudFront forwards the response to the viewer</li>
+                </ul>
+              </li>
+            </ul>
+            <b>Lambda VPC:</b> <br />
+            - By default yoir lambda functions are launched outside your own VPC (in AWS-owned VPC). Therefore it cannot access resources in your VPC
+            <br />
+            - In order to connect your lambda to your VPC you must define the VPC ID, the subnets and the security groups. Lambda will create an ENI
+            (Elastic Network Interface) in your subnets. See image <br />
+            - A good known use case for VPC with lambda is to setup RDS Proxy because RDS Proxy is never publicly accesible <br />
+            <br />
+            <b>DynamoBD</b> <br />
+            - Fully manage, highly available NoSQL database (with transaction support) with replication accross multiple AZs <br />
+            - Scales to massive workloads (distributed databade) <br />
+            - Support millions of requests per second and hundreds of TB of storage with fast and consistent performance (single-digit milisecond)
+            <br />
+            - Integrated with IAM for security, authentication and authorization <br />
+            - Low cost and auto-scaling capabilities <br />
+            - No maintenance or patching. Always available <br />
+            - Standard and Infrequent Access (IA) tablas classes <br />
+            - DynamoDB can rapidly evolve schemas (there are exam questions regarding this) <br />
+            - Data structure:
+            <ul>
+              <li>DynamoDb is made of tables</li>
+              <li>Each table has a Primary Key (Partition Key + Sort Key)</li>
+              <li>Each table can have an infinite number of items (equivalent to rows in a relational DB)</li>
+              <li>Each item has attributes (equivalent to columns in a relational DB). Can be added over time or can be null</li>
+              <li>Maximum item size is 400KB</li>
+              <li>
+                Data types supported: scalar types (string, number, binary, boolean, null), document types (list, map), and set types (string, set,
+                number set, binary set)
+              </li>
+            </ul>
+            - Capacity modes: control how you manage your table's read/write trhoughput
+            <ul>
+              <li>
+                <b>Provisioned mode (default)</b> <br />
+                - You specify the number of read/writes per second <br />
+                - You need to plan capacity beforehand <br />
+                - Pay for provisioned Read Capacity Units (RCU) and Write Capacity Units (WCU) <br />
+                - Possibility to add auto-scaling mode for RCU and WCU <br />
+              </li>
+              <li>
+                <b>On-deman mode:</b> <br />
+                - RCU and WCU automatically scales up and down with your workloads <br />
+                - No capacity planning needed <br />
+                - Pay for what you use. More expensive than provisioned mode <br />
+                - Great for unpredictable workloads. Ready to handle steep sudden spikes
+              </li>
+            </ul>
+            <br />
+            <b>DynamoDB Accelerator - DAX</b> <br />
+            - Fully managed, highly available, seamless in-memory cache for DyanmoDB <br />
+            - Offer microsecond latency for cached data <br />
+            - Doesn't require application logic modification (compatible with existing DynamoDB APIs) <br />
+            - You can set a TTl for the cache. Default is 5 minutes <br />
+            - Is the prefered cache solution when it comes to DynamoDB (individual objects, query and scan cache). You can also use ElastiCache to
+            store aggregated result if it's needed <br />
+            - Dynamo DB Streams: the idea is that you have an steam of all the modifications (create/update/delete) of your table's data. You can
+            manage the stream intwo ways:
+            <ul>
+              <li>
+                <b>DynamoDB Streams:</b> offers 24 hours retention. Support a limited number of consumers. You can process the data using a AWS Lambda
+                Triggers or DynamoDB Stream kinesis adapter
+              </li>
+              <li>
+                <b>Kinesis Data Streams:</b> offers 1 year retention. Support a high number of consumers. You can process the data using AWS Lambda,
+                Kinesis Data Analitycs, Kinesis Data Firehose, AWS Glue Streaming ETL, etc.
+              </li>
+            </ul>
+            - DynamoDB Global Tables: it makes a dynamo table accesible with low latency in multiple AWS regions. It supports (by default)
+            active-active replication, which means that applications can read or write to the table in any region. You must enable DynamoDB Streams as
+            a pre-requisite. <br />
+            - Dynamo TTL: llows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of
+            the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. When enabling TTL on a table,
+            DynamoDB requires you to identify a specific attribute name that the service will look for when determining if an item is eligible for
+            expiration <br />
+            - Dynamo backup options:
+            <ul>
+              <li>
+                <b>Continuous backups using point-in-time recovery (PITR):</b> optionally enabled for the last 35 days. You can recover for any time
+                within the backup memory. The recovery process creates a new table
+              </li>
+              <li>
+                <b>On-demand backups:</b> full backup for long term retention (until explicitly deleted). This kind of backup doesn't affect
+                performance or latency. Can be configured an managed in the AWS Backups service which allows you to create cross-region copies. The
+                recovery process creates a new table
+              </li>
+            </ul>
+            <br />
+            <b>API Gateway</b> <br />
+            - Can integrate with lambda functions and many other AWS services, such as SQS, Step Functions and so on. Can expose HTTP endpoints in the
+            backend (internal HTTP on-premise, Application Load Balance, etc) <br />
+            - You can manage authentication and authorization of the request through IAM Roles (useful for internal applications) , Cognito (useful
+            for external users), or Custom Authorizer (your own logic) <br />
+            - Offers Custom Domain Name HTTPS security through integration with AWS Certificate Manager (ACM). In order to use a custom domain you
+            must setup CNAME or A-alias record in Route53. If you're using an edge-optimized endpoint, the certificate must be in us-east-1 region. If
+            using regional endpoint, the certificate must be in the same regional of the API Gateway Endpoint<br />
+            - Offers three types on endpoints (deployments):
+            <ul>
+              <li>
+                <b>Edge-optimized (default):</b> for global clients. Requests are routed through the CloudFront edge locations (improves latency). The
+                API Gateway still lives in only one region
+              </li>
+              <li>
+                <b>Regional:</b> for clients within the same region. Could manually combine with CloudFront (more control over the cachng strategies
+                and the distribution)
+              </li>
+              <li><b>Private:</b> Can only be accessed from your VPC using an inteface VPC endpoint (ENI). Use a resource policy to define access</li>
+            </ul>
+            <br />
+            <b>Step Functions</b> <br />
+            - State Machine that helps you build serverless visual workflows to orchestrate your lambda functions (and other AWS services) <br />
+            - Support different kind of steps: sequence, parallel, conditions, timeouts, error handling, etc <br />
+            - Can integrate with EC2, ECS, on-premises servers, API Gateway, SQS, etc
+          </td>
+          <td>
+            <span>Lambda Runtimes</span>
+            <img src="../assets/116.-lambda-runtimes.png" alt="Lambda Runtimes" />
+            <hr />
+            <span>CloudFront Functions</span>
+            <img src="../assets/117.-lambda-edge-cloudfront.png" alt="CloudFront Functions" />
+            <hr />
+            <span>CloudFront Functions vs Lambda@Edge</span>
+            <img src="../assets/118.-cloudfront-function-vs-edge-function.png" alt="CloudFront Functions vs Lambda@Edge" />
+            <hr />
+            <span>Lambda VPC</span>
+            <img src="../assets/119.-lambda-vpc.png" alt="Lambda VPC" />
+            <hr />
+            <span>DynamoDB and S3 Integration</span>
+            <img src="../assets/120.-dynamo-s3-integration.png" alt="DynamoDB and S3 Integration" />
+            <hr />
+            <span>API Gateway Capabilities</span>
+            <img src="../assets/121.-api-gw-overview.png" alt="API Gateway Capabilities" />
+          </td>
+        </tr>
+        <tr>
+          <td>21.- Severless Solution Architecture Discussions</td>
+          <td></td>
+          <td></td>
+        </tr>
       </tbody>
     </table>
     <script>
