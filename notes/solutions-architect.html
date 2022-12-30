@@ -1706,7 +1706,7 @@
             - A good known use case for VPC with lambda is to setup RDS Proxy because RDS Proxy is never publicly accesible <br />
             <br />
             <b>DynamoBD</b> <br />
-            - Fully manage, highly available NoSQL database (with transaction support) with replication accross multiple AZs <br />
+            - Fully manage, highly available NoSQL database (with transaction support) with replication across multiple AZs <br />
             - Scales to massive workloads (distributed databade) <br />
             - Support millions of requests per second and hundreds of TB of storage with fast and consistent performance (single-digit milisecond)
             <br />
@@ -1852,9 +1852,9 @@
             <b>Amazon Aurora</b> <br />
             - For Amazon Aurora, storage and compute are separate <br />
             - Compatible API for PostgreSQL and MySQL <br />
-            - By default the data is stored in 6 replicas, accross 3 AZs (you cannot change this). Thus, it's a highly available, self-healing and
+            - By default the data is stored in 6 replicas, across 3 AZs (you cannot change this). Thus, it's a highly available, self-healing and
             auto-scaling database <br />
-            - For compute, it deploys a cluster of DB instances accross multiple AZs. In case you need more capacity, you can configure auto-scaling
+            - For compute, it deploys a cluster of DB instances across multiple AZs. In case you need more capacity, you can configure auto-scaling
             for the read-replicas <br />
             - It expose a writer endpoint and a reader endpoint <br />
             - Same security, monitoring and maintenance features of RDS <br />
@@ -1902,13 +1902,13 @@
             <b>DocuemntDB</b> <br />
             - It's an Aurora version (fully managed DB) for MongoDB (no-SQL database) <br />
             - MongoDB is used to store, query, and index JSON data <br />
-            - Highly available with replication accross 3 AZs <br />
+            - Highly available with replication across 3 AZs <br />
             - Storage automatically grows in increments of 10GB, up to 64TB <br />
             - Automatically scales to workloads with millions of requests per seconds <br />
             <br />
             <b>Neptune</b> <br />
             - Fully managed graph database <br />
-            - Highly available accross 3 AZs, with up to 15 read replicas <br />
+            - Highly available across 3 AZs, with up to 15 read replicas <br />
             - Great for build and run applications working with highly connected datasets, optimized for these complex queries <br />
             - Can store up to billions of relations and query the grapgh with miliseconds latency <br />
             - Great for knowledge graphs (wikipedia), fraud detection, recommendation engines and social networking <br />
@@ -1917,7 +1917,7 @@
             - It's an Apache Cassandra database fully managed by AWS. <br />
             - Apache Cassandra is an open-source NoSQL distributed database <br />
             - It's highly available, serverless, and automatically scales up and down based on application's traffic <br />
-            - Tables data is replicated 3 times accross multiple AZs <br />
+            - Tables data is replicated 3 times across multiple AZs <br />
             - To perform queries you use the Cassandra Query Language (CQL) <br />
             - Offers single-digit milisecond latency atany scale. Support thousands of requests per second <br />
             - Support provisioned capacity with optional auto-scaling and on-demand capacity. Same as DynamoDB <br />
@@ -1926,7 +1926,7 @@
             <br />
             <b>Quantum Ledge Database - QLDB</b> <br />
             - A ledger is a book recording financial transactions <br />
-            - Is a fully managed database, serverless, and high available (replication accross 3 AZs) <br />
+            - Is a fully managed database, serverless, and high available (replication across 3 AZs) <br />
             - Used to review history of all the changes made to your application data over time <br />
             - Inmutable system: no entry can be removed or modified. To ensure this behaviour it's cryptographically verifiable <br />
             - You can manipulate data using SQL <br />
@@ -1944,11 +1944,227 @@
             - Data storage tiering: recent data kept in memory and historical data kept in a cost-optimized storage <br />
             - Built-in time series analitycs functions that helps you identify patterns in your data in near real-time <br />
             - Support encryption in-transit and at-rest <br />
-            - Use cases: IoT apps, operational applications, real-time analitycs, etc <br />
+            - Use cases: IoT apps, operational applications, real-time analitycs, etc
           </td>
           <td>
             <span>Time series DB inputs (to the left) and outputs (to the right)</span>
             <img src="../assets/122.-timeseries-db-architecture.png" alt="Time series DB inputs (to the left) and outputs (to the right)" />
+          </td>
+        </tr>
+        <tr>
+          <td>Data and Analitycs</td>
+          <td>
+            <b>Athena</b> <br />
+            - Serverless query service (built of Presto Engine) to analyze data stored in Amazon S3 <br />
+            - Uses standard SQL language to query the files <br />
+            - You can create databases and tables in Athena to store the data retrieved for the queries you run. You need to create an S3 bucket where
+            this data is actually stored <br />
+            - Supports csv, json, ORC, Avro and Parquet <br />
+            - Pricing: 5$ per TB of data scanned <br />
+            - Commonly used with Amazon Quicksight for reporting/dashboard <br />
+            - EXAM TIP: everytime they ask you to analyze data in S3 using serverless SQL, use Athena <br />
+            - Performance improvement;
+            <ul>
+              <li>
+                <b>Use columnar data for cost savings:</b> <br />
+                - Apache Parquet or ORC formats are recommended (gives you a huge performance improvement) <br />
+                - Use Glue to convert your data to Parquet or ORC
+              </li>
+              <li><b>Compress data for smaller retrievals:</b> use bzip2, gzip, snappy, zlip, zstd, etc</li>
+              <li>
+                <b>Partition datasets in S3 for easy querying or virtual columns: </b> this means that you can use Athena to filter by path/folder
+                name. Let's sayyou have your data partitioned by year, the you can query only the data inside a specific folder. For example:
+                s3://athena-examples-bucket/my-data/year=2010/
+              </li>
+              <li>
+                <b>Use larger files (> 128 MB)</b> to minimize overhead. With many small files Athena is not going to be as performant as it can
+              </li>
+            </ul>
+            - Federated query: allows you to run SQL queries across data stored in relational, non-relational, object, and custom data sources (AWS or
+            on-premises). To achieve this you can use a Data Source Connector that run on AWS Lambda to run Federated Queries (e.g. CloudWatch Logs,
+            DynamoDB, RDS, etc) <br />
+            <br />
+            <b>Redshift</b> <br />
+            - It's based on PostgreSQL but it's not used for OLTP, instead it's used for online analytical processing - OLAP (analytics and data
+            warehousing) <br />
+            - Offers 10x better performance tha other data warehouses and can scale to PBs of data <br />
+            - Columna storage of data (instead of row based) and parallel query engine <br />
+            - Pay as you go pricing, based on the instances provisioned in your Redshift cluster <br />
+            - Has a SQL interface to perform the queries <br />
+            - BI tools such as Amazon Quicksight or Tableau integrate with it <br />
+            - Can perform faster queries, joins and aggregations than Athena thanks to indexes <br />
+            - Enhanced VPC Routing: is a Redshift feature that forces all COPY and UNLOAD traffic moving between your cluster and data repositories
+            through your VPCs <br />
+            - Consist of a leader node (for query planning and result aggregation), a compute node (for performing the queries and send result to the
+            leader node). You need to provision the node size in advance and can use reserved instances for cost savings <br />
+            - Redshift has no Multi-Az mode. Thus you need to use snapshots to implement disaster recovery strategies. Snapshots are point-in-time
+            backups of a cluster, stored internally in S3. Snapshots are incremental (only what has changed is saved). You can restore a snapshot into
+            a new cluster. You can have two types of snapshots:
+            <ul>
+              <li><b>Manual:</b> snapshot is retained until you delete it</li>
+              <li><b>Automated:</b> every 8 hours, every 5 GB, or on a schedule. You need to set the retention time</li>
+            </ul>
+            - You can configure Redshift to automatically copy snapshots (created the Manual or Automated way) of a cluster to another AWS Region
+            <br />
+            - To load data to Redshift you can use Kinesis Data Firehose (throgh S3 copy), manually running a Redshift query that make an S3 copy
+            (through internet or your VPC), and using JDBC driver from an EC2 instace (which a better approach to write data in batches) <br />
+            - Redshift Spectrum: allows you to query data that is already in S3 without loading it on Redshift. You must have a Redshift cluster
+            available to start the query. The query is then submitted to up to thousands of Redshift Spectrum nodes that are launched automatically.
+            With this feature you can leverage much more query power than the you originally have inyou provisioned cluster <br />
+            <br />
+            <b>Amazon OpenSearch (ex-ElasticSearch - name changed for license issues)</b> <br />
+            - With OpenSearch you can search any field, even partially matches <br />
+            - It's common to use OpenSearch as a complement to another database (like DynamoDB) <br />
+            - OpenSearch requires a cluster of instances (not serverless) <br />
+            . It has its own query language. Does not support SQL <br />
+            - Support data ingestion from Kinesis Data Firehose, AWS IoT, CloudWatch Logs, etc <br />
+            - Great for efficiently store and analyze logs <br />
+            - Security through Cognito, IAM, KMS encryption and TLS <br />
+            - Comes with OpenSearch Dashboards to create visualizations on top of your data <br />
+            <br />
+            <b>Elastic MapReduce - EMR</b> <br />
+            - It helps you creating Hadoop clusters (Big Data) to analyze and process vast amount of data <br />
+            - EMR takes care of all the provisinning and configuration of the clusters (each cluster can be made of hundreds of EC2 instances) <br />
+            - EMR comes bundled with related services that can be hard to setup: Apache Spark, Hive, HBase, Presto, Flink, etc <br />
+            - It's integrated with auto-scaling and integrated with spot instances for cost reduction <br />
+            - Can have long-running clusters, or transient (temporary) clusters <br />
+            - With EMR you have different types of nodes:
+            <ul>
+              <li><b>Master node:</b> manage the cluster, coordinate, manage health. Must be long running</li>
+              <li><b>Core node:</b> run tasks and store data. Must be long running</li>
+              <li><b>Task node (optional):</b> just run tasks. Usually use spot instances</li>
+            </ul>
+            - Nodes purchasing options:
+            <ul>
+              <li><b>On-demand:</b> reliable, predictable, won't be terminated</li>
+              <li><b>Reserved (min one year):</b> cost savings (EMR will automatically use if available)</li>
+              <li><b>Spot instances:</b> less reliable but cheaper. Can be terminated</li>
+            </ul>
+            - Use cases: data processing, machine learning, web indexing, big data, etc <br />
+            <br />
+            <b>Amazon QuickSight</b> <br />
+            - Serverless machine learning-powered business intelligence service to create interactive dashboards <br />
+            - Fast, automatically scalable, embeddable, with per-session pricing <br />
+            - Integrated with RDS, Aurora, Athena, Redshift, S3, OpenSearch, TimeStream, etc <br />
+            - In-memory computationg using SPICE engine if data is imported into QuickSight <br />
+            - The enterprise edition (like a premium version) offers the possibility to setup column-level security (CLS) to allow or deny access to
+            some users depending on their permissions <br />
+            - In QuickSight yuo can define users (standard version) and groups (enterprise version). These users and groups only exists within
+            QuickSight, no IAM <br />
+            - In QuickSight, a dashboard is a read-only snapshot of an analysis that you can share. The snapshot preserves the configuration of the
+            analysis (filtering, parameters, controls, sort, etc) <br />
+            - You can share your analysis or dasboards with with users and groups within QuickSight. Users who see the dashboard can also see the
+            underlying data. You mus first publish your dashboard <br />
+            - Use cases: business analytics, building visualizations, perform ad-hoc analysis, get business insights using data <br />
+            <br />
+            <b>AWS Glue</b> <br />
+            - Managed and fully serverless extract, transform and load (ETL) service. Useful to rpepare and transform data for analytics <br />
+            - AWS Glue Data Catalog can store metadata about your data sources, leveraging AWS Glue Data Crawler to retrieve the metadata (db schemas,
+            etc) and Glue Jobs to perform ETL. <br />
+            - Other services that need to make schema discovery or something similar uses AWS Glue Data Catalog under the hood. Some of these services
+            are: Amazon Athena, Amazon Redshift Spectrum, and Amazon EMR <br />
+            - Glue Job Bookmarks: save and track the data that has already been processed during a previous run of a Glue ETL job to help you prevent
+            re-processing old data in case you run a new ETL job <br />
+            - Glue Elastic Views: it helps you to levearge a "virtual table" (materialized view), combininng and replicating data across multiple data
+            stores using SQL without the need of any custom code. Glue monitors for changes in the source data. It's a serverless service <br />
+            - Glue DataBrew: clean and normalize data using pre-built transformation <br />
+            - Glue Studio: new GUI to create, run and monitor ETL jobs in Glue <br />
+            - Glue Streaming ETL (built on Apache Spark Structured Streaming): the Glue version that is compatible with Kinesis Data Stream, Kafka,
+            MSK (managed Kafka) <br />
+            <br />
+            <b>AWS Lake Formation</b> <br />
+            - A data lake is a central place to have all your data for analytics purposes <br />
+            - AWS Lake Formation is a fully managed service that makes it easy to setup a data lake in days. The data lake is stored in S3 <br />
+            - It helps you cleans, transform and ingest data into your Data Lake <br />
+            - It automates many complex manual steps (collecting, cleansing, moving, cataloging data, etc) and de-duplicate (using ML Transforms)
+            <br />
+            - Combine structured ans unstructured data in the data lake <br />
+            - out of the box source blueprint: S3, RDS, on-premises Relational and NoSQL DBs, etc <br />
+            - Fine-grained access control for your applications (row andcolumn level) <br />
+            - It's actually a layer on top of AWS Glue, but you don't need to interact with Glue to use AWS Lake Formation <br />
+            - Use cases: it can help you to have centralized access control to your data instead of control per user os service that want to use your
+            data <br />
+            <br />
+            <b>Kinesis Data Analytics</b> <br />
+            - It's a fully managed service with automatic scaling to perform real-time analytics. It comes in two modes: <br />
+            - Kinesis Data Analytics for SQL applications
+            <ul>
+              <li>It can read from Kinesis Data Streams or Kinesis Data Firehose</li>
+              <li>It allows you to perform sql queries for analytics</li>
+              <li>You can add reference data from Amazon S3 to enrich streaming data</li>
+              <li>You can send data to Kinesis Data Streams and Kinesis Data Firehose</li>
+              <li>Use cases: time-series analytics, real-time dashborads, and real-time metrics</li>
+            </ul>
+            - Kinesis Data Analytics for Apache Flink
+            <ul>
+              <li>Flink are special applications that you need to write (Java, Scala or SQL)</li>
+              <li>It uses Flink to process and analyze streaming data</li>
+              <li>
+                It can run any Apache Flink application and use any Apache Flink programming feature on a managed cluster on AWS. It manages
+                provisioned computing resources, parallel computation, automatic scaling, and application backups (as checkpoints or snapshots)
+              </li>
+              <li>It can read from Kinesis Data Streams or Amazon MSK</li>
+              <li>Flink does NOT read from Kinesis Data Firehose</li>
+              <li></li>
+            </ul>
+            <br />
+            <b>Amazon Managed Streaming for Apache Kafka (Amazon MKS)</b> <br />
+            - Kafka is an alternative for Amazon Kinesis <br />
+            - Amazon MSK is a managed Apache Kafka on AWS <br />
+            - It allows you to create, update, and delete clusters <br />
+            - MSK creates and manges Kafka brokers nodes and Zookeeper nodes for you <br />
+            - It deploy your MSK cluster in your own VPC with multi-AZ (up to 3 AZs) <br />
+            - Data is stored in EBS volumes for as long as you want <br />
+            - MSK serverless is the serverless solution for Amazon MSK. You don't need to manage the capacity because MSK serverless automatically
+            provisions resources and scales compute and storage <br />
+            - For producers you need to write you producer application, but it comes to consumer you have different options: Kinensis Data Analytics
+            for Apache Flink, AWS Glue, AWS Lambda, or an application running on EC2, ECS or EKS <br />
+            <br />
+            <b>Use case -> Big Data Ingestion Pipeline</b> <br />
+            - Se images <br />
+            - IoT Core is a service that allows you to harvest data from Iot devices <br />
+            - Kinesis Data Streams is great for rea time data collection <br />
+            - Kinesis Data Firehose helps with data delivery to S3 in near real-time (1 minute is the lowest frequency you can choose)<br />
+            - We process the Iot devices data with Kinesis Data Streams and leverage AWS Lambda to transform the data that in Kinesis Data Firehose
+            before it's sent to an S3 bucket <br />
+            - Then we can configure an event on the S3 bucket that is processed for a lambda function that triggers an Athen query, which output is
+            stored in another S3 bucket <br />
+            - We can visualize the data in our reporting bucket with Amazon QuickSight or load the data in a proper storage for analytics like Amazon
+            Redshift
+          </td>
+          <td>
+            <span>Athena Federated Queries</span>
+            <img src="../assets/123.-athena-federated-queries.png" alt="Athena Federated Queries" />
+            <hr />
+            <span>Redshift Architecture</span>
+            <img src="../assets/124.-redshift.png" alt="Redshift Architecture" />
+            <hr />
+            <span>Redshift Load Data</span>
+            <img src="../assets/125.-redshift-load-data.png" alt="Redshift Load Data" />
+            <hr />
+            <span>Redshift Spectrum</span>
+            <img src="../assets/126.-redshift-spectrum.png" alt="Redshift Spectrum" />
+            <hr />
+            <span>QuickSight Example</span>
+            <img src="../assets/127.-quicksight.png" alt="QuickSight Example" />
+            <hr />
+            <span>QuickSight Integrations</span>
+            <img src="../assets/128.-quicksight-integrations.png" alt="QuickSight Integrations" />
+            <hr />
+            <span>Glue Data Catalog</span>
+            <img src="../assets/129.-glue-data-catalog.png" alt="Glue Data Catalog" />
+            <hr />
+            <span>AWS Lake Formation</span>
+            <img src="../assets/130.-lake-formation.png" alt="AWS Lake Formation" />
+            <hr />
+            <span>Amazon Managed Streaming for Apache Kafka (Amazon MKS)</span>
+            <img src="../assets/131.-msk.png" alt="Amazon Managed Streaming for Apache Kafka (Amazon MKS)" />
+            <hr />
+            <span>MSK vs Kinesis</span>
+            <img src="../assets/132.-msk-vs-kinesis.png" alt="MSK vs Kinesis" />
+            <hr />
+            <span>Use case -> Requirements -> Big Data Ingestion Pipeline</span>
+            <img src="../assets/133.-big-data-pipeline-use-case-requirements.png" alt="Use case -> Requirements -> Big Data Ingestion Pipeline" />
           </td>
         </tr>
       </tbody>
