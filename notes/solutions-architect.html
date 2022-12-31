@@ -2167,6 +2167,194 @@
             <img src="../assets/133.-big-data-pipeline-use-case-requirements.png" alt="Use case -> Requirements -> Big Data Ingestion Pipeline" />
           </td>
         </tr>
+        <tr>
+          <td>Machine Learning</td>
+          <td>
+            <b>Rekognition</b> <br />
+            - It's a service used to find objects, people, test, scenes in images and videos usin ML <br />
+            - You can make facial analysis and facial search to do user verification or people counting <br />
+            - It allows you to create a database of "familiar faces" or compare against celebrities <br />
+            - You can set a minimum confidence threshold for items that will be flagged. This is used to content moderation, so the content that is
+            flagged as sensitive is then reviewed manually in Amazon Augmented AI (A2I) <br />
+            - Use cases: labeling, content moderation, text detection, face detection and analysis (gender, age, emotions, etc), face search and
+            verification, celebrity recognition, pathing (ex: the movement of athetes in a football game) <br />
+            <br />
+            <b>Amazon Transcribe</b> <br />
+            - Automatically convert speech to text <br />
+            - Uses a deep learning process called automatic speech recognition (ASR) to convert speech to text quickly and accurately <br />
+            - It can automatically remove Personally Identifiable Information (PII) using Redaction <br />
+            - Support automatically language identification ofr multi-lingual audio <br />
+            - Use cases: transcribe customer service calls, automate closed captioning and subtitling, generate metadata for media assets to create a
+            fully searchable archive <br />
+            <br />
+            <b>Amazon Polly</b> <br />
+            - It turns text into speech using deep learning, allowing you to create applications that talk <br />
+            - Lexicon: its a feature that allows you to "add words" to Polly. A good example are acronyms like AWS, you can use lexicom for Polly to
+            tell "Amazon Web Services" each time it reads the acronym "AWS". To use a lexicom, you need to upload it and use them in the
+            SynthesizeSṕeech operation <br />
+            - Speech Synthesis Markup Language (SSML): it enables more customization to how speech is made. It can be used to emphasizing specific
+            words or phrases, using phonetic pronunciation, including breathing sounds, whispering, using the newscaster speaking style and so on
+            <br />
+            <br />
+            <b>Amazon Translate</b> <br />
+            - Natural and accurate language translation <br />
+            - Amazon translate allows you to localize content (such as websites and applications) for international users and to easily translate
+            large volumes of text efficiently <br />
+            <br />
+            <b>Amazon Lex and Connect</b> <br />
+            - When the exam ask about a service to transform speech to text and recognize the intent of the text it refers to Lex <br />
+            - Amazon Lex is the same technology that powers Alexa:
+            <ul>
+              <li>Uses Automatic Speech Recognition (ASR) to convert speech to text</li>
+              <li>Natural Language Understanding to recognize the intent of text o audio</li>
+              <li>Helps build chatbots or call center bots</li>
+            </ul>
+            - Amazon Connect: a solution designed for call centers
+            <ul>
+              <li>Receive calls, create contact flows, cloud-based virtual contact center</li>
+              <li>Can integrate with other CRM systems or AWS services</li>
+              <li>No upfront payment needed and 80% cheaper than traditional contact center solutions</li>
+            </ul>
+            <br />
+            <b>Amazon Comprehend</b> <br />
+            - From an exam perspective it is a Natural Language Processing (NLP) service: Comprehend is about taking text or unstructured data in and
+            structure it <br />
+            - It is a fully managed an serverless service that uses machine learning to find insights and relationships in text (the language of the
+            text; extracts key phrases, places, people, brands or events; understands how positive or negative the text is; can organize a collection
+            of text files by topic) <br />
+            - Use cases: analyze customer interactions (emails) to find what leads to a positive or negative experience <br />
+            - Amazon Comprehend Medical: used for clinical texts (test results, case notes, etc). You can store your documents in amazon S3 analyze
+            real-time data with Kinesis Data Firehose, or use Amazon Transcribe to transcribe patient narratives into text that can be analyzed by
+            Amazon Comporehend Medical. It uses NLP to detect Protected Health Information (PHI) and obfuscate that info in order to comply with legal
+            regulations <br />
+            <br />
+            <b>Amazon SageMaker</b> <br />
+            - Fully managed service for developers and data scientists to build ML models <br />
+            - It helps to simplify the machine learning development process (labeling, build, train and tune the ML model) <br />
+            <br />
+            <b>Amazon Forecast</b> <br />
+            - Fully managed service to uses ML to deliver highly accurate forecasts. For example: predict the future of sales <br />
+            - Normally it's 50% more accurate than looking at the data itself <br />
+            - Reduce forecasting time from months to hours <br />
+            - It takes data from an S3 bucket to produce the foracsting model <br />
+            <br />
+            <b>Amazon Kendra</b> <br />
+            - Fully managed document search service powered by ML <br />
+            - Its main purpose is to extract answers from within a document (text, PDF, HTML, PowerPoint, MS Word, FAQs, etc) <br />
+            - Support natural language search capabilities, so you can make searches like you do with google <br />
+            - It can learn from user interaction/feedback to promote prefered results (Incremental Learning) <br />
+            - Ability to manuallly fine-tune search results (importance of data, freshness, etc) <br />
+            <br />
+            <b>Amazon Personalize</b> <br />
+            - Fully managed machine learning service to build apps with real-time personalized recommendations. For example: customized direct
+            marketing or recommendations on an e-commerce <br />
+            - It's the same technology used by Amazon.com to provide recommendations <br />
+            - It can read data from as S3 bucket or integrate with real-time data. You can also request recommendations via API <br />
+            <br />
+            <b>Amazon Textract</b> <br />
+            - Automatically extract text, handwriting, and data from any scanned documents using AI and ML <br />
+            - You can also extract data from forms and tables or read and process any type of document (PDF, images, etc) <br />
+            - Use cases: financial services (invoices, financial reports, etc) and healthcare (medical records, insurance claims, etc)
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>AWS Monitoring and Audit: CloudWatch, CloudTrail and Config</td>
+          <td>
+            <b>CloudWatch Metrics</b> <br />
+            - It provides metrics for every service in AWS <br />
+            - A metric is a variable to monitor (CPUUtilization, NetworkIn, etc) <br />
+            - Metrics belong to namespaces <br />
+            - Dimension is an attribute of a metric (instanceId, environment, etc) <br />
+            - Up to 10 dimensions per metric <br />
+            - Metric have timestamps <br />
+            - By default the metrics are logged in 5 minutes periods. To log metric in 1 minute periods you need to enable "detailed monitoring"
+            <br />
+            - You can create a CloudWatch dashboard of metrics, so you can see all of them at once in the specific manner that you configure <br />
+            - You can create CloudWatch Cutom Metrics (ex: memory usage of an EC2 instance) <br />
+            - You can stream your CloudWatch metrics to a destination of your choice (ex: Kinesis Data Streams or 3rd party providers like New Relic)
+            with nrea real-time delivery and low latency. For the strams you have an option to filter metrics to only stream a subset of them <br />
+            <br />
+            <b>CloudWatch Logs</b> <br />
+            - The logs are grouped in "log groups" that you can name whatever you want <br />
+            - Within each log group you have log streams, which represents instances within the application / log files / container <br />
+            - You cand efien log expiration policies (never expires, 30 day, etc) <br />
+            - CloudWatch Logs can use filter expressions (for example, find a specific IP inside of a log). Metric filters can be used to trigger
+            CloudWatch alarms <br />
+            - CloudWatch Insights can be used to query logs and add queries to CloudWatch Dashboards. CloudWatch Insights comes with predefined
+            queries that could be useful <br />
+            - Log sources:
+            <ul>
+              <li>SDK, CloudWatch Logs Agent (deprecated), CloudWatch Unified Agent</li>
+              <li>Elastic Beanstalk: send collection of logs from application</li>
+              <li>ECS: collection from containers</li>
+              <li>AWS Lambda: collection from function logs</li>
+              <li>VPC Flow Logs: VPC specific logs. VPC metadata network traffic</li>
+              <li>API Gateway: send all the requests it receives to CloudWatch</li>
+              <li>CloudTrail: send info based on filters</li>
+              <li>Route53: log all the DNS queries received for the service</li>
+            </ul>
+            - CloudWatch Logs can send logs to:
+            <ul>
+              <li>
+                Amazon S3 (exports): <br />
+                - Log data can take up to 12 hours to become available for export <br />
+                - The API call used for this operation is CreateExportTask <br />
+                - Not near real-time or real-time. If you want real-time you should use Logs Subscriptions instead
+              </li>
+              <li>
+                Subscriptions Filter: <br />
+                - A filter that you put on top of CloudWatch logs to config a destination <br />
+                - It allows you to send logs to Kinesis Data Streams, Kinesis Data Firehose, AWS Lambda and Elastic Search <br />
+                - It allows you to do logs aggregations (multi-account or multi-region). See image
+              </li>
+            </ul>
+            - CloudWatch logs for EC2 intances:
+            <ul>
+              <li>
+                By default, no logs from your EC2 intance will go to CloudWatch. You need to run a CoudWatch Agent on EC2 to push the log files you
+                want (make sure IAM permission are correct)
+              </li>
+              <li>The CloudWatch Logs Agent can be setup on-premises</li>
+              <li>
+                There are two types of agents: <br />
+                - CludWatch Logs Agent (old version of the agent): can only send to CloudWatch Logs <br />
+                - CloudWatch Unified Agent: collect additional system level metrics such as RAM, processes, etc. Collecto logs to send to CloudWatch
+                Logs. Support centralized configuration using SSM Parameter Store
+              </li>
+            </ul>
+            <br />
+            <b>CludWatch Alarms</b> <br />
+            - Alarms are used to trigger notifications for any metric. Alarms can be created on top of CloudWatch Logs Metric Filters <br />
+            - You have various options to set the alarms: sampling, percentage, max, min, etc <br />
+            - The period is how long you want the metrics to be evaluated (from seconds to a very long period) <br />
+            - CloudWatch alarms are on a single metric <br />
+            - Composite alarms are monitoring the state of multiple other alarms (with AND and OR conditions) <br />
+            - You can test your alarms by setting the state to ALARM via cli <br />
+            - Alarm states:
+            <ul>
+              <li>OK: not triggered</li>
+              <li>INSUFFICIENT_DATA: there is no data for the alarm to define a state</li>
+              <li>ALARM: your defined threshold has been reached and therefore the alarm is triggered</li>
+            </ul>
+            - Alarms have three main targets:
+            <ul>
+              <li>EC2 intances: stop, terminate, reboot, or recover an instance</li>
+              <li>EC2 Auto Scaling: trigger auto scaling action (scale out or in)</li>
+              <li>SNS: send a notification to SNS from which you can do pretty much anything</li>
+            </ul>
+          </td>
+          <td>
+            <span>CloudWatch Subscription Filter</span>
+            <img src="../assets/134.-cloudwatch-subscription-filter.png" alt="CloudWatch Subscription Filter" />
+            <hr />
+            <span>CloudWatch Logs Aggregation</span>
+            <img src="../assets/135.-cloudwatch-logs-aggregation.png" alt="CloudWatch Logs Aggregation" />
+            <hr />
+            <span>CloudWatch Unified Agent Metrics</span>
+            <img src="../assets/136.-cloudwatch-unified-agent.png" alt="CloudWatch Unified Agent Metrics" />
+          </td>
+        </tr>
       </tbody>
     </table>
     <script>
