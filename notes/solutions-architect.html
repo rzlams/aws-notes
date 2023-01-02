@@ -2268,17 +2268,19 @@
             - Dimension is an attribute of a metric (instanceId, environment, etc) <br />
             - Up to 10 dimensions per metric <br />
             - Metric have timestamps <br />
-            - By default the metrics are logged in 5 minutes periods. To log metric in 1 minute periods you need to enable "detailed monitoring"
+            - By default the EC2 metrics are logged in 5 minutes periods. To log EC2 metric in 1 minute periods you need to enable "detailed
+            monitoring"
             <br />
             - You can create a CloudWatch dashboard of metrics, so you can see all of them at once in the specific manner that you configure <br />
             - You can create CloudWatch Cutom Metrics (ex: memory usage of an EC2 instance) <br />
-            - You can stream your CloudWatch metrics to a destination of your choice (ex: Kinesis Data Streams or 3rd party providers like New Relic)
-            with nrea real-time delivery and low latency. For the strams you have an option to filter metrics to only stream a subset of them <br />
+            - CloudWatch Metric Strema: you can stream your CloudWatch metrics to a destination of your choice (ex: Kinesis Data Streams or 3rd party
+            providers like New Relic) with nrea real-time delivery and low latency. For the strams you have an option to filter metrics to only stream
+            a subset of them <br />
             <br />
             <b>CloudWatch Logs</b> <br />
             - The logs are grouped in "log groups" that you can name whatever you want <br />
             - Within each log group you have log streams, which represents instances within the application / log files / container <br />
-            - You cand efien log expiration policies (never expires, 30 day, etc) <br />
+            - You can define log expiration policies (never expires, 30 day, etc) <br />
             - CloudWatch Logs can use filter expressions (for example, find a specific IP inside of a log). Metric filters can be used to trigger
             CloudWatch alarms <br />
             - CloudWatch Insights can be used to query logs and add queries to CloudWatch Dashboards. CloudWatch Insights comes with predefined
@@ -2343,6 +2345,122 @@
               <li>EC2 Auto Scaling: trigger auto scaling action (scale out or in)</li>
               <li>SNS: send a notification to SNS from which you can do pretty much anything</li>
             </ul>
+            <br />
+            <b>EventBridge (formerly CloudWatch Events):</b> <br />
+            - It allows you to set more complex rules. Cloud be scheduled events (cron jobs) or event patterns (event rule to react to a services
+            doing something) <br />
+            - The destinations could be: lambda functions, sns, sqs, etc <br />
+            - You have one default event bus on your account which handles AWS services events <br />
+            - You can configure your own event buses. For example: to connect with 3rd party services or custom event buses for yor applications
+            <br />
+            - Event buses can be accessed by other AWS accounts using resource-based policies (manage permission for a specific event bus). Without a
+            resource-based policy only the owner of the event bus can send event to it <br />
+            - You can archive events (all/filter) sent to an event bus (indefinitely or set period) <br />
+            - Cana nalyze the event in your event bus and infer the schema. The Schema registry allows yu to geenrate code for your application, that
+            will know in advance how data is structured in the event bus. Schema (the format of the event) can be versioned <br />
+            <br />
+            <b>CloudWatch Insights</b> <br />
+            - CloudWatch Container Insights:
+            <ul>
+              <li>Collect, aggregate and summarize metrics and logs from containers</li>
+              <li>Available for containers running on ECS, EKS, kubernetes running directly on EC2, Fargate (both ECS and EKS)</li>
+              <li>
+                In Amazon EKS and kubernetes running directly on EC2, CloudWatch Insights is using a containerized version of the CLoudWatch Agent to
+                discover containers
+              </li>
+            </ul>
+            - CloudWatch Lambda Insights:
+            <ul>
+              <li>Monitorign and trouble shooting solution for serverles applications running on AWS Lambda</li>
+              <li>
+                Collect, aggregates and summarize system-level metrics (CPU time, memory, disk, network, cold starts, lambda workers shutdown, etc)
+              </li>
+              <li>Lambda Insight is provided as a lambda layer</li>
+            </ul>
+            - CloudWatch Contributor Insights:
+            <ul>
+              <li>
+                Analyze log data and create time series that display contributor data (see metrics about the top-N contributors, the total number of
+                unique contributors and their usage)
+              </li>
+              <li>
+                This helps you find top talkers and understand who or what is impacting system performance (the heaviest network user, the URLs that
+                generate the most errors, etc)
+              </li>
+              <li>Works for any AWS-generated logs (VPC, DNS, etc)</li>
+              <li>
+                It has built-in rules that you can use to analyze metrics but you can also build new rules from scracth or based on sample rules
+              </li>
+              <li>For the exam: every tiem they ask about a top-N contributors they refers to CloudWatch Contributor Insights</li>
+            </ul>
+            - CloudWatch Application Insights:
+            <ul>
+              <li>Provides automated dashboards that show potential problems with monitored applications, to help isolate ongoing issues</li>
+              <li>Powered by Amazon SageMaker</li>
+              <li>
+                Any time you have a failure in your application, it automatically is going to create a dashboard that shows you the potential issue
+                with some services used by your application
+              </li>
+              <li>Enhance visibility into your application health tor educe the time it will take you to troubleshoot and repair your application</li>
+              <li>All the findings and alerts are sent to Amazon EventBridge and SSM OpsCenter</li>
+            </ul>
+            <br />
+            <b>AWS CloudTrail</b> <br />
+            - Provides governance, compliance and audit for your AWS account <br />
+            - CloudTrail is enabled by default <br />
+            - Get an history of events/API calls made within your AWS Account by console, SDK, CLI, or AWS Services <br />
+            - The retention time of the log in CloudTrail is up to 90 days. You can put logs from CloudTrail into CloudWatch Logs (creating a log
+            group) or S3 for a higher retention time<br />
+            - A trail can be applied to all regions (default) or a single region <br />
+            - If a resource is deleted in AWS, investigate CloudTrail first to know who did it and when <br />
+            - Event types:
+            <ul>
+              <li>
+                Management Events: are operations that are performed on resources in your AWS account (configuring security with IAM, configuring
+                rules for routing or subnets, setting up logging on CloudWatch or CloudTrail, etc) <br />
+                - By default, management events are logged <br />
+                - You can separate Read Events (don't modify resources) from Write Events (modify resources)
+              </li>
+              <li>
+                Data Events: these are also known as data plane operations. Provide visibility into the resource operations performed on or within a
+                resource (Amazon S3 object-level API activity - GetObject, DeleteObject, and PutObject API operations on buckets and objects in
+                buckets; AWS Lambda function execution activity - the Invoke API) <br />
+                - By default, data events are not logged (beacuse high colume operations) <br />
+                - You can separate Read Events (don't modify resources) from Write Events (modify resources)
+              </li>
+              <li>
+                Insights Events: helps AWS users identify and respond to unusual activity associated with write API calls by continuously analyzing
+                CloudTrail management events. <br />
+                - Ususuala activities examples: innacurate resource provisioning, hitting service limits, burst on AWS IAM actions, gaps in periodic
+                maintenance activity, etc <br />
+                - CloudTrail Insights analyzes normal management events to create a baseline and then continously analyzes write events to detect
+                unusual patterns<br />
+                - These events are logged when CloudTrail detects unusual write management API activity in your account <br />
+                - See image. Anomalies appear in the CloudTrail console -> event is sent to Amazon S3 -> an EventBridge event is generated (for
+                automation needs)
+              </li>
+            </ul>
+            <br />
+            <b>AWS Config</b> <br />
+            - Helps with auditing and recording compliance on your AWS resource <br />
+            - Helps record configurations and changes over time <br />
+            - Questions that can be solved by AWS Config: Is there unrestricted SSH access to my security groups? Do my buckets have any public
+            access? Hos has my ALB configuration changed over time? <br />
+            - AWS Config is a per region service <br />
+            - You can receive alerts (SNS notifications) for any changes. Can be aggregated accross regions and accounts <br />
+            - Possibility of storing the configuration data into S3 (analyzed by Athena) <br />
+            - Config rules are the "template" against the AWS Config service evaluate the current configuration of your account/resources. You can use
+            AWS managed config rules (over 75 rules) or you can make custom config rules (must be defined in AWS Lambda) <br />
+            - Custom rule can evaluate (for example) if each EBS disk is of type gp2 or if each EC2 instance is t2.micro <br />
+            - Rules can be evaluated or triggered: whendever a config change (create a new EBS volume or change the type of an existing one) and/or at
+            regular time intervals <br />
+            - There is no free tier for AWS Config <br />
+            - AWS config rules DOES NOT prevent actions from happening (no deny), they are only for compliance <br />
+            - AWS Config Remediations: allows you to automate remediation of non-compliant resources using SSM Automation Documents (can be AWS
+            managed or custom). You can create custom Automation Documents that invoke lambda functions and apply retries to them in case of failure
+            <br />
+            - AWS Config Notifications: AWS Config can integrate with EventBridge and SNS to trigger notifications when AWS resources are not
+            compliant <br />
           </td>
           <td>
             <span>CloudWatch Subscription Filter</span>
@@ -2353,6 +2471,18 @@
             <hr />
             <span>CloudWatch Unified Agent Metrics</span>
             <img src="../assets/136.-cloudwatch-unified-agent.png" alt="CloudWatch Unified Agent Metrics" />
+            <hr />
+            <span>EventBridge Rules</span>
+            <img src="../assets/137.-eventbridge.png" alt="EventBridge Rules" />
+            <hr />
+            <span>CloudWatch Insights Summary</span>
+            <img src="../assets/138.-cloudwatch-insights-summary.png" alt="CloudWatch Insights Summary" />
+            <hr />
+            <span>CloudTrail Insights</span>
+            <img src="../assets/139.-cloudtrail-insights.png" alt="CloudTrail Insights" />
+            <hr />
+            <span>CloudWatch vs CloudTrail vs Config</span>
+            <img src="../assets/140.-cloudwatch-vs-cloudtrail-vs-config.png" alt="CloudWatch vs CloudTrail vs Config" />
           </td>
         </tr>
       </tbody>
