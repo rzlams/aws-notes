@@ -2485,6 +2485,272 @@
             <img src="../assets/140.-cloudwatch-vs-cloudtrail-vs-config.png" alt="CloudWatch vs CloudTrail vs Config" />
           </td>
         </tr>
+        <tr>
+          <td>Identity and Access Management (IAM) - Advanced</td>
+          <td>
+            <b>AWS Organizations</b> <br />
+            - Global service that allows you to manage multiple AWS accounts <br />
+            - The main account is the "management account" and the others are "member accounts" <br />
+            - Member account can only be part of one organization <br />
+            - AWS Organizations allows you to have consolidated billing across all accounts with a single payment method (on the management account).
+            This can give you priving benefits (volume discount) <br />
+            - The reserved EC2 instances and Saving Plans can be shared across accounts within an AWS Organization <br />
+            - AWS Organizations gives you access to an API for easily create new member accounts <br />
+            - You can send invitations to other accounts to join your organization, via email or directly through a notification in the AWS console
+            <br />
+            - Besides SCP, you can set other kind of policies for your organization. For example: backup policy to deploy organizational wide backup
+            strategies or tags policy to standardize tags for all account in the organization <br />
+            - Organizations are divided in Organizational Units (OU) <br />
+            - The main advantages of organizations are related to aggregation and permissions control. For example: is more secure a multi account
+            approach than a single account with multiple VPCs; CloudTrail and CloudWatch logs of several accounts can be aggregated in a single S3
+            bucket for the entire organization; configure cross account admin roles <br />
+            - Service Control Policy (SCP): are IAM policies applied to OUs o accounts to restrict users and roles. Like any other IAM policy, they
+            need to explicitly allow or deny access. They can apply to an}nything but the (main) management account that always has full admin access.
+            The SCPs are inherited and also the higher hierarchy SCPs prevails over the lower hierarchy SCPs (in the image the AuthorizedRedshift have
+            no effect because of the DenyRedshift SCP on the Prod OU). You can use an Blocklist (allow anything but the resources explicitly denied)
+            or Allowslist (only allow specific resources) strategy for SCPs, see image.
+            <br />
+            <b>IAM Policy Conditions</b> <br />
+            - The Condition element (or Condition block) lets you specify conditions for when a policy is in effect. The Condition element is
+            optional. In the Condition element, you build expressions in which you use condition operators (equal, less than, etc.) to match the
+            condition keys and values in the policy against keys and values in the request context <br />
+            - The condition key that you specify can be a global condition key or a service-specific condition key. Global condition keys have the
+            aws: prefix. Service-specific condition keys have the service's prefix. For example, Amazon EC2 lets you write a condition using the
+            ec2:InstanceType key, which is unique to that service<br />
+            - Condition keys are not case sensitive <br />
+            - Condition structure: "Condition" : { "{condition-operator}" : { "{condition-key}" : "{condition-value}" }} <br />
+            - Example policies:
+            <ul>
+              <li>
+                <b> aws:SourceIp</b> restrict the client IP from which the API calls are being made. Image example means that unless the request is
+                made from the specified IP ranges, the request must be denied
+              </li>
+              <li>
+                <b>aws-RequestedRegion</b> restricts the region the API calls are made to. Image example means that unless the request to rds, ec2 or
+                dynamo are made to the specified regions, the request must be denied
+              </li>
+              <li>
+                <b>ec2:ResourceTag</b> restrict based on tags. Image example allows to start and stop ec2 intances with the resource tag Project with
+                a value of DataAnalytics, only by users that has the tag Department with a value of Data
+              </li>
+              <li>
+                <b>aws:MultiFactorAuthPresent</b> to force MFA. Iamge means that users can do anything on EC2 but the can only start or terminate
+                instances if the have MFA present
+              </li>
+              <li>
+                <b>S3</b> has bucket level operations (don't need the asterisk) and object level operations (is represented by na asterik at the end)
+              </li>
+              <li>
+                <b>aws:PrincipalOrgID</b> can be used in any resource policy to restrict access to accounts that are member of an AWS Organization
+              </li>
+            </ul>
+            <br />
+            <b>IAM Roles vs Resource Based Policies</b> <br />
+            - Both can be used for cross account access. An user assuming a role to communicate with an S3 bucket or an S3 policy to allow the user<br />
+            - When you assume a role (user, applcation or service), you give up your original permissions and take the permissions assigned to the
+            role <br />
+            - When using a resource based policy, the principal doesn't have to give up his permissions <br />
+            - There are case where a role is not a good fit. For example: user in account A needs to scan a DynamoDB table in account A and dump it in
+            an S3 buscket in account B. <br />
+            - For EventBridge, when a rule runs it needs permission on target. There are two kind of targets:
+            <ul>
+              <li>Targets that support resource based policies: Lambda, SNS, SQS, S3, CloudWatch Logs, API Gateway, etc</li>
+              <li>
+                Targets that doesn't support resource based policies (need to assume an IAM role): Kinesis Data Streams, Systems Manager Run Command,
+                ECS tasks, etc
+              </li>
+            </ul>
+            <br />
+            <b>IAM Permission Boundaries</b> <br />
+            - It's an advance feature to use a managed policy to set the maximum permissions an IAM entity can get <br />
+            - It's supported by users and roles (not groups) <br />
+            - IAM Policy Evaluation Logic (see image): in short, if you have an explicit deny for any action you can't perform the action even if you
+            also have an explicit allow <br />
+            <br />
+            <b>Amazon Cognito</b><br />
+            - Exam tip: whenever they ask about auth for "hundreds of users", "mobile users", or "authenticate with SAML", they are talking about
+            Cognito <br />
+            - It's goal is to give to external users an identity to interact with or web or mobile application <br />
+            - Cognito User Pool:
+            <ul>
+              <li>It creates a serverless database of users of your web or mobile application</li>
+              <li>Integrate with API Gateway and Aplication Load Balancer</li>
+              <li>
+                Features:
+                <ul>
+                  <li>Sign in functionality for app users (user or email and password)</li>
+                  <li>Passwrod reset</li>
+                  <li>Email and phone verification</li>
+                  <li>Multifactor authentication (MFA)</li>
+                  <li>Federated Identities: users from facebook, google, SAML, etc</li>
+                </ul>
+              </li>
+              <li>Integrates with API Gateway and Application Load Balancer</li>
+            </ul>
+            - Cognito Identity Pool (federeated identity):
+            <ul>
+              <li>Provides temporary AWS credentials to users so they can access AWS resources directly or through API Gateway</li>
+              <li>Can integrate with Cognito User Pool as an identity provider or 3rd party logins</li>
+              <li>
+                The IAM policies applied to the credentials are defined in cognito. The credentials can be customized based on user_id for
+                fine-grained control
+              </li>
+              <li>You can also define a default IAM roles (base permission) for authenticated and guest users</li>
+            </ul>
+            <br />
+            <b>AWS IAM Identity Center (successor to AWS Single Sign-On </b> <br />
+            - It gives you one login for all your AWS accounts in your AWS Organizations, your business cloud applications (salesforce, microsoft 365,
+            etc), any other application that have SAML-2.0 enabled, or EC2 Windows instances <br />
+            - The identity provider could be: built-in identity store in IAM Identity Center or a 3rd party provider (Active Directory, One Login,
+            Okta, etc) <br />
+            <br />
+            <b>AWS Directory Services</b> <br />
+            - Microsoft Active Directory is a database of objects (user accounts, computers, printers, file shares, security groups) found on any
+            Windows Server with AD Domain Services. <br />
+            - It gives you the ability to centralize the security management (create accounts and assign permissions) <br />
+            - Objects are organized in "trees", and a group of "trees" is called a "forest" <br />
+            - The idea behind AD is that you can login from one machine and have access (depending on your permssions) to all of the machines in the
+            network <br />
+            - AWS Directory Services provides you a way to create a Microsoft Active Directory on AWS and it comes in three flavors:
+            <ul>
+              <li>
+                <b>AWS Managed Microsoft AD:</b> create your own AD on AWS. manage uasers locally. Supports MFA. With this standalone AD, you can
+                create a "trust" connection with you on-premise AD (users are shared across on-premise and AWS AD)
+              </li>
+              <li>
+                <b>AD Connector:</b> it's a Directory Gateway (proxy) to redirect to on-premise AD. It supports MFA. Users are managed only on the
+                on-premises AD
+              </li>
+              <li>
+                <b>Simple AD:</b> AD-compatible managed directory on AWS (good if you don't have an on-premise AD). Cannot be joined with on-premise
+                AD
+              </li>
+            </ul>
+            <br />
+            <b>AWS Control Tower</b> <br />
+            - Easy way to setup and govern a secure and compliant multi-account AWS environment based on best practices <br />
+            - AWS Control Tower uses AWS Organizations to create accounts <br />
+            - It automates the setup of your environment in a few clicks <br />
+            - It automates ongoing policy management using guardrails <br />
+            - It can detect policy violations and remediate them <br />
+            - You can monitor compliance through an interactive dashboard <br />
+            - AWS Control Tower Guardrails: provides ongoing governance for your Control Tower environment (AWS accounts). It helps you to restrict or
+            monitor some things on several account. There are two kind of Guardrails:
+            <ul>
+              <li>
+                <b>Preventive Guardrail:</b> used to prevent accounts to doing something. Behind the scenes it uses AWS Organization SCPs (ex:
+                restrict regions across all accounts to only use us-east-1)
+              </li>
+              <li>
+                <b>Detective Guardrail:</b> helps you to detect non compliance. Behind the scenes it uses AWS Config (ex: identify untagged resources)
+              </li>
+            </ul>
+          </td>
+          <td>
+            <span>Service Control Policy Hierarchy</span>
+            <img src="../assets/141.-service-control-policy-hierarchy.png" alt="Service Control Policy Hierarchy" />
+            <hr />
+            <span>Service Control Policy Strategies</span>
+            <img src="../assets/142.-service-control-policy-strategies.png" alt="Service Control Policy Strategies" />
+            <hr />
+            <span>IAM Conditions - aws:SourceIp and aws:RequestedRegion</span>
+            <img src="../assets/143.-policy-conditions.png" alt="IAM Conditions - aws:SourceIp and aws:RequestedRegion" />
+            <hr />
+            <span>IAM Conditions - aws:ResourceTag and aws:MultiFactorAuthPresent</span>
+            <img src="../assets/144.-policy-conditions.png" alt="IAM Conditions - aws:ResourceTag and aws:MultiFactorAuthPresent" />
+            <hr />
+            <span>S3 bucket and object level policy statement</span>
+            <img src="../assets/145.-s3-policy.png" alt="S3 bucket and object level policy statement" />
+            <hr />
+            <span>IAM Conditions - aws:PrincipalOrgID</span>
+            <img src="../assets/146.-policy-condition.png" alt="IAM Conditions - aws:PrincipalOrgID" />
+            <hr />
+            <span>IAM Permissions Logic</span>
+            <img src="../assets/147.-iam-permissions-logic.png" alt="IAM Permissions Logic" />
+            <hr />
+            <span>Cognito User Pool Integrations</span>
+            <img src="../assets/149.-congnito-integrations.png" alt="Cognito User Pool Integrations" />
+            <hr />
+            <span>Cognito Identity Pool</span>
+            <img src="../assets/150.-congnito-identity-pool.png" alt="Cognito Identity Pool" />
+            <hr />
+            <span>IAM Identity Center - Fine-grained permissions and assignments</span>
+            <img src="../assets/151.-iam-identity-center.png" alt="IAM Identity Center - Fine-grained permissions and assignments" />
+            <hr />
+            <span>IAM Identity Center - Active Directory setup</span>
+            <img src="../assets/152.-iam-identity-center-active-directory.png" alt="IAM Identity Center - Active Directory setup" />
+            <hr />
+            <span>Control Tower - Guardrail Detective</span>
+            <img src="../assets/153.-control-tower-guardrail.png" alt="Control Tower - Guardrail Detective" />
+          </td>
+        </tr>
+        <tr>
+          <td>AWS Security and Encyption</td>
+          <td>
+            <b>Encryption</b> <br />
+            - Encryption in-flight: the data is encrypted before it's sending and decrypted after receiving. SSL certificates (HTTPS) help with
+            encryption, it ensures no man in the middle attack (MITM) can happen <br />
+            - Encryption at rest (server side): data is encrypted after being received by the server and decrypted before sent back to the client. The
+            data is stored in an encrypted form thanks to a key (usually a data key). The encryption/decryption keys must be managed somewhere and the
+            server must have access to it <br />
+            - Client side encryption: data is encrypted by the client and never decrypted by the server, data wil be decrypted by a receiving client.
+            The server should not be able to decrypt the data (best practice). Could leverage envelope encryption <br />
+            <br />
+            <b>AWS Key Management Service (KMS)</b> <br />
+            - Anytime you hear "encryption" for an AWS service it most likely refers to KMS <br />
+            - With KMS, AWS manages the encryption keys for us <br />
+            - KMS is fully integrated with IAM for authorization <br />
+            - You are able to audit every single API call to use your KMS keys with CloudTrail <br />
+            - KMS is seamlessly integrated into most AWS services (EBS, S3, RDS, SSM, etc) <br />
+            - KMS keys are also available through API call (SDK, CLI) <br />
+            - Encrypted secrets can be stored in environment variables <br />
+            - KMS keys are scoped per region. The same KMS key cannot in live in two regions (but can be accessed from a different region). When you
+            copy an snapshot across regions, behind the scenes AWS decrypt the snapshot in the source region and re-encrypt it in the destination
+            region <br />
+            - KMS keys types: KMS Keys is the new name of KMS Customer Master Key
+            <ul>
+              <li>
+                <b> Symmetric (AES-256 keys): </b> single encryption key that is used to encrypt and decrypt. AWS services that are integrated with
+                KMS use Symmetric keys. you never get access to the KMS key unencrypted (must call KMS API to use)
+              </li>
+              <li>
+                <b>Asymmetric (RSA and EC key pairs):</b> consist of a public key (encrypt) and private key (decrypt) pair. the public key is
+                downloadable, but you cant's access the private key unencrypted. This kind of key could be used for encryption outside of AWS by users
+                who can't call the KMS API
+              </li>
+            </ul>
+            - KMS key types by maagement: you pay 0.03 USD / 10000 KMS API calls
+            <ul>
+              <li>
+                <b>AWS managed keys:</b> they are managed by AWS and are free to use on any AWS services. It automatically rotates keys every one year
+              </li>
+              <li>
+                <b>Customer managed keys (CMK):</b> you can create them with KMS with a fee of 1 dollar per key monthly. To have automatically key
+                rotation, you have to enable it and it will automatically rotate your key every one year
+              </li>
+              <li>
+                <b>Customer managed keys imported (must be 256-bit symmetric key):</b> you can also import your own keys and this will cost you 1
+                dollar per key monthly. Only manual key rotation is posible (using KMS key alias)
+              </li>
+            </ul>
+            - KMS key policies: it's used to control access to your keys (similar to S3 bucket policy). If you don't have a KMS key policy, no one
+            outside your account can access your keys. There are two types of KMS policies:
+            <ul>
+              <li>
+                <b>Default KMS key policy:</b> created if you don't provide a specific KMS key policy. Allow everyone in your account to access the
+                keys
+              </li>
+              <li>
+                <b>Custom KMS key policy:</b> define users and roles that can access the KMS key. Define who can administer the key. Useful for
+                cross-account access of your KMS key
+              </li>
+            </ul>
+          </td>
+          <td>
+            <span>Use case - Cross-account access of a KMS key</span>
+            <img src="../assets/154.-kms-cross-account.png" alt="Use case - Cross-account access of a KMS key" />
+          </td>
+        </tr>
       </tbody>
     </table>
     <script>
