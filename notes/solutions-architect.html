@@ -2704,9 +2704,8 @@
             - KMS is seamlessly integrated into most AWS services (EBS, S3, RDS, SSM, etc) <br />
             - KMS keys are also available through API call (SDK, CLI) <br />
             - Encrypted secrets can be stored in environment variables <br />
-            - KMS keys are scoped per region. The same KMS key cannot in live in two regions (but can be accessed from a different region). When you
-            copy an snapshot across regions, behind the scenes AWS decrypt the snapshot in the source region and re-encrypt it in the destination
-            region <br />
+            - KMS keys are scoped per region. The same KMS key cannot in live in two regions (see multi-region keys). When you copy an snapshot across
+            regions, behind the scenes AWS decrypt the snapshot in the source region and re-encrypt it in the destination region <br />
             - KMS keys types: KMS Keys is the new name of KMS Customer Master Key
             <ul>
               <li>
@@ -2745,11 +2744,271 @@
                 cross-account access of your KMS key
               </li>
             </ul>
+            - KMS multi-region keys: allows you to replicate the key of one region (primary key) into other regions (replicas)
+            <ul>
+              <li>Each key has a different arn (same key id, different key arn)</li>
+              <li>You can have identical KMS keys in differetn AWS regions that can be used interchangeably</li>
+              <li>Allows you to encrypt in one region and decrypt in other without the need to re-encrypt or making cross-region API calls</li>
+              <li>KMS multi-region keys are not global (you have a primary key and replica keys)</li>
+              <li>Each key is managed independently (own key policy, etc)</li>
+              <li>
+                Use cases: global client-side encryption (e.g. S3 or Aurora client-side encryption), encryption on Global DynamoDB tables or Global
+                Aurora
+              </li>
+            </ul>
+            <br />
+            <b>S3 replication encryption considerations</b> <br />
+            - Unencrypted objects and objects encrypted with SSE-S3 are replicated by default <br />
+            - Objects encrypted with SSE-C (customer provided key) are never replicated <br />
+            - For object encrypted with SSE-KMS you need to:
+            <ul>
+              <li>Enable the option to replicates the objects</li>
+              <li>Specify the KMS key to encrypt the objects within the target bucket</li>
+              <li>Adapt the KMS Key Policy for the target key</li>
+              <li>Create an IAM role with kms:Decrypt for the source KMS key and kms:Encrypt for the target KMS key</li>
+              <li>
+                Note: you might get KMS throttling errors, in which case you can ask for a Serviec Quota Increase. Other solution could be use
+                multi-region KMS keys but they are currently treated as independent keys by Amazon S3 (the object will still be decrypted and then
+                encrypted)
+              </li>
+            </ul>
+            <br />
+            <b>Encrypted AMI Sharing Process</b> see image. Step 3 is made with a KMS Key policy <br />
+            <br />
+            <b>SSM Parameter Store</b> <br />
+            - Secure storage for configuration and secrets. Optional seamless encryption using KMS <br />
+            - Serverless, scalable, durable and easy to use via SDK <br />
+            - Support version tracking of configurations and secrets <br />
+            - Security is managed with IAM and notificacion with EventBridge <br />
+            - Integration with CloudFormation <br />
+            - The SSM Parameter Store hierarchy is like a folder structure. You can have something like this for two different environments:
+            /my-department/my-app/dev/url and /my-department/my-app/prod/url <br />
+            - You can access secrets manager with this path: /aws/reference/secretsmanager/secretIdInSecretsManager <br />
+            - There are some public parameters (defined by AWS) that have the value for the last version of an AMI for a specific region or things
+            like that <br />
+            - Parameter policies (for advanced parameters): allow to assign a TTL to a parameter to force updating or deleting sensitive data. Also
+            allow to notify expired or unchanged parameters via EventBridge. You can assign multiple policies at a time <br />
+            <br />
+            <b>AWS Secrets Manager</b> <br />
+            - Newer service that SSM Parameter Store that is meant for storing secrets <br />
+            - It has the capability to force rotation of secrets every X days <br />
+            - It supports the automation of the secrets rotation. For this you need to setup a lambda function <br />
+            - Secrets are encrypted using KMS <br />
+            - Multi-region secrets: allows you to replicate secrets across multiple AWS regions. Secrets Manager keeps read replicas in sync with the
+            "primary secret" (similar to multi-region KMS keys). The uses cases for this cloud be: multi-regions apps or disaster recovery (you can
+            promote a read replica to a standalone secret) <br />
+            <br />
+            <b>AWS Certificate Manager (ACM)</b> <br />
+            - Easily provision, manage, and deploy TLS certificates <br />
+            - Provide in-flight encryption for websites (HTTPS) <br />
+            - Support both, private and public TLS certificates <br />
+            - Free of charge for public TLS certificates <br />
+            - Automatic TLS certificate renewal 60 days before expiry <br />
+            - You cannot use ACM directly with an EC2 instance <br />
+            - Integrates with (load TLS certificates on): Elsatic Load Balancer (CLB, ALB, NLB), CloudFront Distributions, APIs on API Gateway <br />
+            - Requesting public certificates process -> See image <br />
+            - You can generate a public certificate outside of ACM and then import it. This way you don't have automatic renewal (you need to import a
+            new one when it expires), instead ACM send daily expiration notifications to EventBridge (you can configure the number of days to notify
+            before expiry, default is 45 days) <br />
+            - AWS Config has a managed rule names acm-certificate-expiration-check to check for expiring certificates (configurable number of days)
+            <br />
+            <br />
+            <b>Web Application Firewall (WAF)</b> <br />
+            - Protects your web application form common web exploits (layer 7 - HTTP) <br />
+            - WAF do not support Network Load Balancer (layer 4 - TCP/IP) <br />
+            - It can be deployed on: Apllication Load Balancer, API Gateway, CloudFront, AppSync GraphQL API, Cognito User Pool <br />
+            - You configure the behaviour of WAF by defining Web Access Control List (Web ACL) rules <br />
+            - Web ACLs are regional, except for CloudFront <br />
+            - A rule group is a reusable set of rules that you can add to a Web ACL <br />
+            - The rules added to a Web ACL can be defined based on:
+            <ul>
+              <li>IP Set: up to 10.000 IP addresses (use multiple rules for more IPs)</li>
+              <li>HTTP headers, HTTP body, or URI strings: protects from common attacks like SQL injection and Cross-Site Scripting (XSS)</li>
+              <li>Size constraints</li>
+              <li>Geo-match (block countries)</li>
+              <li>Rate-based rules (to count ocurrences of events) for DDoS protection</li>
+            </ul>
+            - Use case: to have a fixed IP with WAF on a ALB, you can use Global Accelerator for fixed IP and WAF on the ALB (WAF and ALB must be in
+            the same region) <br />
+            <br />
+            <b>AWS Shield</b> <br />
+            - It's a service to protect you from Distributed Denial of Service (DDoS) attacks <br />
+            - It comes in two flavors:
+            <ul>
+              <li>
+                <b>AWS SHield Standard:</b> <br />
+                - Free service that is activated for every AWS costumer <br />
+                Provides protection from attacks such as SYN/UDP Floods, Reflection attacks, and other layer 3 and layer 4 attacks <br />
+              </li>
+              <li>
+                <b>AWS SHield Advanced</b> <br />
+                - It's an optional DDoS mitigation service (3.000 USD per month per organization) <br />
+                - Protect against more sophisticated attacks on Amazon EC2, Elastic Load Balancer, Amazon CloudFront, AWS Global Accelerator, and
+                Route53 <br />
+                - 24/7 access to AWS DDoS response team (DRP) <br />
+                - Protect against higher fees during usage spikes due to DDoS <br />
+                - Has an automatic application layer (layer 7) DDoS mitigation that automatically creates, evaluates and deploys AWS WAF rules to
+                mitigate layer 7 attacks
+              </li>
+            </ul>
+            <br />
+            <b>AWS Firewall Manager</b> <br />
+            - Helps you to manage rules in all accounts of an AWS Organization. only applies for account that belong to an AWS Organization <br />
+            - To configure the service you need to create a security policy (a common set of security rules across all your organizaton's accounts)
+            <br />
+            - The policies are created at the region level and are applied to all new resources as they are created across all existing and future
+            account in your organization <br />
+            - Rules could apply to the following resources:
+            <ul>
+              <li>WAF rules</li>
+              <li>AWS Shield Advanced</li>
+              <li>Security Groups for EC2, Application Load Balancer, and ENI resources in VPC</li>
+              <li>AWS network Firewall (VPC Level)</li>
+              <li>Amazon Route53 Resolver DNS Firewall</li>
+            </ul>
+            <br />
+            <b>DDoS Protection Best Practices</b> <br />
+            - Best Practice One (BP1):
+            <ul>
+              <li>
+                <b> CloudFront (BP1):</b> web application delivery at the edge. CloudFront has protection from DDoS common attacks (SYN flood, UDP
+                reflection, etc)
+              </li>
+              <li>
+                <b>Global Accelerator (BP1):</b> if your application is not compatible with CloudFront, you can use Global Accelerator to access your
+                application from the edge. It has integration with Shield for DDoS protection
+              </li>
+              <li><b>Route53 (BP3):</b> Domain name Resolution is at the edge (global) and you can also has DDoS protection in your DNS</li>
+              <li>
+                <b>Ingrastructure Layer Defense (BP1, BP3, BP6):</b> by using a combination of Global Accelerator, Route53, CloudFront, and Elastic
+                Load Balancer you can protect your EC2 instances against high traffic
+              </li>
+              <li>
+                <b>Amazon EC2 with Auto-scaling (BP7):</b> in case the traffic reach your EC2 instances this helps scale in case of sudden traffic
+                surges, including flash crowd or a DDoS attack
+              </li>
+              <li><b>Elastic Load Balancing (BP6):</b> scales with the traffic increases and will distribute the traffic to many EC2 instances</li>
+              <li>
+                <b> Detect and filter malicious web request (BP1, BP2):</b> CloudFront cache static content and serve it from edge locations,
+                protecting your backend. AWS WAF is used on top of CloudFront and Application Load Balancer to filter and block requests based on
+                request signature (request types, IPs, etc). The WAF rate-based rules can automatically blcok the IPs of bad actors. You can also use
+                managed rules on WAF to block attacks based on IP reputation, or block anonymous IPs. CloudFront can block specific geographies
+              </li>
+              <li>
+                <b>Shield Advanced (BP1, BP2, BP6):</b> it acutomatically creates, evaluates and deploys AWS WAF rules to mitigate layer 7 attacks
+              </li>
+              <li>
+                <b>Obfuscating AWS resource (BP1, BP4, BP6):</b> using CloudFront, API Gateway, Elastic Load Balancer to hide your backend resources
+                (lambda functions, EC2 instances, etc)
+              </li>
+              <li>
+                <b>Security groups and network ACLs (BP5):</b> use them to filter traffic based on specific IP at the subnet or ENI level. Elastic IPs
+                can be protected by AWS Shield Advance
+              </li>
+              <li>
+                <b>Protecting API endpoints (BP4):</b> hide resources (EC2, lambda, etc). If you enable edge-optimized mode, or CloudFront + regional
+                mode you gain more control for DDoS. You can also use WAF on top of API Gateway to have burst limit, headers filtering, and force the
+                use of API keys
+              </li>
+            </ul>
+            <br />
+            <b>Amazon GuardDuty</b>
+            <br />
+            - Intelligent threat discovery to protect your AWS account
+            <br />
+            - Uses machine learning algorithms, anomaly detection, and 3rd party data to detect if your account is under attack
+            <br />
+            - Just takes one click to enable it (30 day trial), and you don't need to install any software
+            <br />
+            - You can setup CloudWatch Event rules to be notified in case of findings. CloudWatch Event rules can target AWS Lambda or SNS
+            <br />
+            - Input data from: CloudTrail Event Logs (unusual API calls, unauthorized deployments, etc), VPC Flow Logs (unusual internal traffic,
+            unusual IP addresses, etc), DNS Logs (compromised EC2 instances sending encoded data within DNS queries), and Kubernete Audit Logs
+            (suspicious activities and potential EKS cluster compromises)
+            <br />
+            - GuardDuty can protect against CryptoCurrency attacks (has a dedicated "finding" for it)
+            <br />
+            <br />
+            <b>Amazon Inspector</b>
+            <br />
+            - It allows you to make automated security assesments on:
+            <ul>
+              <li>
+                <b>EC2 instances:</b> leveraging the AWS System manager (SSM) agent. Analyze against unintended network accesibility. Analyze the
+                running OS against known vulnerabilities
+              </li>
+              <li><b>Container Images pushed to Amazon ECR:</b> assesment of container images as they are pushed</li>
+              <li>
+                <b>Lambda functions:</b> assesment of functions as they are deployed to identify software vulnerabilities in function code and package
+                dependencies
+              </li>
+            </ul>
+            - A risk score is associated with all vulnerabilities for prioritization <br />
+            - Reporting and integration with AWS Security Hub <br />
+            - Can send findings to Amazon EventBridge <br />
+            - It can continously scan the infrastructure, only when needed <br />
+            - It evaluates your dependencies against a database of known vulnerabilities (database of CVE). Whenever the database is updated it runs a
+            new evaluation <br />
+            <br />
+            <b>Amazon Macie</b> <br />
+            - It's a fully managed data security and data provacy service thath use machine learning and pattern matching to discover and protect your
+            sensitive data in AWS <br />
+            - Macie helps identify and alert you to sensitive data, such as Personally Identifiable Information (PII) <br />
+            - It evaluates data in your S3 blucket and notify the finding via EventBridge <br />
+            - Just takes one click to enable it and you can evaluate as many S3 buccket as you have
           </td>
           <td>
             <span>Use case - Cross-account access of a KMS key</span>
             <img src="../assets/154.-kms-cross-account.png" alt="Use case - Cross-account access of a KMS key" />
+            <hr />
+            <span>Use case - KMS multi-region key for DynamoDB Global Tables with client side encryption</span>
+            <img
+              src="../assets/155.-kms-multi-region-keys-use-case.png"
+              alt="Use case - KMS multi-region key for DynamoDB Global Tables with client side encryption"
+            />
+            <hr />
+            <span>Use case - Encrypted AMI Sharing Process</span>
+            <img src="../assets/156.-sharing-encrypted-ami-use-case.png" alt="Use case - Encrypted AMI Sharing Process" />
+            <hr />
+            <span>SSM Parameter Stores - Standard vs Advanced parameter tiers</span>
+            <img
+              src="../assets/157.-ssm-parameter-store-standard-vs-advanced.png"
+              alt="SSM Parameter Stores - Standard vs Advanced parameter tiers"
+            />
+            <hr />
+            <span>AWS Certificate Manager - Requesting public certificates process</span>
+            <img src="../assets/158.-acm-public-certificate.png" alt="AWS Certificate Manager - Requesting public certificates process" />
+            <hr />
+            <span>AWS Certificate Manager - API Gateway Integration</span>
+            <img src="../assets/159.-acm-api-gw-integration.png" alt="AWS Certificate Manager - API Gateway Integration" />
+            <hr />
+            <span>WAF vs Firewall Manager vs Shield</span>
+            <img src="../assets/160.-waf-vs-firewall-manager-vs-shield.png" alt="WAF vs Firewall Manager vs Shield" />
+            <hr />
+            <span>DDoS Best Practices</span>
+            <img src="../assets/161.-ddos.best-practices.png" alt="DDoS Best Practices" />
+            <hr />
+            <span>AWS GuardDuty</span>
+            <img src="../assets/162.-guarduty.png" alt="AWS GuardDuty" />
+            <hr />
+            <span>Amazon Inspector</span>
+            <img src="../assets/163.-amazon-inspector.png" alt="Amazon Inspector" />
           </td>
+        </tr>
+        <tr>
+          <td>Exam questions</td>
+          <td>
+            <b>
+              You have created the main Edge-Optimized API Gateway in us-west-2 AWS region. This main Edge-Optimized API Gateway forwards traffic to
+              the second level API Gateway in ap-southeast-1. You want to secure the main API Gateway by attaching an ACM certificate to it. Which AWS
+              region are you going to create the ACM certificate in?
+            </b>
+            <br />
+            As the Edge-Optimized API Gateway is using a custom AWS managed CloudFront distribution behind the scene to route requests across the
+            globe through CloudFront Edge locations, the ACM certificate must be created in us-east-1. <br />
+            <br />
+          </td>
+          <td></td>
         </tr>
       </tbody>
     </table>
