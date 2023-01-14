@@ -3044,7 +3044,7 @@
             - Amazon Virtual Private Cloud (Amazon VPC) enables you to launch AWS resources into a virtual network that you've defined. This virtual
             network closely resembles a traditional network that you'd operate in your own data center, with the benefits of using the scalable
             infrastructure of AWS. - All new AWS accounts have a default VPC <br />
-            - New EC2 nistances are launched into the default VPC if no subnet is specified <br />
+            - New EC2 instances are launched into the default VPC if no subnet is specified <br />
             - Default VPC has internet connectivity and all EC2 instances inside it have public IPv4 addresses <br />
             - We also get a public and a private IPv4 DNS names fo our EC2 instances <br />
             - You can have multiple VPCs in an AWS region (max 5 per region - you can increase it) <br />
@@ -3531,6 +3531,122 @@
             <hr />
             <span>NATGW vs Gateway VPC Endpoint Costs</span>
             <img src="../assets/197.-natgw-vs-gateway-vpc-endpoint-costs.png" alt="NATGW vs Gateway VPC Endpoint Costs" />
+          </td>
+        </tr>
+        <tr>
+          <td>Disaster Recovery and Migrations</td>
+          <td>
+            - A disaster is any event that has a negative impact on a company business continuity or finances is a disaster <br />
+            - Disaster Recovery (DR) is about preparing for and recovering from a disaster <br />
+            - There are trhee types of disaster recovery:
+            <ul>
+              <li><b>On-premise -> on-premise:</b> traditional DR. Very expensive</li>
+              <li><b>On-premise -> AWS Cloud:</b> hybrid recovery</li>
+              <li>
+                <b>AWS Cloud Region A -> AWS Cloud Region B:</b>
+              </li>
+            </ul>
+            <br />
+            <b>Recovery Point Objective (RPO) and Recovery Time Objective (RTO)</b> <br />
+            - RPO is (basically) how often you run backups. To determine your RPO you need to think about how much data loss are you willing to accept
+            in case of a disaster happens. When a disaster strikes, the time between the RPO (last backup) and the disaster is going to be a data
+            loss. For example, if you backup data every hour, you can lost at most the last one hour of data <br />
+            - RTO is when you recover from the disaster. The time between the disaster and the RTO is the downtime. To determine your RTO you need to
+            think about how much downtime are you willing to accept in case a disaster happens <br />
+            <br />
+            <b> Disaster Recovery Strategies </b> <br />
+            - Backup and Restore (high RPO): the easiest to implement. You don't need to manage any infrastructure for DR, you just recreate the
+            resources (e.g: databases) based on your backups <br />
+            - Pilot Light: consist on a small version of your app that is always running in the cloud (ussually just the critical core fo your app).
+            It's similar to backup and restore, but faster as critical systems are already up. Offers you a lower RPO and RTO with a still low cost
+            <br />
+            - Warm Standby: is when you have a full system up and running, but at a minimum size. Upon disaster, you can scale to production load.
+            With this strategy you can decrease yout RPO and RTO but at a higher cost <br />
+            - Multi-site / host-site: it consist on a full production scale application running on both, cloud (AWS) and on-premises. Your DNS
+            (Route53) can always redirect traffic to either of your deployments, because they are full production scale versions of your app. You get
+            very low RO (minutes or seconds) but very expensive. If your app is running only in the cloud, you can also use this approach by
+            leveraging multi-region deployments <br />
+            - Disaster Recovery tips -> see image <br />
+            <br />
+            <b>Database Migration Service (DMS)</b> <br />
+            - Quickly and securely migrate databases to AWS. It's resilient and self-healing <br />
+            - The source database remains available during the migration <br />
+            - Support bot homogeneous migratiosn (Oracle to Oracle) and heterogeneous migrations (Microsoft SQL Server to Aurora) <br />
+            - Support continous data replication, using Change Data Capture (CDC) <br />
+            - To use DMS, you need to create an EC2 instance to perform the replication tasks (could be a multi-AZ deployment) <br />
+            - When setting up DMS, you can choose the maintenance window, which is the time that you want the service to migrate the database <br />
+            - Sources and targets supported -> se image <br />
+            - To migrate a database to another that not have the same engine, you need to use AWS Schema Conversion (SCT). You don't need to use SCT
+            if your source and target database have the same engine (for example: on-premise MySQL to RDS MySQL) <br />
+            - Continous replication: you first need to setup a server running SCT to convert the schema to the target DB and then setup a DMS instance
+            that takes care of the data migration leveraging CDC to perform the continous replication <br />
+            <br />
+            <b>RDS to Aurora MySQL migration</b> <br />
+            - RDS MySQL to Aurora MySQL:
+            <ul>
+              <li><b>Option 1 (also apply to PostgresSQL): </b> DB snapshot from RDS MySQL restores as MySQL Aurora DB</li>
+              <li>
+                <b>Option 2 (also apply to PostgresSQL): </b> create an Aurora Read Replica from your RDS MySQL, and when the replication lag is zero,
+                promote at it's own DB cluster. This approach can take more time and cost
+              </li>
+            </ul>
+            - External MySQL to Aurora MySQL:
+            <ul>
+              <li>
+                <b>Option 1 (also apply to PostgresSQL):</b> use Percona XtraBackup to crate a file backup in Amazon S3 and then create Aurora MySQL
+                DB from Amazon S3
+              </li>
+              <li><b>Option 2:</b> create an Aurora MySQL DB and use the mysqldump utility to migrate MySQL into Aurora (slower than S3 method)</li>
+            </ul>
+            - Use DMS if both DBs are up and running <br />
+            <br />
+            <b>On-premises strategy with AWS -> Services and resources than can help you migrate from on-premises to the cloud -> see image</b> <br />
+            <br />
+            <b>AWS Backup</b> <br />
+            - Fully managed service that allows you to centraalymanage and automate backups accross AWS services <br />
+            - The idea of this service is that you don't have the need to create custom scripts ans manual processes <br />
+            - It supports EC2, EBS, S3, RDS, DocumentDB, EFS, AWS Storage Gateway, etc <br />
+            - Supports cross-region and cross-account backups <br />
+            - Support Point-in-time recovery (PITR) for supported services. On-demand and scheduled backups. Tag-based backup policies <br />
+            - You can create backup policies, known as Backup Plans which allows you to control: backup frequency, backup window, transition to cold
+            storage, retention period, etc <br />
+            - AWS Backup Vault Lock: enforce a WORM (Write Once Read Many) state for all the backups that you store in your AWS Backup Vault (even the
+            root user cannot delete backups when enabled). It gives you an additional layer of defense to protect your backups against: inadvertent or
+            malicious delete operations, and updates that shorten or alter retention periods <br />
+          </td>
+          <td>
+            <span>RPO and RTO</span>
+            <img src="../assets/198.-rpo-and-rto.png" alt="RPO and RTO" />
+            <hr />
+            <span>DR Strategies RTO</span>
+            <img src="../assets/199.-dr-strategies-rto.png" alt="DR Strategies RTO" />
+            <hr />
+            <span>DR Strategies - Backup and Restore</span>
+            <img src="../assets/200.-dr-strategies-backup-and-restore.png" alt="DR Strategies - Backup and Restore" />
+            <hr />
+            <span>DR Strategies - Pilot Light</span>
+            <img src="../assets/201.-dr-strategies-pilot-light.png" alt="DR Strategies - Pilot Light" />
+            <hr />
+            <span>DR Strategies - Warm Standby</span>
+            <img src="../assets/202.-dr-strategies-warm-srandby.png" alt="DR Strategies - Warm Standby" />
+            <hr />
+            <span>DR Strategies - Multi-site</span>
+            <img src="../assets/203.-dr-strategies-multi-site.png" alt="DR Strategies - Multi-site" />
+            <hr />
+            <span>DR Strategies tips</span>
+            <img src="../assets/204.-dr-strategies-tips.png" alt="DR Strategies tips" />
+            <hr />
+            <span>Database Migration Service (DMS)</span>
+            <img src="../assets/205.-dms.png" alt="Database Migration Service (DMS)" />
+            <hr />
+            <span>DMS - Sources and Targets</span>
+            <img src="../assets/206.-dms-sources-and-targets.png" alt="DMS - Sources and Targets" />
+            <hr />
+            <span>On-premises Strategy with AWS</span>
+            <img src="../assets/207.-on-premises-strategy-with-aws.png" alt="On-premises Strategy with AWS" />
+            <hr />
+            <span>AWS Backup</span>
+            <img src="../assets/208.-aws-backup.png" alt="AWS Backup" />
           </td>
         </tr>
         <tr>
