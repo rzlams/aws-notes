@@ -3613,6 +3613,72 @@
             - AWS Backup Vault Lock: enforce a WORM (Write Once Read Many) state for all the backups that you store in your AWS Backup Vault (even the
             root user cannot delete backups when enabled). It gives you an additional layer of defense to protect your backups against: inadvertent or
             malicious delete operations, and updates that shorten or alter retention periods <br />
+            <br />
+            <b>AWS Application Discovery Service</b> <br />
+            - Helpful to identify what you need to move in a migration process and how they are interconnected <br />
+            - Plan migration projects by gathering information about on-premises data centers <br />
+            - Helps you to asses server utilization data and dependency mapping. This data is important for migration to know what to migrate (order)
+            and how to migrate <br />
+            - You can run assesments in two ways:
+            <ul>
+              <li>
+                <b> Agentless Discovery (AWS Agentless Discovery Connector): </b> VM inventory, configuration, and performance history such as CPU,
+                memory, and disk usage
+              </li>
+              <li>
+                <b>Agent-based Discovery (AWS Application Discovery Agent): </b> system configuration, system performance, running processes, and
+                details of the entwork connections between systems
+              </li>
+            </ul>
+            - Resulting data can be viewed within AWS Migration Hub <br />
+            - AWS Application Migration Service (MGN)
+            <ul>
+              <li>It's a lift-and-shift (rehost) solution which simplify migrating applications to AWS</li>
+              <li>It's the simplest way to move from on-premises to AWS</li>
+              <li>It's the successor of the service CloudEndure Migration (replacing AWS Server Migration Service - SMS)</li>
+              <li>Converts your physical, virtual, and cloud-based servers to run natevily on AWS</li>
+              <li>Supports wide range of platforms, Operating Systems, and databases</li>
+              <li>Minimal downtime and reduced cost</li>
+              <li>
+                This service takes care of the replication of your on-premise data to a staging environment in the cloud, and when you are ready to
+                make the "cutover", you can simply leverage the staging environment to production. See image
+              </li>
+            </ul>
+            <br />
+            <b>Transferring large amount of data to AWS</b> <br />
+            - Use Case: transfer 200TB of data in the cloud. We have a 100 Mbps internet connection
+            <ul>
+              <li>
+                <b>Over the internet / Site-to-site VPN:</b> <br />
+                - Inmediate to setup <br />
+                - Will take 200(TB) x 1000(GB) x 1000(MB) x 8(MB) / 100 Mbps = 16.000.000 seconds = 185 days <br />
+              </li>
+              <li>
+                <b>Over Direct Connect:</b> <br />
+                - Long for the one-time setup (over a month) <br />
+                - Will take 200(TB) x 1000(GB) x 8(GB) / 1 Gbps = 1.600.000 seconds = 18,5 days <br />
+              </li>
+              <li>
+                <b> Over SnowBall: </b> <br />
+                - Wil take 2 to 3 SnowBall in parallel <br />
+                - Takes about 1 week for the end-to-end transfer (delivered and sent back to AWS) <br />
+                - NOTE: if you are trying to transer a DB, you can combine it with DMS to finish the process <br />
+              </li>
+              <li>
+                <b>For on-going replication / transfers:</b> you can use Site-to-site VPN o DX with DMS or DataSync. Snow devices are going to be used
+                for more one-time long transfers
+              </li>
+            </ul>
+            <br />
+            <b>VMware Cloud on AWS</b> <br />
+            - Some customer use VMware Cloud to manage their own on-premises Data Center <br />
+            - Useful when customers want to extend their Data Center capacity to AWS, but keep using the VMware Cloud software. See image <br />
+            - Use cases:
+            <ul>
+              <li>Migrate your VMware vSphere-based workloads to AWS</li>
+              <li>Run your production workloads across VMware vSphere-based private, public, and hybrid cloud environments</li>
+              <li>It gives you a disaster recovery strategy. In case a disaster in your DC, you can failover to the AWS cloud</li>
+            </ul>
           </td>
           <td>
             <span>RPO and RTO</span>
@@ -3647,7 +3713,188 @@
             <hr />
             <span>AWS Backup</span>
             <img src="../assets/208.-aws-backup.png" alt="AWS Backup" />
+            <hr />
+            <span>Application Migration Service</span>
+            <img src="../assets/209.-application-migration-service.png" alt="Application Migration Service" />
+            <hr />
+            <span>VMware Cloud on AWS</span>
+            <img src="../assets/210.-vmware-cloud-on-aws.png" alt="VMware Cloud on AWS" />
           </td>
+        </tr>
+        <tr>
+          <td>Solution Architectures</td>
+          <td>
+            <b>Event processing in AWS</b> <br />
+            - Lambda, SNS, and SQS -> see image <br />
+            - S3 Event Notifications:
+            <ul>
+              <li>S3 buckets can notify when an event occurs in it (S3:ObjectCreated, S3:ObjectRemoved, etc)</li>
+              <li>You can filter by object name (e.g. *.jpg)</li>
+              <li>You can create as many notifications as desired</li>
+              <li>S3 event notifications typically deliver events in seconds but can sometimes take a minute or longer</li>
+              <li>S3 notifications can only be sent to SNS, SQS, Lambda, EventBridge</li>
+            </ul>
+            - EventBridge
+            <ul>
+              <li>EventBridge has over 18 AWS services as destinations (Step Functions, Kinesis Data Streams, Kinesis Data Firehose, etc)</li>
+              <li>Advanced filtering options with JSON rules (metadata, object size, names, etc)</li>
+              <li>EventBridge has the ability to archive, replay events, reliable delivery, etc</li>
+              <li>You can intercept any API call in AWS with CloudTrail and its integration with EventBridge</li>
+            </ul>
+            - API Gateway: can be the source of external events (sent from client). API Gateway can integrate with a lot of AWS services <br />
+            <br />
+            <b> Blocking an IP address in AWS</b> <br />
+            - Use Case 1: Client -> NACL -> EC2 instance with security group in a public subnet
+            <ul>
+              <li><b>NACL:</b> you can set a deny rule for the IP you want to block</li>
+              <li>
+                <b>Security Groups:</b> you cannot have deny rules, you can only have allow rules. You can restrict the incoming traffic with the
+                allow rules but if you have a global application, security groups are not very helpful (it's hard to know what IP range allow without
+                affect your users)
+              </li>
+              <li>
+                <b>Software Firewall installed in EC2 instance:</b> this solve the problem, but you still need to process the request and it will
+                consume resources
+              </li>
+            </ul>
+            - Use Case 2: Client -> NACL -> ALB with security group in a public subnet -> EC2 instance with security group in a private subnet
+            <ul>
+              <li>
+                The EC2 security group is configured to allow the security group of the ALB. Therefore, from the EC2 security group it allows traffic
+                from the ALB, not the client
+              </li>
+              <li>
+                The ALB can do a connection termination based on the security group rules, but it should allow the traffic from the client (same as
+                the previous use case). Not very helpful
+              </li>
+              <li>NACL is the one that blocks the IP</li>
+            </ul>
+            - Use Case 3: Client -> NACL -> NLB -> EC2 instance with security group in a private subnet
+            <ul>
+              <li>
+                Network Load Balancer (NLB) can't have a security group. It just pass the request from the client to the EC2 instance (with the same
+                IP of the client)
+              </li>
+              <li>The only line of defense that we have in this case i the NACL</li>
+            </ul>
+            - Use Case 4: Client -> NACL -> ALB with security group and WAF in a public subnet -> EC2 instance with security group in a private subnet
+            <ul>
+              <li>This is a more expensive approach because you are adding one service (WAF)</li>
+              <li>WAF can perform IP address filtering</li>
+            </ul>
+            - Use Case 5: Client -> CloudFront with WAF -> NACL -> ALB with security group in a public subnet -> EC2 instance with security group in a
+            private subnet
+            <ul>
+              <li>CloudFront seats outside our VPC</li>
+              <li>The request in your VPC comes from CloudFront, not he client. For this reason NACLs are useless in this case</li>
+              <li>The ALB security group allows the IPs of CloudFront (no the client)</li>
+              <li>
+                To block a client from CloudFront we have two possibilities: CloudFront Geo Restriction (to block an entire country) and WAF (IP
+                address filtering)
+              </li>
+            </ul>
+            <br />
+            <b>High Performance Computing (HPC)</b> <br />
+            - The cloud is the perfect place to perform HPC <br />
+            - You can create a very high number of resources in no time <br />
+            - You can speed up time to results by adding more resources <br />
+            - You can pay only ofr the systems you have used, and then destroy them to not be chaged more<br />
+            - HPC can be: perform genomics, cpmputational chemistry, financial risk modeling, weather prediction, machine learning, deep learning,
+            autonomous driving, etc <br />
+            - The services that can help you perform HPC in the cloud can be deparated in:
+            <ul>
+              <li>
+                <b>Data Management and Transfer:</b> <br />
+                - AWS Direct Connect: move GBs of data to the cloud over a private secure network <br />
+                - SnowBall and SnowMobile: move PBs of data to the cloud <br />
+                - AWS DataSync: we have to install a DataSync Agent. It allows us to move large amount of data between on-premise and S3, EFS, or FSx
+                for Windows
+              </li>
+              <li>
+                <b>Compute and Networking</b> <br />
+                - EC2 instances: you can use CPU optimized or GPU optimized, spot instances or spot fleets + auto scaling (for cost savings) <br />
+                - EC2 Placement Groups to have a cluster with good network performance (10 Gbps network) and low latency <br />
+                - EC2 Enhanced Networking (SR-IOV): it gives you higher bandwidth, higher packet per second (PPS), and lower latency. You have two
+                options for SR-IOV: Elastic Network Adapter (ENA) which offers up to 100 Gbps; Intel 82599 VF which offers up to 10 Gbps (legacy
+                option) <br />
+                - Elastic Fabric Adapter (EFA): it's an improved ENA for HPC that only works for linux. It a great solution for inter-node
+                communications (tightly coupled workloads). It levergaes Message Passing Interface (MPI) standard. What it does is bypass the
+                underlying Linux OS to provide low-latency and reliable transport (high performance) <br />
+              </li>
+              <li>
+                <b>Storage</b> <br />
+                - EBS: scale up to 256.000 IOPS with io2 Block Express <br />
+                - Instance Store: scale to millions of IOPS, linked to EC2 instances, low latency <br />
+                - S3: not a file system. Used to store large objects (block storage) <br />
+                - EFS: scale IOPS based on total size or use provisioned IOPS <br />
+                - FSx for Lustre: HPC optimized file system, sclaes to millions of IOPS. It's backed by S3 <br />
+              </li>
+              <li>
+                <b>Automation and Orchestration</b> <br />
+                - AWS Batch: support multi-node parallel jobs, which enables you to run single jobs that span multiple EC2 instances. Easy to schedule
+                jobs an launch EC2 instances accordingly <br />
+                - AWS Parallel Cluster: open-source cluster management tool to deploy HPC on AWS. You configure the cluster using text files. You can
+                automate creation of VPC, subnets, cluster type and instance type. It has the ability to use EFA on the cluster to improve network
+                performance <br />
+              </li>
+            </ul>
+            <br />
+            <b>Highly Available EC2 instance</b> <br />
+            - Solution 1: Client -> Elastic IP -> EC2 intance
+            <ul>
+              <li>
+                This solution rely on a CloudWatch Event that is triggered whenever the metrics of your EC2 instances indicate that have a failure
+                (kindof health check)
+              </li>
+              <li>The CloudWatch Event triggers a Lambda function that starts a new EC2 instances and attach to it the Elastic IP</li>
+              <li>Once the Elastic IP is set to the new EC2 instance the previous EC2 instance is terminates</li>
+            </ul>
+            - Solution 2: Client -> Elastic IP -> EC2 intance with auto scaling group
+            <ul>
+              <li>This solution rely on ASG and EC2 user data (bootstrap script) attached based on tags</li>
+              <li>Assuming an ASG configuration as follows: 1 min - 1 max - 1 desired - >= 2 AZ</li>
+              <li>The ASG takes care of replace the failing EC2 instance</li>
+              <li>The EC2 user data is attached to the replacement EC2 instance based on tags</li>
+              <li>The EC2 user data attach the Elastic IP to the replacement EC2 instance</li>
+            </ul>
+            - Solution 3: Client -> Elastic IP -> EC2 intance with auto scaling group -> EBS volume
+            <ul>
+              <li>Similar to Solution 2 but this time we need to move the EBS volume from one AZ to another</li>
+              <li>EBS volumes are locked into a specific AZ</li>
+              <li>
+                We know that ASG has lifecycle hooks, so we can use the Terminate lifecycle hook to create a snapshot of our EBS volume (adding tags)
+              </li>
+              <li>
+                Then we can use the ASG Launch lifecycle hook to create an EBS volume in the new AZ, based on the EBS snapshot created in the previous
+                step, and then attach it to the replacement EC2 instance
+              </li>
+            </ul>
+          </td>
+          <td>
+            <span>Event Processing - SNS, SQS, and Lambda</span>
+            <img src="../assets/211.-event-processing-sns-sqs-lambda.png" alt="Event Processing - SNS, SQS, and Lambda" />
+            <hr />
+            <span>Event Processing - Fan-out pattern</span>
+            <img src="../assets/212.-event-processing-fan-out-pattern.png" alt="Event Processing - Fan-out pattern" />
+            <hr />
+            <span>Highly Available EC2 instance - Solution 1</span>
+            <img src="../assets/213.-highly-available-ec2-instance.png" alt="Highly Available EC2 instance - Solution 1" />
+            <hr />
+            <span>Highly Available EC2 instance - Solution 2</span>
+            <img src="../assets/214.-highly-available-ec2-instance.png" alt="Highly Available EC2 instance - Solution 2" />
+            <hr />
+            <span>Highly Available EC2 instance - Solution 3</span>
+            <img src="../assets/215.-highly-available-ec2-instance.png" alt="Highly Available EC2 instance - Solution 3" />
+          </td>
+        </tr>
+        <tr>
+          <td>Other Services</td>
+          <td>
+            <br />
+            <b>CloudFormation</b> <br />
+            -
+          </td>
+          <td></td>
         </tr>
         <tr>
           <td>Exam questions</td>
