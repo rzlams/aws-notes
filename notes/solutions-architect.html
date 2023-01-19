@@ -3892,7 +3892,177 @@
           <td>
             <br />
             <b>CloudFormation</b> <br />
-            -
+            - I't the Infrastructure as Code (IaC) service of AWS <br />
+            - It's a declarative way of outlining your AWS infrastructure, for any resources (most of them are supported) <br />
+            - You specify resources in a CloudFormation template (.yml file) and then CloudFormation creates the resources for you, in the right order
+            and with the exact configuration that you specify <br />
+            - Each CloudFormation deploy is called a stack. The stack groups and manage together all the resources created with the template <br />
+            - You can estimate the cost of your resources with your CloudFormation template <br />
+            - Saving strategies: for example, you could automate deletion of resources at 5pm and recreate at 9am <br />
+            - CloudFront Stack Designer: allows you to visually (diagram) build your template. Including the relationship between the resources <br />
+            <br />
+            <b>Simple Email Service (SES)</b> <br />
+            - Fully managed service to send emails securely, globally and at scale <br />
+            - Allows inbound and outbound emails <br />
+            - It gives you a reputation dashboard for performance insight and anti-spam feedback <br />
+            - Provides statistics, such as: email deliveries, bounces, feedback loop results, email open, etc <br />
+            - Support DomainKeys Identified Mail (DKIM) and Sender Policy Framework (SPF) <br />
+            - Flexible IP deployment: you can send email from a shared, dedicated, or a customer-owned IP <br />
+            - You can send emails using your application,the AWS console, APIs or SMTP <br />
+            - Use cases: transactional, marketing and bulk email communications <br />
+            <br />
+            <b>Amazon Pinpoint</b> <br />
+            - Scalable 2-way (inbound/outbound) marketing communications service <br />
+            - Supports email, SMS, push, voice, and in-app messaging <br />
+            - Has the ability to segment and personalize messages with the right content to customers <br />
+            - Offers the possibility to receive replies <br />
+            - It can send streams/events to SNS, Kinesis Data Firehose, and CloudWatch Logs <br />
+            - Scales to billions of messages per day <br />
+            - Use cases: run campaigns by sending marketing, bulk, or transactional SMS messages <br />
+            - Pinpoint vs Amazon SNS and Amazon SES: in SNS and SES you manage each message's audience, content and delivery schedule. In Amazon
+            Pinpoint, you create message templates, delivery schedules, highly targeted segments, and full campaigns <br />
+            <br />
+            <b>SSM Session Manager</b> <br />
+            - Allows you to start a secure shell on your EC2 on-premises servers without the need of ssh access (noo ssh keys) or a bastion host
+            <br />
+            - You don't need to open the port 22 (better security). The connection is established through the SSM agent installed in the EC2 instance
+            <br />
+            - Support Linux, macOs, and Windows <br />
+            - Send session log data to S3 or CloudWatch Logs <br />
+            <br />
+            <b>SSM Other Services</b> <br />
+            - SSM Run Command:
+            <ul>
+              <li>Execute a document (script) or just run a command in an EC2 instances with the SSM Agent installed</li>
+              <li>Can run a command across multiple instances (using resource groups)</li>
+              <li>No need for SSH</li>
+              <li>The command output can be shown in the AWS Console, sent to S3 bucket, or CloudWatch Logs</li>
+              <li>It can send notifications to SNS about command status (in progress, success, failed, etc)</li>
+              <li>Integrated with IAM and CloudTrail</li>
+              <li>The run command action can be invoked by EventBrigde</li>
+            </ul>
+            - SSM Patch Manager:
+            <ul>
+              <li>Automates the process of patching instances managed by SSM (Os updates, applications updates, security updates, etc)</li>
+              <li>Supports EC2 instances and on-premises servers</li>
+              <li>Supports Linux, macOS, and Windows</li>
+              <li>Patch on-demand or on a schedule using Maintenane Windows</li>
+              <li>It can san your instances and geenrate patch compliance report (missing patches)</li>
+            </ul>
+            - SSM Maintenance Windows: defines a schedule for when to perform actions on your instances (Os patching, updating drivers, installing
+            software). A maintenances windows contains: schedule, duration, set of registered instances, and set of registered tasks. See image <br />
+            - SSM Automation:
+            <ul>
+              <li>
+                Simplifies common maintenance and deployment tasks of EC2 instances and other AWS resources (restart instances, create an AMI, EBS
+                snapshot, etc)
+              </li>
+              <li>Automation Runbook: SSM documents to define actions peformed on your EC2 instances or AWS resources (pre-defined or custom)</li>
+              <li>
+                Can be triggered using: the AWS Console (manually), AWS CLI, SDK, Amazon EventBridge, SSM Maintenance Windows (on a schedule), or by
+                AWS Config for rules remdiation (whenever it finds a resources that is not compliant)
+              </li>
+            </ul>
+            <br />
+            <b>Cost Explorer</b> <br />
+            - Helps you visualize, understand, and manage your AWS costs and usage over time <br />
+            - Create custom reports that analyze cost and usage data <br />
+            - Analyze your data at a high level: total cost and usage across all accounts <br />
+            - Can also analyze data at monthly, hourly, or resource level granularity <br />
+            - Choose an optimal Savings Plan to lower prices on your bill <br />
+            - You can forecast usage up to 12 months based on previous usage <br />
+            <br />
+            <b>Elastic Transcoder</b> <br />
+            - Is used to convert media files stored in S3 into media files in the formats required by cosumer playback devices (phones, PCs, tablet,
+            etc) <br />
+            - It's easy to use and highly scalable (can handle large volumes of media files and large file sizes) <br />
+            - Fully managed, secure and cost effective (duration-based pricing model - only pay for what you use) <br />
+            <br />
+            <b>AWS Batch</b> <br />
+            - Fully managed batch processing at any scale <br />
+            - Efficiently run 100.000s of computing batch jobs on AWS <br />
+            - A "batch job" is a job with a start and an end (opposed to continuous or stream) <br />
+            - Batch will dynamically launch EC2 instances or spot instances to provision tha right amount of compute and memory for your batch job.
+            You submit or schedule batch jobs and AWS Batch does the rest <br />
+            - Batch jobs are defined as Docker Images and run on ECS (virtually anything that runs on ECS can run on AWS Batch) <br />
+            - Helpful for cost optimizations and focusing less on the infrastructure <br />
+            <br />
+            <b>Amazon AppFlow</b> <br />
+            - Fully managed inegration service that enables you to securely transfer data between Software-as-a-Serviec (SaaS) applications and AWS
+            <br />
+            - The idea is that you don't spend time writing the integrations and leverage Amazon AppFlow APIs inmediately <br />
+            - Source: Salesforce, SAP, Zendesk, Slack, ServiceNow, etc <br />
+            - Destinations: AWS services like Amazon S3, Amazon Redshift or non-AWS services such as SnowFlake and Salesforce <br />
+            - You can define integration base on a schedule, or in response to events, or on demand <br />
+            - It offers data transformation capabilities, like filtering and validation <br />
+            - The data is encrypted over the public internet or privately over AWS PrivateLink <br />
+          </td>
+          <td>
+            <span>Amazon Pinpoint</span>
+            <img src="../assets/216.-pinpoint.png" alt="Amazon Pinpoint" />
+            <hr />
+            <span>SSM Session Manager</span>
+            <img src="../assets/217.-ssm-session-manager.png" alt="SSM Session Manager" />
+            <hr />
+            <span>SSM Run Command</span>
+            <img src="../assets/218.-ssm-run-command.png" alt="SSM Run Command" />
+            <hr />
+            <span>SSM Patch Manager</span>
+            <img src="../assets/219.-ssm-patch-manager.png" alt="SSM Patch Manager" />
+            <hr />
+            <span>SSM Maintenance Window</span>
+            <img src="../assets/220.-ssm-maintenance-window.png" alt="SSM Maintenance Window" />
+            <hr />
+            <span>SSM Automation</span>
+            <img src="../assets/221.-ssm-automation.png" alt="SSM Automation" />
+            <hr />
+            <span>Elastic Transcoder</span>
+            <img src="../assets/222.-elastic-transcoder.png" alt="Elastic Transcoder" />
+            <hr />
+            <span>AWS Batch vs AWS Lambda</span>
+            <img src="../assets/223.-batch-vs-lambda.png" alt="AWS Batch vs AWS Lambda" />
+            <hr />
+            <span>AppFlow</span>
+            <img src="../assets/224.-appflow.png" alt="AppFlow" />
+          </td>
+        </tr>
+        <tr>
+          <td>WhitePapers and Architectures</td>
+          <td>
+            <b>Well Architected Framework</b> <br />
+            - General guiding principles:
+            <ul>
+              <li>Stop guessing your capacity needs (instead use auto-scaling groups, serverless services, etc)</li>
+              <li>Test systems at production scale (AWS allows you to quickly setup the infrastructure to test and delete it once you test)</li>
+              <li>
+                Automate to make architectural experimentation easier (for example: with a CloudFormation template you can easily deploy in different
+                environments and experiment)
+              </li>
+              <li>Allow for evolutionary architectures (design based on changing requirements)</li>
+              <li>Drive architectures using data</li>
+              <li>
+                Improve through game days (for example: simulate applications for flash sale days that can put a lot of pressure on your application)
+              </li>
+            </ul>
+            - It consist of six pillars. These pillar are not something to balance, or trade-offs, they're a synergy:
+            <ol>
+              <li>Operational Excellence</li>
+              <li>Security</li>
+              <li>Reliability</li>
+              <li>Performance Efficiency</li>
+              <li>Cost Optimization</li>
+              <li>Sustainability</li>
+            </ol>
+            <br />
+            <b>Well Architected Tool</b> <br />
+            - Free tool to review your achitectures against the 6 pillars of the Well Architected Framework and adopt architectural best-practices
+            <br />
+            - The use of the tool follows this process:
+            <ul>
+              <li>Select your workload, select a lens (the focus of the questions) and answer questions</li>
+              <li>Review your answers against the 6 pillars</li>
+              <li>Obtain advice: get videos and documentations, generate a report, see the results in a dashboard</li>
+            </ul>
           </td>
           <td></td>
         </tr>
