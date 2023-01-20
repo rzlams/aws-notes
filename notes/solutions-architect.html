@@ -136,10 +136,12 @@
               <li>Increase speed and agility: develop faster and focus only in your code</li>
               <li>Go global in minutes</li>
             </ul>
-            <b>- The costumer is responsible for the security IN the cloud: </b> security groups, IAM users, patching EC2 Operating System, patching
+            <b>- The customer is responsible for the security IN the cloud: </b> security groups, IAM users, patching EC2 Operating System, patching
             DBs running in EC2,etc. <br />
             <b>- AWS is responsible for the security OF the cloud: </b> management of data centers, security cameras, cabling, patching RDS operating
             system, etc. <br />
+            - Exam tip: if you can do something in the AWS Console, you are likely responsible. If not, AWS is likely responsible. Encryption is a
+            shared responsibility <br />
           </td>
           <td>
             <img src="../assets/01-shared-responsibility-model.jpg.png" alt="Shared responsibiliity model" />
@@ -148,25 +150,34 @@
         <tr>
           <td>IAM - Identity and Access Management</td>
           <td>
-            A user can belong to one or many groups<br />
-            The policies define the permissions of the user, groups or roles<br />
-            When a policy is attached to an individual user is called an inline policy<br />
+            - IAM is universal (it does not apply to regions) <br />
+            - A user can belong to one or many groups<br />
+            - The policies define the permissions of the user, groups or roles<br />
+            - When a policy is attached to an individual user is called an inline policy<br />
+            - IAM users are considered "permanent" because once their password, access key, or secret key is set, these credentials don't
+            automatically rotate or change without human interaction <br />
             <br />
             <b>MFA</b><br />
-            Virtual MFA Device = Google Authenticator o Authy<br />
-            U2F security key = physical USB device<br />
+            - Virtual MFA Device: Google Authenticator o Authy<br />
+            - U2F security key: physical USB device<br />
             <br />
             <b>How to manage AWS</b><br />
-            AWS Console = UI accesible via web browser<br />
-            AWS SDK = package that allow a programming language to communicate with AWS<br />
-            AWS CLI = You need to install the AWS CLI and it allows you to do everything you can do in the web (AWS console).<br />
-            AWS CloudShell = Is an AWS CLI that you can launch in the web browser (when you are logged in). You can upload and download files to your
-            AWS PowerShell as if you are working in a machine<br />
+            - AWS Console: UI accesible via web browser<br />
+            - AWS SDK: package that allow a programming language to communicate with AWS<br />
+            - AWS CLI: You need to install the AWS CLI and it allows you to do everything you can do in the web (AWS console).<br />
+            - AWS CloudShell: Is an AWS CLI that you can launch in the web browser (when you are logged in). You can upload and download files to your
+            <br />
+            - AWS PowerShell: as if you are working in a machine<br />
             <br />
             <b>IAM Roles</b><br />
-            They are used to assign permissions to AWS services in order to perform action on your behalf. A role can be used by either an IAM user in
-            the same AWS account as the role or a user in a different AWS account. A role can also be used by a web service that AWS offers; a prime
-            example is Amazon EC2.<br />
+            - They are used to assign permissions to AWS services in order to perform action on your behalf <br />
+            - A role can be used by either an IAM user in the same AWS account as the role or a user in a different AWS account <br />
+            - A role can also be used by a web service that AWS offers; a prime example is Amazon EC2 <br />
+            <br />
+            <b>IAM Federation</b> <br />
+            - You can combine existing user account with AWS. For example, when you log on to your PC (usually using Microsoft Active Directory), you
+            can use the same credentials to log into AWS if you set up federation <br />
+            - Identity Federation ses the SAML standard, which is Active Directory <br />
             <br />
             <b>Identities</b> <br />
             They are the IAM resource objects that are used to identify and group. You can attach a policy to an IAM identity. These include users,
@@ -179,9 +190,22 @@
             It is a person or application that uses the AWS account root user, an IAM user, or an IAM role to sign in and make requests to AWS. <br />
             <br />
             <b>Security Tools</b><br />
-            IAM Credentials Report (account-level) = a report (excel) that lists all your account's users and the status of their various
+            - IAM Credentials Report (account-level) = a report (excel) that lists all your account's users and the status of their various
             credentials<br />
-            IAM Access Advisor (user-level) = shows the services permissions granted to a user and when those services were last accessed<br />
+            - IAM Access Advisor (user-level) = shows the services permissions granted to a user and when those services were last accessed <br />
+            <br />
+            <b>AWS Root Account</b>
+            - This is the account created when you first set up your AWS account and it has complete admin access. Secure it as soon as possible and
+            do not use it to log in day to day <br />
+            - New users has no permissions when first created <br />
+            - Four steps to secure your root account:
+            <ol>
+              <li>Enable multi-factor authentication on the root account</li>
+              <li>Create an admin group for your administrators, and assign the appropiate permissions to this group</li>
+              <li>Create user accounts for your administrators</li>
+              <li>Add your users to the admin group</li>
+            </ol>
+            - Good practices: always setup password rotations. You can create and customize your own password rotation policies
           </td>
           <td>
             <img src="../assets/02-iam-users-groups.jpg" alt="User groups" />
@@ -208,9 +232,10 @@
             <b>- EC2 user data: </b> instance bootstraping script <br />
             <br />
             <b>Amazon Machine Image (AMI)</b><br />
-            docker like images to be run in EC2 instances. The AMI must be in the same region as that of the EC2 instance to be launched. If the AMI
-            exists in a different region, you can copy that AMI to the region where you want to launch the EC2 instance. The region of AMI has no
-            bearing on the performance of the EC2 instance. You can create a new AMI from an existing EC2 instance.<br />
+            AMIs are templates for EC2 instances. They are docker like images to be run in EC2 instances. The AMI must be in the same region as that
+            of the EC2 instance to be launched. If the AMI exists in a different region, you can copy that AMI to the region where you want to launch
+            the EC2 instance. The region of AMI has no bearing on the performance of the EC2 instance. You can create a new AMI from an existing EC2
+            instance.<br />
             <br />
             - EC2 Image Builder. Is a free service that help you to attach packages, roles and config other options to create a custom AMI.<br />
             <br />
@@ -837,7 +862,8 @@
             - Each object has metadata, a list of text key/vaue pairs with system or user metadata. The objects can also have up to 10 tags (that can
             be used to manage security or lifecycle) and a verdion id (if versioning is enabled). <br />
             - S3 versioning: allows you to maintain a history of the files stored in S3, so you can rollback any unintended change. Any file that is
-            not versioned prior to enabling versionnig will have version "null". <br />
+            not versioned prior to enabling versionnig will have version "null". Versioning is not enabled by default on new S3 buckets because it
+            will store more data and increase your costs for storage <br />
             - S3 cross / same region replication (CRR/SRR): must give proper IAM permissions and enable versioning in order to use this S3 feature
             (the version IDs are replicated). It basically replicates the data from one S3 bucket into another bucket that can even be in a different
             account. Copying is asynchronous. It's worth mentioning that files that already exist in the bucket before enabling the replication aren't
