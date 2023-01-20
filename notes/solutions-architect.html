@@ -863,7 +863,9 @@
             be used to manage security or lifecycle) and a verdion id (if versioning is enabled). <br />
             - S3 versioning: allows you to maintain a history of the files stored in S3, so you can rollback any unintended change. Any file that is
             not versioned prior to enabling versionnig will have version "null". Versioning is not enabled by default on new S3 buckets because it
-            will store more data and increase your costs for storage <br />
+            will store more data and increase your costs for storage. Versioning cannot be disabled once enabled, only suspended. It can be integrated
+            with lifecycle rules to enable scenarios such as setup a rule that stores all your previous object versions in the lower cost Glacier
+            storage <br />
             - S3 cross / same region replication (CRR/SRR): must give proper IAM permissions and enable versioning in order to use this S3 feature
             (the version IDs are replicated). It basically replicates the data from one S3 bucket into another bucket that can even be in a different
             account. Copying is asynchronous. It's worth mentioning that files that already exist in the bucket before enabling the replication aren't
@@ -1019,11 +1021,18 @@
           <td>S3 Security</td>
           <td>
             <b>Object Encryption:</b> <br />
-            Encryption in transit (SSL/TLS): S3 exposes two methods, HTTP (unencrypted) and HTTPS (encryption in flight). Of course HTTPS is
-            recommended. One way to force encryption is to use a bucket policy and refuse ay API call to PUT an S3 object without ecnryption. Another
-            way to force encryption is to use the default encryption optio in S3. Bucket policies are evaluated before default encryption, so if you
-            set both your request is going to be denied because the default encryption will never be reached<br />
-            You can encrypt objects in S3 buckets using one of 4 methods:
+            - Encryption in transit (SSL/TLS): S3 exposes two methods, HTTP (unencrypted) and HTTPS (encryption in flight). Of course HTTPS is
+            recommended <br />
+            - One way to force encryption is to use the default encryption option in S3 (including the x-amz-server-side-encryption in the request
+            header). This method applies for SSE-S3 and SSE-KMS<br />
+            - Another way to force encryption is to use a bucket policy and refuse any API call to PUT an S3 object without encryption. The bucket
+            policy ensure encryption by checking:
+            <ul>
+              <li>SSE-S3 and SSE-KMS: should include x-amz-server-side-encryption in the request header</li>
+              <li>SSE-C: the encryption key must be included in the request</li>
+              <li>Client side encryption: the uploaded object must be encrypted using the AWS Encryption SDK</li>
+            </ul>
+            - You can encrypt objects in S3 buckets using one of 4 methods:
             <ul>
               <li>
                 SSE-S3: encryption using keys handled, managed, and owned by AWS. Object is encrypted server-side. Encryption type is AES-256. Must
@@ -1035,7 +1044,7 @@
                 encrypted server side. Must set header "x-amz-server-side-encryption":"aws:kms" to request S3 to encrypt the object with KMS
                 mechanism. Using KMS you may be impacted by the KMS limits. When you upload (call GenerateDataKey KMS API) or download (call Decrypt
                 KMS key) an object, the requests to KMS count toward the KSM quota per second (5.500, 10.000 or 30.000 req/s based on region) which
-                can throws an throttle exception
+                can throws an throttle exception. Currently you cannot request a quota increase for KMS
               </li>
               <li>
                 SSE-C: encryption using keys fully managed by the customer outside of AWS. AWS does NOT store the encryption key you provide. HTTPS
@@ -1080,7 +1089,7 @@
               </li>
               <li>
                 Governance: most users can't overwrite or delete an object version or alter its lock settings. Some users have special permissions
-                (given through IAM) to change the retention or deleete the object
+                (given through IAM) to change the retention or delete the object
               </li>
               <li>
                 Legal Hold: protect the object indefenitely, regardless of the retention mode you choose (independent from the retention mode). Can be
