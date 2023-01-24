@@ -173,6 +173,7 @@
             - They are used to assign permissions to AWS services in order to perform action on your behalf <br />
             - A role can be used by either an IAM user in the same AWS account as the role or a user in a different AWS account <br />
             - A role can also be used by a web service that AWS offers; a prime example is Amazon EC2 <br />
+            - AWS doesn't allow users to add an IAM role to an IAM group at this time <br />
             <br />
             <b>IAM Federation</b> <br />
             - You can combine existing user account with AWS. For example, when you log on to your PC (usually using Microsoft Active Directory), you
@@ -225,7 +226,8 @@
             - This services is considered Infrastructure as a Service (IaaS). <br />
             - You can comunicate with an EC2 instance via SSH with your prefered SSH client or with the option "EC2 Instance Connect" in the console
             (web browser).<br />
-            - The minimum charge for an EC2 instance is 60 seconds <br />
+            - The minimum charge for an EC2 instance is 60 seconds, but there is no minimum uptime requirement for an EC2 instance once it has been
+            enabled <br />
             <b>- Instance metadata: </b> is data about your instance that you can use to configure or manage the running instance (even
             programatically). <br />
             <br />
@@ -261,12 +263,27 @@
                 this messages in its web: "You cannot purchase Scheduled Reserved Instances at this time".
               </li>
             </ul>
-            <b>- Spot: </b> the most cost-efficient (up to 90% discount). They use available resources of other instances thus they can be destroyed
-            without prior notification.<br />
+            <b>- Spot: </b> the most cost-efficient (up to 90% discount). They use available resources of other instances thus they can be terminated
+            at any moment. Useful for any type of computing where you don't need persistent storage. When Amazon EC2 interrupts a Spot Instance, it
+            either terminates (default), stops, or hibernates the instance, depending on what you specified when you created the Spot request <br />
+            EC2 Spot Instance interruption notice: when Amazon EC2 is going to interrupt your Spot Instance, it emits an event two minutes prior to
+            the actual interruption (except for hibernation, which gets the interruption notice, but not two minutes in advance, because hibernation
+            begins immediately). The interruption notices are made available as a CloudWatch event and as items in the instance metadata on the Spot
+            Instance. Interruption notices are emitted on a best effort basis <br />
+            Spot fleet: is a collection of spot instances and, optionally, on-demand instances <br />
+            Exam tip: Spot Instances with a defined duration (also known as spot blocks) are no longer available to new customers as of July 1, 2021
+            <br />
             <b>- Dedicated Instance: </b>hardware dedicated to your use but you don't have control over instance placement.<br />
             <b>- Dedicated Host: </b>physical server fully dedicated to your use. You need to commit for a 3 years period. Any question that talks
             about special licensing requirements refers to this instance type.<br />
             <br />
+            <b>AWS Outposts: </b> <br />
+            - Are server racks that offers the same AWS structure, services, APIs and tools to build your own applications on-premises just as in the
+            cloud, so you can use the AWS cloud resources directly in your facilities <br />
+            - AWS will setup and manage "Outposts racks" with your on-premise infrastructure and you can start leveraging AWS services on-premises
+            <br />
+            - You are responsible for the security of the racks <br />
+            - Outposts racks are for large deployments and Outpost servers are for smaller deployments
           </td>
           <td>
             <img src="../assets/04-EC2-instance-types.png" alt="EC2 instance types" />
@@ -293,22 +310,25 @@
             <br />
             <b>- Spot Fleet:</b> is a set of Spot Instances and optionally On-demand Instances. It allows you to automatically request Spot Instances
             with the lowest price. <br />
-            <b>- EC2 Placement Groups:</b> It allows you to control the EC2 instances placement. When you create a placement group you can specify one
-            of these strategies:
+            <b>- EC2 Placement Groups:</b> It allows you to control the EC2 instances placement. Only certain types of instances can be launches in a
+            placement group (compute optimized, GPU, memory optimized, storage optimized). You can't merge placement groups. When you create a
+            placement group you can specify one of these strategies:
             <ul>
               <li>
                 <b>Cluster: </b> clusters instances into a low latency group in a single AZ. Good for applications that need low latency but has the
-                con of low availability
+                con of low availability. AWS recommends homogenous instances within cluster placement groups. This strategy can't span multiple AZs
               </li>
               <li>
                 <b>Spread: </b> spread instances across underlying hardware - racks (max 7 instances per group per AZ). Good for applications that
-                needs high availability but has the con of a higher latency.
+                needs high availability but has the con of a higher latency. This strategy can span multiple AZs
               </li>
               <li>
                 <b>Partition: </b> spread instances across many different partitions (which rely in different sets of racks) within an AZ. Scales to
-                hundreds of EC2 instances per group. Good for big data applications which are partition aware.
+                hundreds of EC2 instances per group. Good for big data applications which are partition aware. This strategy can span multiple AZs
               </li>
             </ul>
+            Exam tip: You can move an existing instance into a placement group. Before you move the instance, the instance must be in the stopped
+            state. You can move or remove an instance using the AWS CLI or an AWS SDK, but you can't do it via the console yet. <br />
             <br />
             <b>- Elastic Network Interfaces (ENI):</b> Logical component in a VPC that represents a virtual netwrk card. It's bound to a specific AZ.
             You can created it attached to an EC2 instance (it's deleted when the instance is terminates) or on the fly in order to attach it to an
@@ -323,7 +343,7 @@
             <br />
             <b>- EC2 Hibernate:</b> It help you to have shorter instance start times placing the in-memoty (RAM )state in the attached EBS volume (the
             volumen must be an EBS and it must be encrypted). Is available for on-demand, reserved and spot instances. Not supported for are metal
-            instances
+            instances. The instance RAM must be less than 150 GB. An instance can't be hibernated for more than 60 days.
             <br />
           </td>
           <td>
@@ -347,6 +367,7 @@
             - Is a recommended storage option when you run databases on an instance <br />
             - Can be attached to only one EC2 instance at a time but one instance can have several EBS volumes attached<br />
             - Only work in one availability zone. You can create a snapshot to migrate a volume from one AZ to another<br />
+            - You can resize EBS volumes on the fly as well as changing the volume types <br />
             - About volume type: gp2 and gp3 are general porpuse volumes. io1 and io2 are great for operations that needs high I/O operations per
             second. HDD is good if you are looking for a cheaper solution and the performance is not your main concern. <br />
             - Only EBS volume types gp2, gp3, io1 and io2 can be used as boot volumes <br />
@@ -357,17 +378,25 @@
             the volume, all data in-flight between volume and instance, snapshot and volumes created from an ecrypted snapshot. <br />
             - Amazon EBS Snapshots are a point in time copy of your block data. For the first snapshot of a volume, Amazon EBS saves a full copy of
             your data to Amazon S3. EBS Snapshots are stored incrementally, which means you are billed only for the changed blocks stored. <br />
+            - All snapshots are encrypted. All the data in flight moving between the EC2 instance and the volume is encrypted <br />
+            - When you encrypt an EBS volume, the encryption operations occur on the servers that host EC2 instances, ensuring the security of both
+            data-at-rest and data-in-transit between an instance and its attached EBS storage <br />
+            - Volumes exist in EBS, qhereas snapshots exist in S3 <br />
             <br />
             <b>EC2 Instance Store</b><br />
             - Is a high performance block storage attached to an EC2 instance. Is ephemeral, is deleted when the EC2 instance is terminated.<br />
             <br />
             <b>EFS - Elastic File System</b><br />
             - Is an elastic file system for Linux-based workloads <br />
+            - Supports the Network File System version 4 (NFSv4) protocol <br />
             - No upfront payments. You pay for the amount of data (per GB) that you use <br />
+            - Can support thousand of concurrent NFS connections <br />
             - Can be mounted in hundreds of EC2 instances even if they belong to multiple AZs.<br />
             - Can be directly used with on-premises systems. <br />
             - Offers high availability, scalability but at a higher cost (3x expensive than EBS gp2). EC2 instances can access files on an EFS file
             system across many Availability Zones, Regions and VPCs<br />
+            - Can scale up to petabytes wiht read-after write consistency. No action is needed to scale, as AWS will automatically size EFS based on
+            your usage <br />
             - It has an Infrequent Access storage Class that is cost-optimized for files accessed less frequently. Data stored on the Infrequent
             Access storage class costs less than Standard and you will pay a fee each time you read from or write to a file. <br />
             <br />
@@ -382,6 +411,15 @@
             <hr />
             <span>EBS drive type</span>
             <img src="../assets/49.-EBS-drive-types.png" alt="EBS drive type" />
+            <hr />
+            <span>EBS drive type - gp2 and gp3</span>
+            <img src="../assets/227.-ebs-drive-types.png" alt="EBS drive type - gp2 and gp3" />
+            <hr />
+            <span>EBS drive type - io1 and io2</span>
+            <img src="../assets/228.-ebs-drive-types.png" alt="EBS drive type - io1 and io2" />
+            <hr />
+            <span>EBS drive type - st1 and sc1</span>
+            <img src="../assets/229.-ebs-drive-types.png" alt="EBS drive type - st1 and sc1" />
             <hr />
             <span>EFS storage classes</span>
             <img src="../assets/62.-efs-storage-classes.png" alt="EFS storage classes" />
@@ -4120,7 +4158,7 @@
           </td>
         </tr>
         <tr>
-          <td>Exam questions</td>
+          <td>Exam questions and tips</td>
           <td>
             <b>
               You have created the main Edge-Optimized API Gateway in us-west-2 AWS region. This main Edge-Optimized API Gateway forwards traffic to
@@ -4136,13 +4174,43 @@
               if you plan on connecting your networks later on?
             </b>
             <br />
-            172.16.0.0/12 - WRONG <br />
-            172.16.0.0/16 - CORRECT. CIDR not should overlap, and the max CIDR size in AWS is /16. <br />
-            10.0.16.0/16 - WRONG <br />
-            192.168.4.0/18 - WRONG <br />
+            - 172.16.0.0/12 - WRONG <br />
+            - 172.16.0.0/16 - CORRECT. CIDR not should overlap, and the max CIDR size in AWS is /16. <br />
+            - 10.0.16.0/16 - WRONG <br />
+            - 192.168.4.0/18 - WRONG <br />
+            <br />
+            <b>
+              True or False? You can create an unencrypted EBS volume from an encrypted snapshot by unselecting the "encryption" check box when
+              restoring it
+            </b>
+            <br />
+            You can't unencrypt a volume using this method <br />
+            <br />
+            <b
+              >You've been tasked with creating a highly performant database on your EC2 instance. Which type of EBS volume will support the high
+              level of IOPS that you require?</b
+            >
+            <br />
+            - Provisioned IOPS - CORRECT. Provisioned IOPS would be the best option in this instance <br />
+            - Throughput Optimized - WRONG<br />
+            - Cold HDD - WRONG<br />
+            - General Purpose - WRONG<br />
+            <br />
+            <b>
+              You've been tasked with creating a file system for a Linux workload that should support concurrent access to the same file or directory
+              from thousands of compute instances and handle massive datasets, up to hundreds of gigabytes per second. What AWS service would you use?
+            </b>
+            <br />
+            - Amazon FSx - WRONG <br />
+            - Amazon FSx for Lustre - CORRECT. Amazon FSx for Lustre is the most suitable option for high-performance Linux file systems<br />
+            - Amazon EFS High Performance- WRONG. Amazon EFS doesn't have a "High Performance" feature<br />
+            - Amazon EBS Provisioned IOPS <br />
             <br />
           </td>
-          <td></td>
+          <td>
+            <span>Network Exam Tip</span>
+            <img src="../assets/226.-network-exam-tip.png" alt="Network Exam Tip" />
+          </td>
         </tr>
       </tbody>
     </table>
