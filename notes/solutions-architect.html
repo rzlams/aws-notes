@@ -283,7 +283,12 @@
             - AWS will setup and manage "Outposts racks" with your on-premise infrastructure and you can start leveraging AWS services on-premises
             <br />
             - You are responsible for the security of the racks <br />
-            - Outposts racks are for large deployments and Outpost servers are for smaller deployments
+            - Outposts racks are for large deployments and Outpost servers are for smaller deployments <br />
+            <br />
+            <b>AWS Wavelength: </b> <br />
+            - It consist of infrastrcture deployments embedded within the telecommunication provider's datacenters at the edge of the 5G network
+            <br />
+            - It brings AWS services to the edge of the 5G networks improving performance and lowering the latency. <br />
           </td>
           <td>
             <img src="../assets/04-EC2-instance-types.png" alt="EC2 instance types" />
@@ -572,13 +577,18 @@
             <b>Aurora</b> <br />
             - It's a propietary technology of AWS optimized for the cloud (performance improvement - 5x over MySQL and 3x over PostgreSQL). <br />
             - Only supports MySQL and PostgreSQL. It doesn't support MariaDB. <br />
+            - With Aurora 2 copies of your data are contained in each AZ, with a minimum of 3 AZs (6 copies of your data) <br />
             - Is 20% more expensive than RDS but also more efficient. <br />
             - Its storage grows automatically in increments of 10GB up to 12 8TB. <br />
             - Can have up to 15 replicas and the replication process is faster (sub 10ms). <br />
             - Have one Writer Endpoint that internally points to the master node (the only one that can write) and one Reader Endpoint that load
             balance the client's connections to the read replicas. <br />
+            - Auroa has autmates backups turned on by default. You can also take snapshots with Aurora. You can share Aurora snapshots with other AWS
+            accounts <br />
             - The master (writer) node is replaced with any read replica on failure. <br />
             - Read replica auto scaling: based on CPU usage <br />
+            - There are three types of read replica: Aurora replicas, MySQL replicas, and PostgreSQL replicas. Automated failover is only available
+            with Aurora replicas <br />
             - Custom endpoints: allows you to control which read replica responds to each custom endpoint you create. <br />
             - Aurora serverless: automatic instantiation and auto scaling based on actual usage. The client connect to "Proxy fleet" (managed by
             Aurora) and it scales the DB based on current usage. <br />
@@ -662,6 +672,9 @@
             <span>RDS Multi AZ</span>
             <img src="../assets/67.-rds-multi-az.png" alt="RDS Multi AZ" />
             <hr />
+            <span>Multi AZ vs Read Replicas</span>
+            <img src="../assets/230.-multi-az-vs-read-replica.png" alt="Multi AZ vs Read Replicas" />
+            <hr />
             <span>Aurora Features</span>
             <img src="../assets/69.-aurora-features.png" alt="Aurora Features" />
             <hr />
@@ -706,8 +719,9 @@
               </li>
             </ul>
             <b>- Route 53:</b> it's a highly available, scalable, fully managed and authoritative (means you can update the DNS records) DNS. It's
-            also a domain registrar. It has the ability t check the health of your resources. it's considered the only AWS service that provides 100%
-            availability SLA. It's name is a reference to the traditional DNS port. Each DNS (Route53) record contains:
+            also a domain registrar. It has the ability to check the health of your resources. It's considered the only AWS service that provides 100%
+            availability SLA. It's name is a reference to the traditional DNS port. You can buy domain names directly with AWS and it can take up to 3
+            days to register. Each DNS (Route53) record contains:
             <ul>
               <li>Domain/subdomain name: e.g. example.com</li>
               <li>Record type: e.g. A or AAAA</li>
@@ -728,14 +742,20 @@
                 possible targets for this type of record
               </li>
               <li>
+                SOA: start of authority record includes administrative information (TTL, etc) about your zone, as defined by the domain name system
+                (DNS). Anytime you set up a new zone, you'll need a new SOA record. And any time you transfer one DNS zone to another, you'll need
+                that record too
+              </li>
+              <li>
                 NS: Name Server for the hosted zone. Control how traffc is routed for a domain. Its is the DNS names or IP adresses of the servers you
                 want to responds to the received queries for your hosted zone
               </li>
             </ul>
+            - Exam tip: given the choice, always choose an alias record over a CNAME record <br />
             - Health Checks: they are mainly for public resource. Health checks only pass when receive 2xx or 3xx status codes. Health checks can be
             set to pass / fail based on text in the first 5120 bytes of the response. Your firewall (e.g. security groups) needs to allow the Route53
-            health checks request. Health checks are integrated with CloudWatch so you can have health checks metrics. The Route53 health checks can
-            monitor three types of resource:
+            health checks request. Health checks are integrated with CloudWatch so you can have health checks metrics. You can set SNS notifications
+            to alert you about failed health checks. The Route53 health checks can monitor three types of resource:
             <ul>
               <li>
                 An endpoint: about 15 health checkers will check the endpoint health, if more than 18% of health checkers report the endpoint is
@@ -1772,7 +1792,7 @@
               </li>
             </ul>
             <b>Lambda VPC:</b> <br />
-            - By default yoir lambda functions are launched outside your own VPC (in AWS-owned VPC). Therefore it cannot access resources in your VPC
+            - By default your lambda functions are launched outside your own VPC (in AWS-owned VPC). Therefore it cannot access resources in your VPC
             <br />
             - In order to connect your lambda to your VPC you must define the VPC ID, the subnets and the security groups. Lambda will create an ENI
             (Elastic Network Interface) in your subnets. See image <br />
@@ -1780,6 +1800,11 @@
             <br />
             <b>DynamoBD</b> <br />
             - Fully manage, highly available NoSQL database (with transaction support) with replication across multiple AZs <br />
+            - The data is stored on SSD storage, spread across 3 geographically distinct data centers <br />
+            - DynamoDb is eventually consistent by defaul, but you can have strongly consistent reads <br />
+            - Support transactions (ACID across one or more tables within a single AWS account and region) of up to 25 items or 4 MB of data <br />
+            - You have three options for reads: eventual consistency, strong consistency, and transactional <br />
+            - You have two options for writes: standard and transactional <br />
             - Scales to massive workloads (distributed databade) <br />
             - Support millions of requests per second and hundreds of TB of storage with fast and consistent performance (single-digit milisecond)
             <br />
@@ -1825,8 +1850,8 @@
             - You can set a TTl for the cache. Default is 5 minutes <br />
             - Is the prefered cache solution when it comes to DynamoDB (individual objects, query and scan cache). You can also use ElastiCache to
             store aggregated result if it's needed <br />
-            - Dynamo DB Streams: the idea is that you have an steam of all the modifications (create/update/delete) of your table's data. You can
-            manage the stream intwo ways:
+            - Dynamo DB Streams: the idea is that you have an stream (time-ordered sequence) of all the modifications (create/update/delete) of your
+            table's data. You can manage the stream intwo ways:
             <ul>
               <li>
                 <b>DynamoDB Streams:</b> offers 24 hours retention. Support a limited number of consumers. You can process the data using a AWS Lambda
@@ -1838,8 +1863,8 @@
               </li>
             </ul>
             - DynamoDB Global Tables: it makes a dynamo table accesible with low latency in multiple AWS regions. It supports (by default)
-            active-active replication, which means that applications can read or write to the table in any region. You must enable DynamoDB Streams as
-            a pre-requisite. <br />
+            active-active replication (multi-master), which means that applications can read or write to the table in any region. You must enable
+            DynamoDB Streams as a pre-requisite. <br />
             - Dynamo TTL: llows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of
             the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. When enabling TTL on a table,
             DynamoDB requires you to identify a specific attribute name that the service will look for when determining if an item is eligible for
@@ -3120,6 +3145,7 @@
             - New EC2 instances are launched into the default VPC if no subnet is specified <br />
             - Default VPC has internet connectivity and all EC2 instances inside it have public IPv4 addresses <br />
             - We also get a public and a private IPv4 DNS names fo our EC2 instances <br />
+            - One subnet is always in 1 AZ. It can't span to more than one AZ <br />
             - You can have multiple VPCs in an AWS region (max 5 per region - you can increase it) <br />
             - The maximum number of CIDRS to assign per VPC is 5. For each CIDR:
             <ul>
@@ -3194,7 +3220,8 @@
             - You must manage security groups and rules <br />
             <br />
             <b>NAT Gateways</b> <br />
-            - AWS managed NAT (instances), higher bandwidth, high availablility, no administration <br />
+            - AWS managed NAT (instances), higher bandwidth, high availablility (redundant inside th AZ), no administration, and no need to patch
+            <br />
             - Only support IPv4 <br />
             - You pay per hour of usage and bandwidth <br />
             - NATGW is created in a specific AZ and inherit an Elastic IP <br />
@@ -3207,7 +3234,7 @@
             the IGW <br />
             - To route the traffic from a private subnet to the NATGW, you need to edit the route table <br />
             - NATGW is resilient (high available) only within a single AZ. For this reason, you need to create multiple NAT Gateways in multiple AZs
-            for fault-tolerance. There is no need to configure a failover for NATGW because iif an AZ goes down it doesn't need NAT <br />
+            for fault-tolerance. There is no need to configure a failover for NATGW because if an AZ goes down it doesn't need NAT <br />
             - In a route table, when you have a private subnet that points to the internet (a public IP ) without a NATGW or NAT instance that can
             effectively route that traffic, the status of the route/destination in the route table is "Blackhole" <br />
             <br />
@@ -3218,9 +3245,12 @@
             automatically allowed <br />
             <br />
             <b>Network Access Control List (NACL)</b> <br />
-            - NACL are like a firewall which contorl traffic from and to subnets <br />
-            - One NACL per subnet, new subnets are assigned the Default NACL <br />
-            - Newly created NACLs will deny everything <br />
+            - NACL are like a firewall which control traffic from and to subnets <br />
+            - Each subnet in your VPC must be associatedwith a NACL. If you don't explicitly aasociate a subnet with a NACL, the subnet is
+            automatically associated with the Default NACL <br />
+            - You can associate a NACL with multiple subnets; however, a subnet can be associated with only one NACL at a time. When you associate a
+            network ACL with a subnet, the previous association is removed <br />
+            - Newly created Custom NACLs will deny all traffic. On the other hand, the Default NACL will allow all traffic <br />
             - NACL are a great way of blocking a specific IP address at the subnet level <br />
             - You can define NACL rules:
             <ul>
@@ -3273,7 +3303,10 @@
             - Route tables must be updated in both VPCs that are peered <br />
             <br />
             <b>VPC Endpoints (AWS PrivateLink)</b> <br />
-            - Every AWS service uis publicly exposed (public URL) <br />
+            - Every AWS service is publicly exposed (public URL) <br />
+            - AWS PrivateLink is the best way to expose a service VPC to tens, hundreds, or thousands of customer VPCs. Doesn't require VPC peering,
+            route tables, NATGW, IGW, etc. It requires a Network Load Balancer on the service VPC (kindof producer) and an ENI on the customer VPC
+            (kindof consumer) <br />
             - VPC Endpoints (powered by AWS PrivateLink) allows you to connect to AWS services using a private network instead of using the public
             internet <br />
             - VPC Endpoints are redundant and scales horizontally <br />
@@ -3285,7 +3318,7 @@
                 <b>Interface Endpoint (powered by PrivateLink):</b> <br />
                 - Provisions an ENI (private IP address) as an entry point (must attach a security group) <br />
                 - Support most AWS services <br />
-                - You pay for per hour and per GB of data processed
+                - You pay per hour and per GB of data processed
               </li>
               <li>
                 <b>Gateway Endpoint:</b> <br />
@@ -3370,11 +3403,12 @@
             the route table that is associated with your subnets <br />
             - If you need to ping your EC2 instances from on-premises, make sure you add the ICMP protocol on the inbound rules of your security
             groups <br />
-            - AWS VPN CloudHub: provides secure communication between multiple sites, if you have multiple VPN connections. Offers a low-cost
-            hub-and-spoke model for primary or secondary network connectivity netween different locations (VPN only). To set it up, connect multiple
-            VPN connections on the same VGW, setup dynamic routing and configure route tables <br />
+            - AWS VPN CloudHub (or VPN Hub): provides secure communication between multiple sites, if you have multiple VPN connections. Offers a
+            low-cost hub-and-spoke model for primary or secondary network connectivity netween different locations (VPN only). To set it up, connect
+            multiple VPN connections on the same VGW, setup dynamic routing and configure route tables <br />
             - The spoke-hub distribution paradigm (hub-and-spoke model) is a form of transport topology optimization in which traffic planners
             organize routes as a series of "spokes" that connect outlying points to a central "hub" <br />
+            - Exam tip: If you see a question that talks about simplify the network topology, think of VPN CloudHub <br />
             <br />
             <b>Direct Connect (DX)</b> <br />
             - It provides a dedicated private connection from a remote network to your VPC <br />
@@ -4160,6 +4194,15 @@
         <tr>
           <td>Exam questions and tips</td>
           <td>
+            <b>EXAM TIPS:</b> <br />
+            - The database Neptune is often used as distractor. If the scenario is not talking about graph databases, do not select Neptune as an
+            answer. You only need to know what Neptune does at a very high level <br />
+            - QLDB is often used as distractor. If the scenario is not talking about inmutable databases, do not select QLDB as an answer. You only
+            need to know what QLDB does at a very high level <br />
+            - For scenarios talking about where to store a large amount of time-series data for analysis. Think of Timestream<br />
+            <br />
+            <br />
+            <b>QUESTIONS:</b> <br />
             <b>
               You have created the main Edge-Optimized API Gateway in us-west-2 AWS region. This main Edge-Optimized API Gateway forwards traffic to
               the second level API Gateway in ap-southeast-1. You want to secure the main API Gateway by attaching an ACM certificate to it. Which AWS
