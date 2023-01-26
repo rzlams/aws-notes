@@ -445,35 +445,57 @@
             - Provide SSL for several EC2 instances<br />
             - Do regular health checks to your instances<br />
             - Some load balancer can be setup as internal (private) or external (public) <br />
+            - Listeners: A listener check for connection requests from clients, using the protocol and port you configure <br />
+            - Rules: determine how the load balancer route requests to its registered targets. Each rules consist of a priority, one or more actions,
+            and one or more conditions <br />
+            - Target groups: each target group routes requests to one or more registered targets, such as EC2 instances, using the protocol and port
+            number you specify <br />
             - The most secure way of ensuring only the ALB can access the EC2 instances is referencing the ALB by security group in rules. <br />
             - AWS offers three kind of load balancers:
             <ul>
               <li>
-                Classic load balancer - CLB (slowly retiring) - layer 4 & 7: when created receive a fixed hostname (XXX.region.elb.amazonaws.com). In
-                order to add targets you need to add them directly to the load balancer's configuration (not using target group). Can make health
-                checks via HTTP, HTTPS or TCP protocols. Provides static DNS
+                Classic load balancer - CLB (slowly retiring) - layer 4 & 7: <br />
+                - When created receive a fixed hostname (XXX.region.elb.amazonaws.com) <br />
+                - In order to add targets you need to add them directly to the load balancer's configuration (not using target group) <br />
+                - Can make health checks via HTTP, HTTPS or TCP protocols <br />
+                - Provides static DNS
               </li>
               <li>
-                <b>Application load balancer - ALB (HTTP / HTTPS only) - layer 7:</b> you can set a target group that list the EC2 instances, ECS
-                tasks, lambda functions o IP Addresses where is going to route the traffic to. It can route to differente target groups. The health
-                checks are at target group level. You can configure responses from the load balancer, is not required to route to a target group.
-                Provides static DNS. To get the client's IP address, ALB adds an additional header called "X-Forwarded-For", it contains the client's
-                IP address
+                <b>Application load balancer - ALB (HTTP / HTTPS only) - layer 7:</b> <br />
+                - You can set a target group that list the EC2 instances, ECS tasks, lambda functions o IP Addresses where is going to route the
+                traffic to <br />
+                - It can route to differente target groups <br />
+                - The health checks are at target group level <br />
+                - You can configure responses from the load balancer, is not required to route to a target group <br />
+                - Provides static DNS <br />
+                - To get the client's IP address, ALB adds an additional header called "X-Forwarded-For", it contains the client's IP address <br />
+                - To use an HTTPS listener, yu must deploy at least one SSL/TLS server certificate on your load balancer. The load balancer uses a
+                server certificate to terminate the frontend connection and then decrypt requests from clients before sending them to the targets
+                <br />
               </li>
               <li>
-                <b>Network load balancer - NLB (ultra high performance, allows for TCP and UDP) - layer 4:</b> less latency than Application load
-                balancer and can handle millions of requestsper second. Has one static IP per AZ and supports assigning elactic IP (helpful for
-                whitelisting specific IP). Their target groups support EC2 instances, IP addresses (only private IPs) and Application load balancer.
-                Can make health checks via HTTP, HTTPS or TCP protocols. Only Network Load Balancer provides both static DNS name and static IP.
+                <b>Network load balancer - NLB (ultra high performance, allows for TCP and UDP) - layer 4:</b> <br />
+                - Less latency than Application load balancer and can handle millions of requestsper second <br />
+                - Has one static IP per AZ and supports assigning elactic IP (helpful for whitelisting specific IP) <br />
+                - Their target groups support EC2 instances, IP addresses (only private IPs) and Application load balancer <br />
+                - Can make health checks via HTTP, HTTPS or TCP protocols <br />
+                - Only Network Load Balancer provides both static DNS name and static IP <br />
+                - Use when you need extreme performance or you need protocols not supported by ALB <br />
+                - Network Load Balancers can decrypt traffic, but you will need to install the certificate on the load balacer
               </li>
               <li>
-                <b>Gateway load balancer - GLB - layer 3 (network layer) IP Protocol:</b> deploy, scale and manage a fleet of 3rd party netwotk
-                virtual appliances (for example: firewalls, intrusion detection systems, payload manipulation, etc). It's normally used in combination
-                with oter type of load balancer (see image).Uses the GENEVE prtotocol on port 6081. Their target groups support EC2 instances and IP
-                addresses (only private IPs). Combine the following functions: Transparent network gateway (single exit/entry for all traffic) and
-                Load balancer (distributes trafic to your virtual appliances)
+                <b>Gateway load balancer - GLB - layer 3 (network layer) IP Protocol:</b>
+                - Deploy, scale and manage a fleet of 3rd party netwotk virtual appliances (for example: firewalls, intrusion detection systems,
+                payload manipulation, etc) <br />
+                - It's normally used in combination with other type of load balancer (see image) <br />
+                - It uses the GENEVE prtotocol on port 6081 <br />
+                - Their target groups support EC2 instances and IP addresses (only private IPs) <br />
+                - Combine the following functions: Transparent network gateway (single exit/entry for all traffic) and Load balancer (distributes
+                trafic to your virtual appliances)
               </li>
             </ul>
+            - Exam tip: a 504 error means the gateway has timed out. This means that the application is not responding within the idle tiemout period
+            <br />
             - During the ELB config process you can:
             <ul>
               <li>Make the ALB available in different subnetworks (ACs)</li>
@@ -485,6 +507,10 @@
             instance behind a load balancer. This works for classic load balancer and application load balancer. A use case for this feature could be
             make sure the user doesn't lose his session data. The stickiness is controlled with a cookie that can be generated by the target or the
             load balancer, in both cases you can set the duration of the cookie (from 1 second to 7 days). <br />
+            - Exam tip: For ALBs, the traffic will be sent at the target gtoup level, not to individual EC2 instances (unless you configure a target
+            group with just one EC2 instance) <br />
+            - Exam tip: You may see scenario-based questions where you remove an EC2 instance from a pool, but the load balancer continues to direct
+            traffic to that EC2 instance. To solve a scenario like this, disable sticky sessions<br />
             - Cross-zone load balacing: allows you to route the traffic to more than one AZ. See image for more details for each loadb balancer
             type<br />
             - SSL - Server Name Indication (SNI): SNI solves the problem of load multiple SSL certificates onto one web server (to serve ultiple
@@ -492,10 +518,12 @@
             certificate. It only works for ALB and NLB, to apply multiple SSL certificates with CLB you must create multiple CLB<br />
             - Connection drainning (for CLB) or Deregistration Delay (for ALB and NLB): use it to ensure that a Load Balancer stops sending requests
             to instances that are de-registering or unhealthy, while keeping the existing connections open. This enables the load balancer to complete
-            in-flight requests made to instances that are de-registering or unhealthy. When you enable connection draining, you can specify a maximum
-            time for the load balancer to keep connections alive before reporting the instance as de-registered. The maximum timeout value can be set
-            between 1 and 3,600 seconds (the default is 300 seconds). When the maximum time limit is reached, the load balancer forcibly closes
-            connections to the de-registering instance <br />
+            in-flight requests made to instances that are de-registering or unhealthy. Enable deregistration delay keep existing connections open if
+            the EC2 instance becomes unhealthy. Disable deregistrtion delay the load balancer inmediately close connections to EC2 instances that are
+            de-registered or have become unhealthy. When you enable connection draining, you can specify a maximum time for the load balancer to keep
+            connections alive before reporting the instance as de-registered. The maximum timeout value can be set between 1 and 3,600 seconds (the
+            default is 300 seconds). When the maximum time limit is reached, the load balancer forcibly closes connections to the de-registering
+            instance <br />
             <br />
             <b>Auto Scaling Groups - ASG</b><br />
             - Scale out means add instances. Scale in means remove instances<br />
@@ -2383,6 +2411,7 @@
             CloudWatch alarms <br />
             - CloudWatch Insights can be used to query logs and add queries to CloudWatch Dashboards. CloudWatch Insights comes with predefined
             queries that could be useful <br />
+            - Exam tip: When it comes to monitoring, if it ask for a real-time logging service pick Kinesis over CloudWatch <br />
             - Log sources:
             <ul>
               <li>SDK, CloudWatch Logs Agent (deprecated), CloudWatch Unified Agent</li>
@@ -2443,6 +2472,9 @@
               <li>EC2 Auto Scaling: trigger auto scaling action (scale out or in)</li>
               <li>SNS: send a notification to SNS from which you can do pretty much anything</li>
             </ul>
+            <br />
+            <br />
+            <b>Grafana and Prometheus </b> See image <br />
             <br />
             <b>EventBridge (formerly CloudWatch Events):</b> <br />
             - It allows you to set more complex rules. Cloud be scheduled events (cron jobs) or event patterns (event rule to react to a services
@@ -2569,6 +2601,10 @@
             <hr />
             <span>CloudWatch Unified Agent Metrics</span>
             <img src="../assets/136.-cloudwatch-unified-agent.png" alt="CloudWatch Unified Agent Metrics" />
+            <hr />
+            <span>Grafana and Prometheus</span>
+            <img src="../assets/231.-grafana-and-prometheus.png" alt="Grafana and Prometheus" />
+
             <hr />
             <span>EventBridge Rules</span>
             <img src="../assets/137.-eventbridge.png" alt="EventBridge Rules" />
@@ -4248,6 +4284,13 @@
             - Amazon FSx for Lustre - CORRECT. Amazon FSx for Lustre is the most suitable option for high-performance Linux file systems<br />
             - Amazon EFS High Performance- WRONG. Amazon EFS doesn't have a "High Performance" feature<br />
             - Amazon EBS Provisioned IOPS <br />
+            <br />
+            <b>What instance will a NLB load balancer send traffic to if no hosts are healthy?</b>
+            <br />
+            - It will reject all traffic - WRONG<br />
+            - It will terminate the unhealthy hosts - WRONG<br />
+            - It will try to send traffic to all the instances - CORRECT. It will send traffic to all the instances, hoping one is online<br />
+            - It will store the traffic for later. - WRONG<br />
             <br />
           </td>
           <td>
