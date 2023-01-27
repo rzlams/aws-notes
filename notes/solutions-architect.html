@@ -534,6 +534,16 @@
             launch or terminate additional instances (to allow for metrics to stabilize) <br />
             - Good metrics to scale on: CPU utilization, request count per target, average network in / out, custom metrics that better fit your use
             case <br />
+            - Auto Scaling will balance your EC2 count across the AZs you list (high availability) <br />
+            - You can create an ASG using a launch template, you must create a launch template with the parameters required to launch an EC2 instance.
+            These parameters include the ID of the Amazon Machine Image (AMI) and an instance type <br />
+            - A launch template provides full functionality for Amazon EC2 Auto Scaling and also newer features of Amazon EC2 such as the current
+            generation of Amazon EBS Provisioned IOPS volumes (io2), EBS volume tagging, T2 Unlimited instances, Elastic Inference, and Dedicated
+            Hosts <br />
+            - If you need to change the AMI included in a launch template, create a new version of the launch template with the updated AMI <br />
+            - When you use Elastic Load Balancing with your Auto Scaling group, it's not necessary to register individual EC2 instances with the load
+            balancer. Instances that are launched by your Auto Scaling group are automatically registered with the load balancer. Likewise, instances
+            that are terminated by your Auto Scaling group are automatically deregistered from the load balancer <br />
             - Scaling Strategies:<br />
             <ul>
               <li>Manual Scaling: manually set the ideal sizes</li>
@@ -1552,10 +1562,12 @@
             policy, it receives every message <br />
             <br />
             <b>Amazon Kinesis:</b> <br />
-            - Make it easy to collect, process, analyze streaming data in rela-time <br />
+            - Make it easy to collect, process, analyze streaming data in real-time <br />
             - Ingest real-time data such as: application logs, metrics, website clickstremas, IoT telemetry data, etc <br />
             - A shard is a uniquely identified sequence of data records in a stream. A stream is composed of one or more shards, each of which
             provides a fixed unit of capacity. <br />
+            - Exam tip: Kinesis is the only service with a real-time response. If the question asks for a real-time solution to processing or moving
+            data, look for an answer that includes Kinesis <br />
             <b>Amazon Kinesis Data Streams:</b> <br />
             - Capture process and store data stream <br />
             - Can have many producers and consumers <br />
@@ -1620,13 +1632,19 @@
             <b>Amazon Kinesis Video Streams:</b> capture, process, and store video streams <br />
             <br />
             <b>Amazon MQ</b> <br />
-            - Managed message broker services that support open source messaging protocols like MQTT, AMQP, STOMP, Openwire, and WSS <br />
+            - Managed message broker services that support open source messaging protocols like JMS, MQTT, AMQP, STOMP, OpenWire, and WSS <br />
             - Helpful when you are migrating (that use, for example: RabbitMQ or ActiveMQ) to the cloud and don't want to re-engineer your application
             to use SQS and SQS <br />
             - It doesn't scale as much as SQS and SNS <br />
             - It runs in severs and can run in multi-AZ with failover <br />
             - Amazon MQ has both queue feature (SQS) and topic featuew (SNS) <br />
-            - When you seetup Multi-AZ (high availability) for Amazon MQ, you have one AZ as "active" and the other one as "standby"
+            - When you seetup Multi-AZ (high availability) for Amazon MQ, you have one AZ as "active" and the other one as "standby" <br />
+            <br />
+            <b>AWS Data Pipeline</b> <br />
+            - It is a managed ETL service within AWS <br />
+            - It's meant to help you implement automated workflows for movement and transformation of your data <br />
+            - It integrates with storage services (e.g. RDS and S3) and compute services (e.g. EC2 and EMR) <br />
+            - I's great for data-driven and task-dependent (depens on previous success task to move on the next one) ETL workflows <br />
           </td>
           <td>
             <span>SQS with Auto Scaling Group</span>
@@ -1932,9 +1950,11 @@
             </ul>
             <br />
             <b>Step Functions</b> <br />
+            - Serverless orchestration service <br />
             - State Machine that helps you build serverless visual workflows to orchestrate your lambda functions (and other AWS services) <br />
             - Support different kind of steps: sequence, parallel, conditions, timeouts, error handling, etc <br />
-            - Can integrate with EC2, ECS, on-premises servers, API Gateway, SQS, etc
+            - Can integrate with EC2, ECS, on-premises servers, API Gateway, SQS, etc <br />
+            - Exam tip: If a question talks about a lengthy wait period, up to one year, think of step functions <br />
           </td>
           <td>
             <span>Lambda Runtimes</span>
@@ -2113,8 +2133,10 @@
             <b>Redshift</b> <br />
             - It's based on PostgreSQL but it's not used for OLTP, instead it's used for online analytical processing - OLAP (analytics and data
             warehousing) <br />
+            - While Redshift is a relational database, it's not a replacement for RDS in traditional applications <br />
             - Offers 10x better performance tha other data warehouses and can scale to PBs of data <br />
-            - Columna storage of data (instead of row based) and parallel query engine <br />
+            - Redshift can hold up to 16 petabytes of data per cluster <br />
+            - Columnar storage of data (instead of row based) and parallel query engine <br />
             - Pay as you go pricing, based on the instances provisioned in your Redshift cluster <br />
             - Has a SQL interface to perform the queries <br />
             - BI tools such as Amazon Quicksight or Tableau integrate with it <br />
@@ -2123,9 +2145,12 @@
             through your VPCs <br />
             - Consist of a leader node (for query planning and result aggregation), a compute node (for performing the queries and send result to the
             leader node). You need to provision the node size in advance and can use reserved instances for cost savings <br />
-            - Redshift has no Multi-Az mode. Thus you need to use snapshots to implement disaster recovery strategies. Snapshots are point-in-time
-            backups of a cluster, stored internally in S3. Snapshots are incremental (only what has changed is saved). You can restore a snapshot into
-            a new cluster. You can have two types of snapshots:
+            - Redshift only support single-AZ deployments. You can create multiple clusters in different AZs, but they're tecnically seprate
+            deployments. It's not highly available by default <br />
+            - Redshift has no Multi-Az mode. Thus you need to use snapshots to implement disaster recovery strategies <br />
+            - Snapshots are point-in-time backups of a cluster, stored internally in S3 <br />
+            - Snapshots are incremental (only what has changed is saved). You can restore a snapshot into a new cluster <br />
+            - You can have two types of snapshots:
             <ul>
               <li><b>Manual:</b> snapshot is retained until you delete it</li>
               <li><b>Automated:</b> every 8 hours, every 5 GB, or on a schedule. You need to set the retention time</li>
@@ -2139,6 +2164,8 @@
             With this feature you can leverage much more query power than the you originally have inyou provisioned cluster <br />
             <br />
             <b>Amazon OpenSearch (ex-ElasticSearch - name changed for license issues)</b> <br />
+            - Amazon OpenSearch Service (the Amazon Elasticsearch Service successor) is a managed service allowing you to run search and analytics
+            engines for various use cases <br />
             - With OpenSearch you can search any field, even partially matches <br />
             - It's common to use OpenSearch as a complement to another database (like DynamoDB) <br />
             - OpenSearch requires a cluster of instances (not serverless) <br />
@@ -2152,6 +2179,7 @@
             - It helps you creating Hadoop clusters (Big Data) to analyze and process vast amount of data <br />
             - EMR takes care of all the provisinning and configuration of the clusters (each cluster can be made of hundreds of EC2 instances) <br />
             - EMR comes bundled with related services that can be hard to setup: Apache Spark, Hive, HBase, Presto, Flink, etc <br />
+            - EMR is made up of EC2 instances. This means you can employ your standard EC2 instance cost-saving measures <br />
             - It's integrated with auto-scaling and integrated with spot instances for cost reduction <br />
             - Can have long-running clusters, or transient (temporary) clusters <br />
             - With EMR you have different types of nodes:
@@ -2236,9 +2264,13 @@
             <br />
             <b>Amazon Managed Streaming for Apache Kafka (Amazon MKS)</b> <br />
             - Kafka is an alternative for Amazon Kinesis <br />
-            - Amazon MSK is a managed Apache Kafka on AWS <br />
+            - Amazon MSK is a managed Apache Kafka streaming applications on AWS <br />
+            - The service handles control plane operations for you (creation, updating, and deletion). While you manage all the data plane operations
+            <br />
             - It allows you to create, update, and delete clusters <br />
-            - MSK creates and manges Kafka brokers nodes and Zookeeper nodes for you <br />
+            - It can push broker logs to CloudWatch, S3, or Kinesis Data Firehose <br />
+            - As any other AWS service. It's API call are loggged to CloudTrail <br />
+            - MSK creates and manages Kafka brokers nodes and Zookeeper nodes for you <br />
             - It deploy your MSK cluster in your own VPC with multi-AZ (up to 3 AZs) <br />
             - Data is stored in EBS volumes for as long as you want <br />
             - MSK serverless is the serverless solution for Amazon MSK. You don't need to manage the capacity because MSK serverless automatically
@@ -2249,7 +2281,7 @@
             <b>Use case -> Big Data Ingestion Pipeline</b> <br />
             - Se images <br />
             - IoT Core is a service that allows you to harvest data from Iot devices <br />
-            - Kinesis Data Streams is great for rea time data collection <br />
+            - Kinesis Data Streams is great for real time data collection <br />
             - Kinesis Data Firehose helps with data delivery to S3 in near real-time (1 minute is the lowest frequency you can choose)<br />
             - We process the Iot devices data with Kinesis Data Streams and leverage AWS Lambda to transform the data that in Kinesis Data Firehose
             before it's sent to an S3 bucket <br />
@@ -4129,11 +4161,14 @@
             You submit or schedule batch jobs and AWS Batch does the rest <br />
             - Batch jobs are defined as Docker Images and run on ECS (virtually anything that runs on ECS can run on AWS Batch) <br />
             - Helpful for cost optimizations and focusing less on the infrastructure <br />
+            - It can be an alternative to AWS Lambda (that has a max execution time of 15 minutes) <br />
+            - Exam tip: if you see a question about batch workloads requiring queues (workloads executed sequentially), then think of AWS Batch <br />
             <br />
             <b>Amazon AppFlow</b> <br />
-            - Fully managed inegration service that enables you to securely transfer data between Software-as-a-Serviec (SaaS) applications and AWS
+            - Fully managed integration service that enables you to securely transfer data between Software-as-a-Serviec (SaaS) applications and AWS
             <br />
             - The idea is that you don't spend time writing the integrations and leverage Amazon AppFlow APIs inmediately <br />
+            - Can be bi-directional, depending on configurations <br />
             - Source: Salesforce, SAP, Zendesk, Slack, ServiceNow, etc <br />
             - Destinations: AWS services like Amazon S3, Amazon Redshift or non-AWS services such as SnowFlake and Salesforce <br />
             - You can define integration base on a schedule, or in response to events, or on demand <br />
@@ -4235,7 +4270,14 @@
             answer. You only need to know what Neptune does at a very high level <br />
             - QLDB is often used as distractor. If the scenario is not talking about inmutable databases, do not select QLDB as an answer. You only
             need to know what QLDB does at a very high level <br />
-            - For scenarios talking about where to store a large amount of time-series data for analysis. Think of Timestream<br />
+            - For scenarios talking about where to store a large amount of time-series data for analysis. Think of Timestream <br />
+            - Always choose the answer that offers high availability and is cost effective, unless the question explicitly says that is not required
+            <br />
+            - Auto-scaling groups are only for EC2 instances. Of course, there are other services that scale automatically, but they not use
+            auto-scaling groups. From an exam perspective, make sure you always have your auto-scaling groups over at least two AZs <br />
+            - Bake AMIs to redice build times. You can avoid long provisioning times by putting everythig in an AMI. this is better than using user
+            dat whenever possible <br />
+            <br />
             <br />
             <br />
             <b>QUESTIONS:</b> <br />
@@ -4323,10 +4365,37 @@
             (86,400 seconds). The default value is 60 seconds. <br />
             - 300 seconds - WRONG <br />
             <br />
+            <b>Which setting has limitations that could potentially prevent a launch template from being used with Amazon EC2 Auto Scaling? </b>
+            <br />
+            - Not including user data - WRONG<br />
+            - Requiring an ELB load balancer - WRONG<br />
+            - Defining EC2 instance size - WRONG<br />
+            - Changing the default network interface - CORRECT. When creating a launch template for an Auto Scaling group and specifying a network
+            interface, there are considerations and limitations that need to be taken into account in order to avoid errors<br />
+            <br />
+            <b>What type of firewall can be used in conjunction with API Gateway to help prevent DDoS attacks?</b>
+            <br />
+            - Security group - WRONG<br />
+            - Host firewall - WRONG<br />
+            - Web Application Firewall (WAF) - CORRECT. API Gateway and WAF help protect you from a DDoS attack<br />
+            - NACL - WRONG<br />
+            <br />
+            <b>Which AWS service is a good choice for visualizing and analyzing application logs?</b>
+            <br />
+            - Amazon CloudWatch - WRONG<br />
+            - Amazon OpenSearch Service - CORRECT.A primary use case for the Amazon OpenSearch Service is for analyzing log files using indexes and
+            dashboards<br />
+            - AWS Glue - WRONG<br />
+            - Amazon Athena - WRONG<br />
+            <br />
           </td>
           <td>
             <span>Network Exam Tip</span>
             <img src="../assets/226.-network-exam-tip.png" alt="Network Exam Tip" />
+            <hr />
+            <span>Exam Question - AWS Data Pipeline use cases</span>
+            <img src="../assets/232.-exam-question.png" alt="Exam Question - AWS Data Pipeline use cases" />
+            
           </td>
         </tr>
       </tbody>
