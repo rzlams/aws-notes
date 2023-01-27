@@ -1796,12 +1796,15 @@
             - The default concurrency limit per lambda is 1000. It can be increased <br />
             - The default disk capacity in the "function container" (in /tmp) is 512 MB. It can be increased up to 10 GB <br />
             - Easy pricing, pay per request and compute time. Free tier of 1 million executions and 400.000 GBs of compute time <br />
-            - Easy moitoring with CludWatch and integration with the whole AWS suite of services <br />
+            - Easy monitoring with CludWatch and integration with the whole AWS suite of services <br />
             - You can provision from 128 MB up to 10240 MB of RAM per function in increments of 1 MB. Increase RAM will also improve CPU and network
             <br />
             - Lambda support different runtimes laguages (see image). You can also deploy your code to lambda using the Lambda Container Image which
             is an AMI (container image) that implements the Lambda Runtime API. If your container image doesn't implement the Lambda Runtime API you
             need ECS/Fargate to deploy it <br />
+            - Whenever you're talking about credentials and lambda, ensure you're attaching a role to the function <br />
+            - Exam tip: any AWS API call can be a trigger to kick off an EventBridge rule. This is faster than trying to scrape through CloudTrail
+            <br />
             - Deployment limit: max size for compressed .zip files is 50 MB. Max size for uncompressed deployments (code + dependencies) is 250 MB. In
             case you need to load big files at startup you can use the /tmp directory. <br />
             <b>Edge Functions:</b> <br />
@@ -1844,7 +1847,7 @@
             (Elastic Network Interface) in your subnets. See image <br />
             - A good known use case for VPC with lambda is to setup RDS Proxy because RDS Proxy is never publicly accesible <br />
             <br />
-            <b>DynamoBD</b> <br />
+            <b>DynamoDB</b> <br />
             - Fully manage, highly available NoSQL database (with transaction support) with replication across multiple AZs <br />
             - The data is stored on SSD storage, spread across 3 geographically distinct data centers <br />
             - DynamoDb is eventually consistent by defaul, but you can have strongly consistent reads <br />
@@ -1955,6 +1958,29 @@
             - Support different kind of steps: sequence, parallel, conditions, timeouts, error handling, etc <br />
             - Can integrate with EC2, ECS, on-premises servers, API Gateway, SQS, etc <br />
             - Exam tip: If a question talks about a lengthy wait period, up to one year, think of step functions <br />
+            <br />
+            <b>AWS X-Ray</b> <br />
+            - It provides a complete view of requests as they travel through your application and filters visual data across payloads, functions,
+            traces, services, APIs, and more with no-code and low-code motions <br />
+            - 100.000 traces recorded free per month with the AWS Free Tier <br />
+            - Exam tip: - Traces and downstream response times: if these terms are brought up in the question, then you will want to look for AWS
+            X-Ray <br />
+            - Use cases: Analyze and debug applications; Generate a detailed service map; View performance analytics; Audit your data securely <br />
+            <br />
+            <b>AWS Serverless Application Repository</b> <br />
+            - It's a managed repository for serverless applications <br />
+            - It enables teams, organizations, and individual developers to store and share reusable applications, and easily assemble and deploy
+            serverless architectures in powerful new ways <br />
+            - Using the Serverless Application Repository, you don't need to clone, build, package, or publish source code to AWS before deploying it.
+            Instead, you can use pre-built applications from the Serverless Application Repository in your serverless architectures, helping you and
+            your teams reduce duplicated work, ensure organizational best practices, and get to market faster <br />
+            - Integration with AWS Identity and Access Management (IAM) provides resource-level control of each application, enabling you to publicly
+            share applications with everyone or privately share them with specific AWS accounts <br />
+            - To share an application you've built, publish it to the AWS Serverless Application Repository <br />
+            - Each application is packaged with an AWS Serverless Application Model (SAM) template that defines the AWS resources used <br />
+            - Publicly shared applications also include a link to the application's source code <br />
+            - There is no additional charge to use the Serverless Application Repository - you only pay for the AWS resources used in the applications
+            you deploy <br />
           </td>
           <td>
             <span>Lambda Runtimes</span>
@@ -2737,8 +2763,10 @@
             - Exam tip: whenever they ask about auth for "hundreds of users", "mobile users", or "authenticate with SAML", they are talking about
             Cognito <br />
             - It's goal is to give to external users an identity to interact with or web or mobile application <br />
+            - You can User Pool and Identity Pool separately or together <br />
             - Cognito User Pool:
             <ul>
+              <li>User directories that provide sign-up and sign-in options for users of your application</li>
               <li>It creates a serverless database of users of your web or mobile application</li>
               <li>Integrate with API Gateway and Aplication Load Balancer</li>
               <li>
@@ -2755,6 +2783,7 @@
             </ul>
             - Cognito Identity Pool (federeated identity):
             <ul>
+              <li>Allow your users access to other AWS services</li>
               <li>Provides temporary AWS credentials to users so they can access AWS resources directly or through API Gateway</li>
               <li>Can integrate with Cognito User Pool as an identity provider or 3rd party logins</li>
               <li>
@@ -2980,12 +3009,19 @@
             <br />
             <br />
             <b>Web Application Firewall (WAF)</b> <br />
-            - Protects your web application form common web exploits (layer 7 - HTTP) <br />
+            - Protects your web application form common web exploits (layer 7 - HTTP) like SQL injections and cross-site scripting<br />
+            - If you need to block access to specific countries or IP addresses you can also achieve this using AWS WAF <br />
             - WAF do not support Network Load Balancer (layer 4 - TCP/IP) <br />
             - It can be deployed on: Apllication Load Balancer, API Gateway, CloudFront, AppSync GraphQL API, Cognito User Pool <br />
             - You configure the behaviour of WAF by defining Web Access Control List (Web ACL) rules <br />
             - Web ACLs are regional, except for CloudFront <br />
             - A rule group is a reusable set of rules that you can add to a Web ACL <br />
+            - It support three different behaviors:
+            <ul>
+              <li>Allow al requests except the ones you specify</li>
+              <li>Block al requests except the ones you specify</li>
+              <li>Count the requests that match the properties you specify</li>
+            </ul>
             - The rules added to a Web ACL can be defined based on:
             <ul>
               <li>IP Set: up to 10.000 IP addresses (use multiple rules for more IPs)</li>
@@ -2999,6 +3035,7 @@
             <br />
             <b>AWS Shield</b> <br />
             - It's a service to protect you from Distributed Denial of Service (DDoS) attacks <br />
+            - Offers DDoS mitigation (protection against layer 3 and layer 4 attacks) <br />
             - It comes in two flavors:
             <ul>
               <li>
@@ -3078,22 +3115,15 @@
               </li>
             </ul>
             <br />
-            <b>Amazon GuardDuty</b>
-            <br />
-            - Intelligent threat discovery to protect your AWS account
-            <br />
-            - Uses machine learning algorithms, anomaly detection, and 3rd party data to detect if your account is under attack
-            <br />
-            - Just takes one click to enable it (30 day trial), and you don't need to install any software
-            <br />
-            - You can setup CloudWatch Event rules to be notified in case of findings. CloudWatch Event rules can target AWS Lambda or SNS
-            <br />
+            <b>Amazon GuardDuty</b> <br />
+            - Intelligent threat discovery to protect your AWS account <br />
+            - Uses machine learning algorithms, anomaly detection, and 3rd party data to detect if your account is under attack <br />
+            - Just takes one click to enable it (30 day trial), and you don't need to install any software <br />
+            - You can setup CloudWatch Event rules to be notified in case of findings. CloudWatch Event rules can target AWS Lambda or SNS <br />
             - Input data from: CloudTrail Event Logs (unusual API calls, unauthorized deployments, etc), VPC Flow Logs (unusual internal traffic,
             unusual IP addresses, etc), DNS Logs (compromised EC2 instances sending encoded data within DNS queries), and Kubernete Audit Logs
-            (suspicious activities and potential EKS cluster compromises)
-            <br />
-            - GuardDuty can protect against CryptoCurrency attacks (has a dedicated "finding" for it)
-            <br />
+            (suspicious activities and potential EKS cluster compromises) <br />
+            - GuardDuty can protect against CryptoCurrency attacks (has a dedicated "finding" for it) <br />
             <br />
             <b>Amazon Inspector</b>
             <br />
@@ -3109,6 +3139,10 @@
                 dependencies
               </li>
             </ul>
+            - Amazon Inspector requires an agent for host assessment rules packages <br />
+            - The assesments on EC2 instances are called host assesments <br />
+            - The assesments on VPCs are called network assesments <br />
+            - You can run these assesments once or, alternatively, run them weekly <br />
             - A risk score is associated with all vulnerabilities for prioritization <br />
             - Reporting and integration with AWS Security Hub <br />
             - Can send findings to Amazon EventBridge <br />
@@ -3119,11 +3153,43 @@
             <b>Amazon Macie</b> <br />
             - It's a fully managed data security and data provacy service thath use machine learning and pattern matching to discover and protect your
             sensitive data in AWS <br />
-            - Macie helps identify and alert you to sensitive data, such as Personally Identifiable Information (PII) <br />
+            - Macie helps identify and alert you to sensitive data, such as Personally Identifiable Information (PII), Personal Health Information
+            (PHI), and financial data <br />
+            - Great for HIPAA and GDPR compliance as well as preventing identity theft <br />
             - It evaluates data in your S3 blucket and notify the finding via EventBridge <br />
-            - Just takes one click to enable it and you can evaluate as many S3 buccket as you have
+            - You can even automate remediation actions using other AWS services, such as Step Functions <br />
+            - Just takes one click to enable it and you can evaluate as many S3 buccket as you have <br />
+            <br />
+            <b>AWS Audit Manager</b> <br />
+            - Use it to map your compliance requirements to AWS usage data with prebuilt and custom frameworks and automated evidence collection -
+            33.500 resource assessments for 60 days with the AWS Free Tier <br />
+            - Exam tip: If you have a scenario question about HIPAA or GDPR compliance that ask about continuous auditing or automating auditing
+            reports, think of AWS Audit Manager <br />
+            <br />
+            <b>AWS Artifact</b> <br />
+            - Portal that provides customers with on-demand access to AWS compliance documentation and AWS agreements <br />
+            - Can be used to support internal audit or compliance <br />
+            - A PCI DSS Level 1 certification attests to the fact that the AWS Platform met the standard of security for credit/debit cards
+            transactions <br />
+            - A HIPAA certification attests to the fact that the AWS Platform has met the standard required for the secure storage of medical records
+            in the US <br />
+            - Exam tip: If you see a scenario question askig about audits and the need for compliance reports, think of AWS Artifact <br />
+            <br />
+            <b>Amazon Detective</b> <br />
+            - It operates across multiple AWS services and analyzes the root cause of an event <br />
+            - It uses ML and graphs to analyze and identify the root cause of security issues or suspicious activity <br />
+            - Automatically collects and processes events from VPC Flow Logs, CloudTrail, GuardDuty to produce detailed visualizations that gives you
+            context to get to the root cause <br />
+            - Exam tip: Do not confuse it with inspector, which is an automated vulnerability management service that continually scans EC2 instances
+            and container workloads for software vulnerabilities and unintended network exposure (Detective can be a distractor) <br />
           </td>
           <td>
+            <span>KMS - 3 ways to control permissions</span>
+            <img src="../assets/236.-kms-control-permissions.png" alt="KMS - 3 ways to control permissions" />
+            <hr />
+            <span>KMS vs CloudHSM</span>
+            <img src="../assets/237.-kms-vs-cloud-hsm.png" alt="KMS vs CloudHSM" />
+            <hr />
             <span>Use case - Cross-account access of a KMS key</span>
             <img src="../assets/154.-kms-cross-account.png" alt="Use case - Cross-account access of a KMS key" />
             <hr />
@@ -3159,6 +3225,9 @@
             <hr />
             <span>Amazon Inspector</span>
             <img src="../assets/163.-amazon-inspector.png" alt="Amazon Inspector" />
+            <hr />
+            <span>AWS Audit Manager</span>
+            <img src="../assets/240.-aws-audit-manager.png" alt="AWS Audit Manager" />
           </td>
         </tr>
         <tr>
@@ -3599,7 +3668,9 @@
             - Traffic filtering: allow, drop, or alert for the traffic that matches the rules <br />
             - Active flow inspection to protect against network threats with intrusion-prevention capabilities (like Gateway Load Balancer, but all
             managed by AWS) <br />
-            - Send logs of rule matches to Amazon S3, CloudWatch Logs, or Kinesis Data Firehose
+            - Send logs of rule matches to Amazon S3, CloudWatch Logs, or Kinesis Data Firehose <br />
+            - Exam tip: scenario questions about filtering your network traffic before it reaches your internet gateway or you require intrusion
+            prevention systems or any hardware firewall requirements, think of AWS Network Firewall <br />
           </td>
           <td>
             <span>IP octet chart</span>
@@ -4277,6 +4348,7 @@
             auto-scaling groups. From an exam perspective, make sure you always have your auto-scaling groups over at least two AZs <br />
             - Bake AMIs to redice build times. You can avoid long provisioning times by putting everythig in an AMI. this is better than using user
             dat whenever possible <br />
+            - Questions about blocking specific traffic choose: AWS WAF for layer 7, AWS Shield or NACLs for layer 4 <br />
             <br />
             <br />
             <br />
@@ -4390,12 +4462,26 @@
             <br />
           </td>
           <td>
-            <span>Network Exam Tip</span>
-            <img src="../assets/226.-network-exam-tip.png" alt="Network Exam Tip" />
+            <span>Exam Tip - Network </span>
+            <img src="../assets/226.-network-exam-tip.png" alt="Exam Tip - Network" />
+            <hr />
+            <span>Exam Tip - Three ways of generate a CMK</span>
+            <img src="../assets/235.-exam-tip.png" alt="Exam Tip - Three ways of generate a CMK" />
+            <hr />
+            <span>Exam Tip - Parameter Store or Secret Manager</span>
+            <img src="../assets/238.-exam-tip.png" alt="Exam Tip - Parameter Store or Secret Manager" />
+            <hr />
+            <span>Exam Tip - IAM Policies</span>
+            <img src="../assets/239.-exam-tip.png" alt="Exam Tip - IAM Policies" />
             <hr />
             <span>Exam Question - AWS Data Pipeline use cases</span>
             <img src="../assets/232.-exam-question.png" alt="Exam Question - AWS Data Pipeline use cases" />
-            
+            <hr />
+            <span>Exam Question - ECR features</span>
+            <img src="../assets/233.-exam-question.png" alt="Exam Question - ECR features" />
+            <hr />
+            <span>Exam Question - Serverless Application Repository</span>
+            <img src="../assets/234.-exam-question.png" alt="Exam Question - Serverless Application Repository" />
           </td>
         </tr>
       </tbody>
