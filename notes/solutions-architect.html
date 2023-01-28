@@ -220,9 +220,6 @@
         <tr>
           <td>EC2 - Elastic Compute Cloud</td>
           <td>
-            <b>- Budget: </b> create budget and send alarms when costs (current or forecasted) exceed the budget. Allows you to set a limit to your
-            bill. You can also set actions when the thresholds are exceeded. Budget could be of three types: usage, costs or reservation.<br />
-            <br />
             - This services is considered Infrastructure as a Service (IaaS). <br />
             - You can comunicate with an EC2 instance via SSH with your prefered SSH client or with the option "EC2 Instance Connect" in the console
             (web browser).<br />
@@ -285,10 +282,85 @@
             - You are responsible for the security of the racks <br />
             - Outposts racks are for large deployments and Outpost servers are for smaller deployments <br />
             <br />
-            <b>AWS Wavelength: </b> <br />
+            <b>AWS Wavelength</b> <br />
             - It consist of infrastrcture deployments embedded within the telecommunication provider's datacenters at the edge of the 5G network
             <br />
             - It brings AWS services to the edge of the 5G networks improving performance and lowering the latency. <br />
+            <br />
+            <b>Cost Allocation tags</b> <br />
+            - Allows you to group resources with the same tag and generate a Cost and Usage Report (the most detailed cost report in AWS) for group
+            (or tag) <br />
+            - You must activate both types of tags (AWS generated and user-generated) separately before they can appear in Cost Explorer or on a cost
+            allocation report <br />
+            <br />
+            <b>Cost Explorer</b>
+            - It helps you to visualize, understand and manage your AWS costs and usage over time (monthly, hourly or resource level granularity)
+            <br />
+            - It gives you a very in-depth process of exploring your costs <br />
+            - It also allows you to view costs from the past 12 months, current detailed costs, and forecasts costs for up to 3 months based on
+            current usage <br />
+            <br />
+            <b>Cost and Usage Report</b>
+            - Provides the most detailed and comprehensive report for AWS cost and usage <br />
+            - Cost and Usage Reports are delivered daily <br />
+            - All billing data metric for any region is stored in CloudWatch us-east-1. It's for actual costs not for projected costs
+            <br />
+            <b>Budget</b> <br />
+            - Create budget and send alarms when costs (current or forecasted) exceed the budget <br />
+            - It allows you to set a limit to your bill <br />
+            - You can also set actions when the thresholds are exceeded. Budget could be of three types: usage, costs or reservation <br />
+            <br />
+            <b>AWS Compute Optimizer</b> <br />
+            - It helps you identify the optimal AWS resource configurations, such as Amazon EC2 instance types, Amazon EBS volume configurations (EBS
+            is NOT a compute service), and AWS Lambda function memory size <br />
+            - It reduce costs and improve performance by recommending optimal AWS resources for your workloads with ML <br />
+            - It can lower your costs by up to 25% and its recommendations can be exported to S3 <br />
+            - AWS Compute Optimizer analyzes the configurations and utilization metrics of your AWS resources, including Amazon EC2<br />
+            - It can generate reports on whether your resources are optimal or not <br />
+            - It can also generate optimization recommendations to reduce the cost and improve the performance of your workloads <br />
+            <br />
+            <b>License Manager</b> <br />
+            - It helps you manage software licenses on AWS and on-premise <br />
+            - Useful to prevet license abuse and overcharges <br />
+            <br />
+            <b>AWS Service Catalog</b> <br />
+            - AWS Service Catalog allows organizations to create and manage catalogs of IT services that are approved for use on AWS <br />
+            - These IT services can include everything from virtual machine images, servers, software, and databases to complete multi-tier
+            application architectures <br />
+            - For example you can create a constraint for the deploy of EC2 instances so the users you choose to apply the constraint can only launch
+            an instance when compliant <br />
+            - You can also hide options in the console allowing the user to only modify the options needed <br />
+            <br />
+            <b>AWS Proton</b> <br />
+            - It's a two-pronged automation framework to help your team achieve:
+            <ul>
+              <li>Automated infrastructure as code provisioning and deployment of serverless and container-based applications</li>
+              <li>Standardized infrastructure</li>
+              <li>Deployments integrated with CI/CD</li>
+            </ul>
+            - As an administrator, you create versioned service templates that define standardized <br />
+            - AWS Proton identifies all existing service instances that are using an outdated template version for you. As an administrator, you can
+            request AWS Proton to upgrade them with one click <br />
+            infrastructure and deployment tooling for serverless and container-based applications <br />
+            - As an application developer, you can select from the available service templates to automate your application or service deployments
+            <br />
+            - Platform teams can use AWS Proton and versioned infrastructure as code templates. They can use these templates to define and manage
+            standard application stacks that contain the architecture, infrastructure resources, and the CI/CD software deployment pipeline <br />
+            - When developers use the AWS Proton self-service interface to select a service template, they're selecting a standardized application
+            stack definition for their code deployments. AWS Proton automatically provisions the resources, configures the CI/CD pipeline, and deploys
+            the code into the defined infrastructure <br />
+            <br />
+            <b>AWS Health </b> <br />
+            - It provides ongoing visibility into your resource performance and the availability of your AWS services and accounts <br />
+            - You can use AWS Health events to learn how service and resource changes might affect your applications running on AWS <br />
+            - AWS Health provides relevant and timely information to help you manage events in progress <br />
+            - AWS Health also helps you be aware of and to prepare for planned activities <br />
+            - The service delivers alerts and notifications triggered by changes in the health of AWS resources, so that you get near-instant event
+            visibility and guidance to help accelerate troubleshooting<br />
+            - The AWS Health Dashboard is available for all AWS customers at no additional cost <br />
+            - If you have a Business, Enterprise On-Ramp, or Enterprise Support plan, you can use the AWS Health API to integrate with in-house and
+            third-party systems <br />
+            - Exam tip: questions about servic alerts or notifications of EC2 hardware maintenance reboots will leverage AWS Health in some manner
           </td>
           <td>
             <img src="../assets/04-EC2-instance-types.png" alt="EC2 instance types" />
@@ -929,8 +1001,9 @@
             <br />
             <b>Elastic Beanstalk:</b> it's a managed service that uses different resources (EC2, ASG, ELB, RDS, etc) to deploy an application handling
             automatically capacity provisioning, load balancing, scaling, application health monitoring, etc. With Elastic Beanstalk just the
-            application code is the responsibility of the developer. Beanstalk is free, you only pay for the underlying resources it provision. Behind
-            the scenes it leverages CLoudFormation to create a stack for your application
+            application code is the responsibility of the developer (Platform as a Service - PaaS). Beanstalk is free, you only pay for the underlying
+            resources it provision. Behind the scenes it leverages CloudFormation to create a stack for your application. It will automatically
+            replace instances that fail. It will deploy and update your applications for you. You maintain full control over all of your architecture.
           </td>
           <td>
             <span>ElastiCache Solution</span>
@@ -1219,6 +1292,7 @@
             - Improves read performance, content is cached at the edge. Improves users experience. <br />
             - The CDN is made of 216 points of presence (edges locations) globally <br />
             - Offers DDoS protection leveraging AWS Shield and AWS Application Firewall <br />
+            - CloudFront is the only option to add HTTPS to a static website being hosted in an S3 bucket <br />
             - You can use CloudFront in front of:
             <ul>
               <li>
@@ -1258,6 +1332,16 @@
             lLoudFront Invalidation. You can invalidate all files (*) or a specific path (images/*)<br />
             <br />
             <b>AWS Global Accelerator</b> <br />
+            - Global Accelerator is a global service that supports endpoints in multiple AWS Regions <br />
+            - It's a service in which you create accelerators to improve the performance of your applications for local and global users <br />
+            - Depending on the type of accelerator you choose, you can gain additional benefits:
+            <ul>
+              <li>
+                With a standard accelerator, you can improve availability of your internet applications that are used by a global audience. With a
+                standard accelerator, Global Accelerator directs traffic over the AWS global network to endpoints in the nearest Region to the client.
+              </li>
+              <li>With a custom routing accelerator, you can map one or more users to a specific destination among many destinations.</li>
+            </ul>
             - Unicast IP: one server holds one IP address. <br />
             - Anycast IP: all the servers hold the same IP address and the client is routed to the nearest one. <br />
             - AWS Global Accelerator uses anycast IP. It leverage the AWS global network (via edge locations) to route your application. <br />
@@ -1265,8 +1349,10 @@
             the closest edge location of your users, then the edge locations sends the traffic to your application. <br />
             - It allow "client affinity" that is a kind of sticky session <br />
             - Offers support for health checks <br />
-            - Support 4 enpoint types: Application Load Balancer, Network Load Balancer, EC2 instance and Elastic IP address. <br />
-            - You can assign a weight for each endpoint (a number from 0 to 255)
+            - Support 4 enpoint types: Application Load Balancer, Network Load Balancer, EC2 instance and Elastic IP address <br />
+            - You can assign a weight for each endpoint (a number from 0 to 255) <br />
+            - AWS Global Accelerator gives you two static IP addresses. For this reason, whenever you the scenario talks about IP caching (reduce
+            issues with customers caching old IP addresses) choose AWS Global Accelerator <br />
           </td>
           <td>
             <span>CloudFront</span>
@@ -2044,6 +2130,7 @@
             - Backup, snapshot and point-in-time restores features. Same as RDS <br />
             - Managed and scheduled maintenance <br />
             - Requires some application codes changes to be leveraged <br />
+            - Exam tip: Redis is a more robust solution (can even be a standalone database) than MemCached (that is just a cache) <br />
             <br />
             <b>DynamoDB</b> <br />
             - Propietary technology of AWS. Managed serverless NoSQL database with miliseconnd latency <br />
@@ -2596,6 +2683,7 @@
             <b>AWS CloudTrail</b> <br />
             - Provides governance, compliance and audit for your AWS account <br />
             - CloudTrail is enabled by default <br />
+            - CloudTrail ofers support to log everything into a single AWS account <br />
             - Get an history of events/API calls made within your AWS Account by console, SDK, CLI, or AWS Services <br />
             - The retention time of the log in CloudTrail is up to 90 days. You can put logs from CloudTrail into CloudWatch Logs (creating a log
             group) or S3 for a higher retention time<br />
@@ -2700,7 +2788,8 @@
             need to explicitly allow or deny access. They can apply to an}nything but the (main) management account that always has full admin access.
             The SCPs are inherited and also the higher hierarchy SCPs prevails over the lower hierarchy SCPs (in the image the AuthorizedRedshift have
             no effect because of the DenyRedshift SCP on the Prod OU). You can use an Blocklist (allow anything but the resources explicitly denied)
-            or Allowslist (only allow specific resources) strategy for SCPs, see image.
+            or Allowslist (only allow specific resources) strategy for SCPs, see image. SCPs are the only way to restrict what the root account can
+            do.
             <br />
             <b>IAM Policy Conditions</b> <br />
             - The Condition element (or Condition block) lets you specify conditions for when a policy is in effect. The Condition element is
@@ -2762,6 +2851,7 @@
             <b>Amazon Cognito</b><br />
             - Exam tip: whenever they ask about auth for "hundreds of users", "mobile users", or "authenticate with SAML", they are talking about
             Cognito <br />
+            - Cognito excels with mobile application logins <br />
             - It's goal is to give to external users an identity to interact with or web or mobile application <br />
             - You can User Pool and Identity Pool separately or together <br />
             - Cognito User Pool:
@@ -4169,6 +4259,7 @@
             Pinpoint, you create message templates, delivery schedules, highly targeted segments, and full campaigns <br />
             <br />
             <b>SSM Session Manager</b> <br />
+            - Systems Manager (SSM) can be used to patch and update EC2 instances and on-premises instances <br />
             - Allows you to start a secure shell on your EC2 on-premises servers without the need of ssh access (noo ssh keys) or a bastion host
             <br />
             - You don't need to open the port 22 (better security). The connection is established through the SSM agent installed in the EC2 instance
@@ -4209,6 +4300,7 @@
                 AWS Config for rules remdiation (whenever it finds a resources that is not compliant)
               </li>
             </ul>
+            - Exam tip: SSM automation documents are the primary method used in scenarios asking you to configure the inside of an EC2 instance <br />
             <br />
             <b>Cost Explorer</b> <br />
             - Helps you visualize, understand, and manage your AWS costs and usage over time <br />
@@ -4316,7 +4408,9 @@
             <b>AWS Trusted Advisor</b> <br />
             - No need to install anything. Provides ahigh level AWS account assesment <br />
             - Analyze your AWS accounts and provides recommendations on: cost optimization, performance, security, fault tolerance, and service
-            limits. See image
+            limits. See image <br />
+            - It's stricty an auditing tool, and it won't solve the problem for you. This is a common trap the exam will set for you - You can trigger
+            a lambda function triggered by the event that Trusted Advisor send to EventBridge, to automate the solution <br />
             <br />
             - Trusted Advidor has two tiers:
             <ul>
@@ -4349,7 +4443,19 @@
             - Bake AMIs to redice build times. You can avoid long provisioning times by putting everythig in an AMI. this is better than using user
             dat whenever possible <br />
             - Questions about blocking specific traffic choose: AWS WAF for layer 7, AWS Shield or NACLs for layer 4 <br />
+            - Always choose the option that support automation (e.g. CloudFormation) <br />
+            - Inmutable architecture is preferable. You should favor answers having resources that can be replaced a any time. Stateless is better
+            than stateful in the exam <br />
+            - In an scenario question that involves automation, where the user is not interested in learn the details about AWS or want an easy
+            solution, choose Elastic Beanstalk over CloudFormation <br />
+            - Always favor answers that include caching. The exam doesn't ussually dive into the additional costs and instead frames caching on ly in
+            the positive <br />
+            - When it comes to cache, backups are not supported on any solution besides Redis. MemCached and DAX are not a source of truth for your
+            data (the simply help with performance)<br />
+            - Isolating workloads into separate accounts is a great way to add more layers of security and controls. Avoid answers that lump
+            everything together, unless it talks about centralize logs (which is always the right answer, when it comes to logging and monitoring)
             <br />
+            - For cost management try to automate the response. If you reach a threshold, shut something down and send a notification <br />
             <br />
             <br />
             <b>QUESTIONS:</b> <br />
@@ -4482,6 +4588,18 @@
             <hr />
             <span>Exam Question - Serverless Application Repository</span>
             <img src="../assets/234.-exam-question.png" alt="Exam Question - Serverless Application Repository" />
+            <hr />
+            <span>Exam Question - Automation - Inmutable Pattern</span>
+            <img src="../assets/242.-exam-question.png" alt="Exam Question - Automation - Inmutable Pattern" />
+            <hr />
+            <span>Exam Question - On the exam, always favor the use of cache</span>
+            <img src="../assets/243.-exam-question.png" alt="Exam Question - On the exam, always favor the use of cache" />
+            <hr />
+            <span>Exam Question - Cross-account role access</span>
+            <img src="../assets/244.-exam-question.png" alt="Exam Question - Cross-account role access" />
+            <hr />
+            <span>Exam Question - Control Tower leveraged services</span>
+            <img src="../assets/245.-exam-question.png" alt="Exam Question - Control Tower leveraged services" />
           </td>
         </tr>
       </tbody>
