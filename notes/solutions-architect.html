@@ -1498,9 +1498,11 @@
             - Useful for hybrid clouds. Your infrastructure has a part on the cloud and other on-premises <br />
             - The storage cloud native options are: block storage (EBS, EC2 instance store), file storage (EFS, FSx) and object storage (S3 and
             Glacier) <br />
+            - It's a VM. Storage Gateway is run locally as a VM on-permises <br />
             - Storage Gateway is a bridge between on-premises data an cloud data <br />
             - Use cases: disaster recovery, backup and restore, tiered storage (ex: more frequently used data on-promise and less frequently used data
             on the cloud) <br />
+            - Storage Gateway is the perfect solution if your local network-attached storage is full <br />
             - Hardware Appliance: using Storage Gateway means you need on-premises virtualization. Otherwise, you can use Storage Gateway Hardware
             Appliance (you can buy it on amazon.com). Works with File Gateway, Volume Gateway and Tape Gateway. Has the required CPU, memory, network
             and SSD cache resources to function correctly. Helpful for daily NFS backups in small data centers <br />
@@ -1508,7 +1510,7 @@
             <ul>
               <li>
                 <b>S3 File Gateway:</b> <br />
-                - Uused to expose S3 objects to your on-premises <br />
+                - Used to expose S3 objects to your on-premises <br />
                 - It uses NFS or SMB protocol (basically translates these protocols to S3) <br />
                 - SMB protocol has integration with Active Directory (AD) fro user authentication <br />
                 - Most recently data is cached in the S3 File Gateway <br />
@@ -1543,6 +1545,7 @@
                 presents a storage component (usually hard disk storage) as tape libraries or tape drives for use with existing backup software <br />
                 - Virtual tape library (VTL) backed by S3 and Glacier <br />
                 - Works with leading backup software vendors <br />
+                - Tape Gateway can emulate a tape and then ship the data to AWS <br />
               </li>
             </ul>
             <br />
@@ -1552,14 +1555,24 @@
             - You pay per provisioned endpoint per hour + data transfers (in and out) in GB <br />
             - You can store and manage users' credentials within the service or integrate with existing authentication systems (Microsoft Active
             Directory, LDPA, Okta, Amazon Cognito, or other custom system) <br />
+            - Exam tip: from a exam perspective, AWS Transfer Family allows you to use legacy file transfer protocols to give older applications the
+            ability to read and write from S3 <br />
             <br />
             <b>AWS DataSync</b> <br />
-            - Used to move large amounts of data to and from: on-premises or other clouds to AWS (using NFS, SMB, HDFS, S3 API, etc) - needs agent
-            installation, AWS to AWS (different storage services) - no agent needed. <br />
+            - Used to move large amounts of data to and from:
+            <ul>
+              <li>On-premises or other clouds to AWS (using NFS, SMB, HDFS, S3 API, etc) - needs agent installation</li>
+              <li>
+                AWS to AWS (different storage services) - no agent needed. An agent is not required when transferring between AWS storage services in
+                the same AWS account
+              </li>
+            </ul>
             - Can synchronize to: Amazon S3 (any storage classes, including Glacier), Amazon EFS and Amazon FSx (any FSx type) <br />
             - Replication tasks can be scheduled hourly, daily or weekly <br />
             - File permissions and metadata are preserved on destiny <br />
-            - One agent task can use 10Gbps. You can setup a bandwidth limit.
+            - One agent task can use 10Gbps. You can setup a bandwidth limit <br />
+            - DataSync can transfer to EFS and FSx <br />
+            - Exam tip: from a exam perspective, DataSync is an agent-based solutionthat excels at one-time migrations of file shares into AWS
           </td>
           <td>
             <span>Snow Family Data Migrations</span>
@@ -2119,7 +2132,7 @@
             - Aurora serverless: good for unpredictable or intermittent workloads, no capacity planning <br />
             - Aurora Multi-master: for continuous writes failover (high write availability) <br />
             - Aurora Global: up to 16 DB read instances in each region. The storage replication accroos regions happens in less than a second <br />
-            - Aurora Machine Learning: perform ML usign SageMAker and Comprehend on Aurora <br />
+            - Aurora Machine Learning: perform ML usign SageMaker and Comprehend on Aurora <br />
             - Aurora Database Cloning: allows you to create a new cluster from existing one, faster than restoring a snapshot <br />
             <br />
             <b>ElastiCache</b> <br />
@@ -2493,24 +2506,32 @@
             - It is a fully managed an serverless service that uses machine learning to find insights and relationships in text (the language of the
             text; extracts key phrases, places, people, brands or events; understands how positive or negative the text is; can organize a collection
             of text files by topic) <br />
-            - Use cases: analyze customer interactions (emails) to find what leads to a positive or negative experience <br />
-            - Amazon Comprehend Medical: used for clinical texts (test results, case notes, etc). You can store your documents in amazon S3 analyze
+            - Use cases: analyze customer interactions (emails) to find what leads to a positive or negative experience (sentiment analysis); index
+            and search product reviews; legal brief management; process financial documents <br />
+            - Amazon Comprehend Medical: used for clinical texts (test results, case notes, etc). You can store your documents i amazon S3 analyze
             real-time data with Kinesis Data Firehose, or use Amazon Transcribe to transcribe patient narratives into text that can be analyzed by
             Amazon Comporehend Medical. It uses NLP to detect Protected Health Information (PHI) and obfuscate that info in order to comply with legal
             regulations <br />
             <br />
             <b>Amazon SageMaker</b> <br />
             - Fully managed service for developers and data scientists to build ML models <br />
+            - It scales automatically and is highly available <br />
             - It helps to simplify the machine learning development process (labeling, build, train and tune the ML model) <br />
+            - You can use elastic inference to reduce cost (uses CPU inferences, rather than GPU inferences). Any exam question talking about reducing
+            cost in SageMaker, think of elastic inference <br />
+            - SageMaker Neo allows you to optimize your custom models for a specific type of chip architecture. See image <br />
             <br />
             <b>Amazon Forecast</b> <br />
             - Fully managed service to uses ML to deliver highly accurate forecasts. For example: predict the future of sales <br />
+            - Amazon Forecast is a time-series forecasting service that uses machine learning and is built to provide you with important business
+            insights <br />
             - Normally it's 50% more accurate than looking at the data itself <br />
             - Reduce forecasting time from months to hours <br />
             - It takes data from an S3 bucket to produce the foracsting model <br />
             <br />
             <b>Amazon Kendra</b> <br />
             - Fully managed document search service powered by ML <br />
+            - It allows you to create an intelligent search service powered by machine learning <br />
             - Its main purpose is to extract answers from within a document (text, PDF, HTML, PowerPoint, MS Word, FAQs, etc) <br />
             - Support natural language search capabilities, so you can make searches like you do with google <br />
             - It can learn from user interaction/feedback to promote prefered results (Incremental Learning) <br />
@@ -2525,9 +2546,27 @@
             <b>Amazon Textract</b> <br />
             - Automatically extract text, handwriting, and data from any scanned documents using AI and ML <br />
             - You can also extract data from forms and tables or read and process any type of document (PDF, images, etc) <br />
-            - Use cases: financial services (invoices, financial reports, etc) and healthcare (medical records, insurance claims, etc)
+            - Use cases: financial services (invoices, financial reports, etc) and healthcare (medical records, insurance claims, etc) <br />
+            <br />
+            <b>Amazon Fraud Detector Service</b> <br />
+            - It's a fully managed fraud detection service that automates the detection of potentially fraudulent activities online <br />
+            - These activities include unauthorized transactions and the creation of fake accounts <br />
+            - Amazon Fraud Detector works by using machine learning to analyze your data <br />
+            - It does this in a way that builds off of the seasoned expertise of more than 20 years of fraud detection at Amazon <br />
+            - You can use Amazon Fraud Detector to build customized fraud-detection models, add decision logic to interpret the model's fraud
+            evaluations, and assign outcomes such as pass or send for review for each possible fraud evaluation <br />
+            - With Amazon Fraud Detector, you don't need machine learning expertise to detect fraudulent activities <br />
           </td>
-          <td></td>
+          <td>
+            <span>SageMaker - Capabilities</span>
+            <img src="../assets/246.-sagemaker-examp-tip.png" alt="SageMaker Capabilities" />
+            <hr />
+            <span>SageMaker - Steps to create a model</span>
+            <img src="../assets/247.-sagemaker-examp-tip.png" alt="SageMaker - Steps to create a model" />
+            <hr />
+            <span>SageMaker Neo</span>
+            <img src="../assets/248.-sagemaker-neo.png" alt="SageMaker Neo" />
+          </td>
         </tr>
         <tr>
           <td>AWS Monitoring and Audit: CloudWatch, CloudTrail and Config</td>
@@ -3905,6 +3944,8 @@
             - Disaster Recovery tips -> see image <br />
             <br />
             <b>Database Migration Service (DMS)</b> <br />
+            - It's the AWS's go-to tool for any sort of database migration <br />
+            - It works for on-premises to the cloud, or for moving data between different RDS databases <br />
             - Quickly and securely migrate databases to AWS. It's resilient and self-healing <br />
             - The source database remains available during the migration <br />
             - Support bot homogeneous migratiosn (Oracle to Oracle) and heterogeneous migrations (Microsoft SQL Server to Aurora) <br />
@@ -3963,17 +4004,26 @@
               </li>
               <li>
                 <b>Agent-based Discovery (AWS Application Discovery Agent): </b> system configuration, system performance, running processes, and
-                details of the entwork connections between systems
+                details of the entwork connections between systems. It can run in both, Linux and Windows OS
               </li>
             </ul>
             - Resulting data can be viewed within AWS Migration Hub <br />
+            - AWS Migration Hub is an organizational tool that gives you a way to organize all your steps. You'll need other tools to complete the
+            migration though <br />
             - AWS Application Migration Service (MGN)
             <ul>
               <li>It's a lift-and-shift (rehost) solution which simplify migrating applications to AWS</li>
               <li>It's the simplest way to move from on-premises to AWS</li>
-              <li>It's the successor of the service CloudEndure Migration (replacing AWS Server Migration Service - SMS)</li>
+              <li>
+                It replicates sources servers (e.g. VM, physical, or Azure VM) into AWS for non-disruptive cutovers (RTO of minutes and RPO of
+                sub-seconds)
+              </li>
+              <li>
+                It's the successor of the service CloudEndure Migration (replacing AWS Server Migration Service - SMS. That was mainly focused on VMs)
+              </li>
               <li>Converts your physical, virtual, and cloud-based servers to run natevily on AWS</li>
               <li>Supports wide range of platforms, Operating Systems, and databases</li>
+              <li>It's the tool you'll want to use to migrate out of the data center and into AWS</li>
               <li>Minimal downtime and reduced cost</li>
               <li>
                 This service takes care of the replication of your on-premise data to a staging environment in the cloud, and when you are ready to
@@ -4247,16 +4297,33 @@
             - You can send emails using your application,the AWS console, APIs or SMTP <br />
             - Use cases: transactional, marketing and bulk email communications <br />
             <br />
+            <b>Amazon Amplify</b> <br />
+            - It provides us tools for simplified front-end web and mobile development <br />
+            - Allows us to easily host full-stack applications on AWS <br />
+            - It enable developers to focus on coding and not the infrastructure <br />
+            - It support frameworks like React, Vue, and Angular. It also work with static generation ools like Gatsby and Hugo <br />
+            - It supports server side rendering (e.g. Next.js) <br />
+            <br />
+            <b>AWS Device Farm</b> <br />
+            - It's a real farm of devices that allows you to run tests against desktop browsers, real mobile devices, and tablets <br />
+            - It offers the ability to configure device settings <br />
+            - Exam tip: think of it for scenarios requiring automated or manual testing on physical, real phones or tablets. Used with Android, iOS,
+            and other web applications <br />
+            <br />
             <b>Amazon Pinpoint</b> <br />
             - Scalable 2-way (inbound/outbound) marketing communications service <br />
             - Supports email, SMS, push, voice, and in-app messaging <br />
+            - It enables you to engage with customers on a large or small scale <br />
             - Has the ability to segment and personalize messages with the right content to customers <br />
+            - It leverage machine learning models to predict engagement interactions <br />
             - Offers the possibility to receive replies <br />
             - It can send streams/events to SNS, Kinesis Data Firehose, and CloudWatch Logs <br />
             - Scales to billions of messages per day <br />
             - Use cases: run campaigns by sending marketing, bulk, or transactional SMS messages <br />
+            - Pinpoint is geared toward marketing temas, business users, and sometimes developers <br />
             - Pinpoint vs Amazon SNS and Amazon SES: in SNS and SES you manage each message's audience, content and delivery schedule. In Amazon
             Pinpoint, you create message templates, delivery schedules, highly targeted segments, and full campaigns <br />
+            - Exam tip: Questions that talk about customer engagements, are likely to refer to Pinpoint <br />
             <br />
             <b>SSM Session Manager</b> <br />
             - Systems Manager (SSM) can be used to patch and update EC2 instances and on-premises instances <br />
@@ -4315,6 +4382,14 @@
             etc) <br />
             - It's easy to use and highly scalable (can handle large volumes of media files and large file sizes) <br />
             - Fully managed, secure and cost effective (duration-based pricing model - only pay for what you use) <br />
+            - Exam tip: if you see an exam question using the word "transcode" or talking about converting your media files into an optimized format
+            of a particular device, think of Elactic Transcoder <br />
+            <br />
+            <b>Amazon Kinesis Video Streams</b> <br />
+            - Kinesis Video Streams streams media content from a large number of devices to AWS and then runs analytics, machine learning (ML),
+            playback, and other processing <br />
+            - Exam tip: if you have a scenario-based question about video streaming at scale from millions of devices, think of Amazon Kinesis Video
+            Stremas <br />
             <br />
             <b>AWS Batch</b> <br />
             - Fully managed batch processing at any scale <br />
@@ -4600,6 +4675,9 @@
             <hr />
             <span>Exam Question - Control Tower leveraged services</span>
             <img src="../assets/245.-exam-question.png" alt="Exam Question - Control Tower leveraged services" />
+            <hr />
+            <span>Exam Question - Machine Learning</span>
+            <img src="../assets/249.-exam-question.png" alt="Exam Question - Machine Learning" />
           </td>
         </tr>
       </tbody>
