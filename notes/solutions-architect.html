@@ -548,7 +548,7 @@
               <li>
                 <b>Network load balancer - NLB (ultra high performance, allows for TCP and UDP) - layer 4:</b> <br />
                 - Less latency than Application load balancer and can handle millions of requestsper second <br />
-                - Has one static IP per AZ and supports assigning elactic IP (helpful for whitelisting specific IP) <br />
+                - Has one static IP per AZ and supports assigning elastic IP (helpful for whitelisting specific IP) <br />
                 - Their target groups support EC2 instances, IP addresses (only private IPs) and Application load balancer <br />
                 - Can make health checks via HTTP, HTTPS or TCP protocols <br />
                 - Only Network Load Balancer provides both static DNS name and static IP <br />
@@ -2635,6 +2635,25 @@
                 - CloudWatch Unified Agent: collect additional system level metrics such as RAM, processes, etc. Collecto logs to send to CloudWatch
                 Logs. Support centralized configuration using SSM Parameter Store
               </li>
+              <li>
+                Custom scripts are needed to enable OS-level monitoring of EC2 instances. The MemoryUtilization metric falls into that category, while
+                CPU Credit Usage and Utilization does not (those are available at the host hypervisor)
+              </li>
+              <li>
+                <b>Instance status checks:</b> monitor the software and network configuration of your individual instance. Amazon EC2 checks the
+                health of the instance by sending an address resolution protocol (ARP) request to the network interface (NIC). These checks detect
+                problems that require your involvement to repair. When an instance status check fails, you typically must address the problem yourself
+                (for example, by rebooting the instance or by making instance configuration changes)
+              </li>
+              <li>
+                Stopping and starting an EC2 instance will generally cause it to be launched onto different AWS host hardware (unless you have
+                dedicated tenancy enabled)
+              </li>
+              <li>
+                <b>System status checks:</b> monitor the AWS systems on which your instance runs. These checks detect underlying problems with your
+                instance that require AWS involvement to repair. When a system status check fails, you can choose to wait for AWS to fix the issue, or
+                you can resolve it yourself
+              </li>
             </ul>
             <br />
             <b>CludWatch Alarms</b> <br />
@@ -2725,7 +2744,8 @@
             - CloudTrail ofers support to log everything into a single AWS account <br />
             - Get an history of events/API calls made within your AWS Account by console, SDK, CLI, or AWS Services <br />
             - The retention time of the log in CloudTrail is up to 90 days. You can put logs from CloudTrail into CloudWatch Logs (creating a log
-            group) or S3 for a higher retention time<br />
+            group) or S3 for a higher retention time <br />
+            - CloudTrail log, even failed AWS API calls. CloudTrail will show the API request and the status of Failed for each failed request <br />
             - A trail can be applied to all regions (default) or a single region <br />
             - If a resource is deleted in AWS, investigate CloudTrail first to know who did it and when <br />
             - Event types:
@@ -2767,9 +2787,9 @@
             - Config rules are the "template" against the AWS Config service evaluate the current configuration of your account/resources. You can use
             AWS managed config rules (over 75 rules) or you can make custom config rules (must be defined in AWS Lambda) <br />
             - Custom rule can evaluate (for example) if each EBS disk is of type gp2 or if each EC2 instance is t2.micro <br />
-            - Rules can be evaluated or triggered: whendever a config change (create a new EBS volume or change the type of an existing one) and/or at
+            - Rules can be evaluated or triggered: whenever a config change (create a new EBS volume or change the type of an existing one) and/or at
             regular time intervals <br />
-            - There is no free tier for AWS Config <br />
+            - There is no free tier for AWS Config (charge 2 USD per active rule) <br />
             - AWS config rules DOES NOT prevent actions from happening (no deny), they are only for compliance <br />
             - AWS Config Remediations: allows you to automate remediation of non-compliant resources using SSM Automation Documents (can be AWS
             managed or custom). You can create custom Automation Documents that invoke lambda functions and apply retries to them in case of failure
@@ -3030,6 +3050,8 @@
             - Encrypted secrets can be stored in environment variables <br />
             - KMS keys are scoped per region. The same KMS key cannot in live in two regions (see multi-region keys). When you copy an snapshot across
             regions, behind the scenes AWS decrypt the snapshot in the source region and re-encrypt it in the destination region <br />
+            - Both AWS Managed and Customer Managed keys support key rotation. Rotation is when the physical data used to completed the cryptographic
+            operation is changed. With AWS managed keys, rotation occurs every three years and cannot be disabled <br />
             - KMS keys types: KMS Keys is the new name of KMS Customer Master Key
             <ul>
               <li>
@@ -3048,8 +3070,12 @@
                 <b>AWS managed keys:</b> they are managed by AWS and are free to use on any AWS services. It automatically rotates keys every one year
               </li>
               <li>
-                <b>Customer managed keys (CMK):</b> you can create them with KMS with a fee of 1 dollar per key monthly. To have automatically key
-                rotation, you have to enable it and it will automatically rotate your key every one year
+                <b>Customer managed keys (CMK):</b> <br />
+                - You can create them with KMS with a fee of 1 dollar per key monthly <br />
+                - To have automatically key rotation, you have to enable it and it will automatically rotate your key every one year <br />
+                - Customer managed keys can be either Single-Region or Multi-Region (which allows the key to be replicated into other Regions) <br />
+                - You can schedule the automatic deletion of a CMK <br />
+                - Single Region Keys support the option of having AWS automatically rotate this KMS key every year
               </li>
               <li>
                 <b>Customer managed keys imported (must be 256-bit symmetric key):</b> you can also import your own keys and this will cost you 1
@@ -3245,7 +3271,8 @@
             </ul>
             <br />
             <b>Amazon GuardDuty</b> <br />
-            - Intelligent threat discovery to protect your AWS account <br />
+            - Intelligent threat detection to protect your AWS account <br />
+            - It monitors account and resource for malicious activity and unauthorized behavior <br />
             - Uses machine learning algorithms, anomaly detection, and 3rd party data to detect if your account is under attack <br />
             - Just takes one click to enable it (30 day trial), and you don't need to install any software <br />
             - You can setup CloudWatch Event rules to be notified in case of findings. CloudWatch Event rules can target AWS Lambda or SNS <br />
@@ -3253,6 +3280,7 @@
             unusual IP addresses, etc), DNS Logs (compromised EC2 instances sending encoded data within DNS queries), and Kubernete Audit Logs
             (suspicious activities and potential EKS cluster compromises) <br />
             - GuardDuty can protect against CryptoCurrency attacks (has a dedicated "finding" for it) <br />
+            - Can integrate with CloudWacth events to trigger alarms or lambda functions that run remediation actions <br />
             <br />
             <b>Amazon Inspector</b>
             <br />
@@ -3600,10 +3628,16 @@
             <b>VPC Flow Logs</b> <br />
             - Allows you to capture information about IP traffic going into your interfaces: VPC Flow Logs, Subnet Flow Logs, or Elastic Network
             Interface (ENI) Flow Logs <br />
+            - It do not capture traffic to Amazon DNS, traffic for Windows license activation, traffic to 169.254.169.254 (instance metadata, traffic
+            for DHCP, and traffic for the VPC router) <br />
+            - VPC Flow Logs do not sniff or monitor the traffic <br />
             - It helps to monitor and troubleshoot connectivity issues <br />
             - Flow logs data can go to S3 or CloudWatch Logs <br />
             - Captures network information from AWS managed interfaces too: ELB, RDS, ElastiCache, Redshift, WorkSpaces, NATGW, Transit Gateway, etc
             <br />
+            - VPC Flow Logs do not monitor the traffic within VPCs; they monitors traffic meta data. If traffic traverses our monitor points, the VPC
+            Flow Logs will log information such as the account ID, interface ID, source and destination IP address, source and destination ports, the
+            protocol, number of packets, number of bytes, start and end time, the action if that traffic was allowed or not, and status value <br />
             - VPC Flow Logs can be used for analytics on usage patterns, or malicious behaviour <br />
             - You can query VPC Flow Logs using Athena on S3 or CloudWatch Logs Insights <br />
             - When creating a flow log you can choose:
@@ -4383,7 +4417,7 @@
             - It's easy to use and highly scalable (can handle large volumes of media files and large file sizes) <br />
             - Fully managed, secure and cost effective (duration-based pricing model - only pay for what you use) <br />
             - Exam tip: if you see an exam question using the word "transcode" or talking about converting your media files into an optimized format
-            of a particular device, think of Elactic Transcoder <br />
+            of a particular device, think of Elastic Transcoder <br />
             <br />
             <b>Amazon Kinesis Video Streams</b> <br />
             - Kinesis Video Streams streams media content from a large number of devices to AWS and then runs analytics, machine learning (ML),
@@ -4678,6 +4712,27 @@
             <hr />
             <span>Exam Question - Machine Learning</span>
             <img src="../assets/249.-exam-question.png" alt="Exam Question - Machine Learning" />
+            <hr />
+            <span>Exam Question - EC2 System Status Check error</span>
+            <img src="../assets/250.-exam-question.png" alt="Exam Question - EC2 System Status Check error" />
+            <hr />
+            <span>Exam Question - Monitorign EC2 instances</span>
+            <img src="../assets/251.-exam-question.png" alt="Exam Question - Monitorign EC2 instances" />
+            <hr />
+            <span>Exam Question - Two steps of the same process</span>
+            <img src="../assets/252.-exam-question.png" alt="Exam Question - Two steps of the same process" />
+            <hr />
+            <span>Exam Question - VPC security</span>
+            <img src="../assets/253.-exam-question.png" alt="Exam Question - VPC security" />
+            <hr />
+            <span>Exam Question - VPC security</span>
+            <img src="../assets/254.-exam-question.png" alt="Exam Question - VPC security" />
+            <hr />
+            <span>Exam Question - IAM permissions</span>
+            <img src="../assets/255.-exam-question.png" alt="Exam Question - IAM permissions" />
+            <hr />
+            <span>Exam Question - Proxy host</span>
+            <img src="../assets/256.-exam-question.png" alt="Exam Question - Proxy host" />
           </td>
         </tr>
       </tbody>
