@@ -703,7 +703,9 @@
             - Aurora serverless: automatic instantiation and auto scaling based on actual usage. The client connect to "Proxy fleet" (managed by
             Aurora) and it scales the DB based on current usage. <br />
             - Aurora Multi-master: the default failover mechanism promotes a read replica as the new master. With multi-master every node does reads
-            and writes which gives you the ability to inmediately failover from one node to another. <br />
+            and writes which gives you the ability to inmediately failover from one node to another. AWS refers to this type of availability as
+            continuous availability, to distinguish it from the high availability (with brief downtime during failover) offered by a single-master
+            cluster. <br />
             - Global Aurora: see image. It offers Aurora as a global (multi region) service. Typical cross-region replication takes less than one
             second. <br />
             - Aurora Machine Learning: simple, optimized, and secure integration between Aurora and AWS ML Services (Amazon SageMaker, Amazon
@@ -4565,6 +4567,8 @@
             everything together, unless it talks about centralize logs (which is always the right answer, when it comes to logging and monitoring)
             <br />
             - For cost management try to automate the response. If you reach a threshold, shut something down and send a notification <br />
+            - When it comes to keep using the same license you already have on-premises, the correct answer is Dedicatd Host (NOT dedicated instansce)
+            <br />
             <br />
             <br />
             <b>QUESTIONS:</b> <br />
@@ -4689,6 +4693,9 @@
             <span>Exam Tip - IAM Policies</span>
             <img src="../assets/239.-exam-tip.png" alt="Exam Tip - IAM Policies" />
             <hr />
+            <span>Exam Tip - S3 Lifecycle transition constraints</span>
+            <img src="../assets/279.-exam-tip.png" alt="Exam Tip - S3 Lifecycle transition constraints" />
+            <hr />
             <span>Exam Question - AWS Data Pipeline use cases</span>
             <img src="../assets/232.-exam-question.png" alt="Exam Question - AWS Data Pipeline use cases" />
             <hr />
@@ -4733,6 +4740,72 @@
             <hr />
             <span>Exam Question - Proxy host</span>
             <img src="../assets/256.-exam-question.png" alt="Exam Question - Proxy host" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/257.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/258.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/259.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/260.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/261.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/262.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/263.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/264.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/265.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/266.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/267.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/268.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/269.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/270.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/271.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/272.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/273.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/274.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/275.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/276.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/277.-exam-question.png" alt="Exam Question" />
+            <hr />
+            <span>Exam Question</span>
+            <img src="../assets/278.-exam-question.png" alt="Exam Question" />
           </td>
         </tr>
       </tbody>
