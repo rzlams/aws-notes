@@ -225,10 +225,13 @@
             (web browser).<br />
             - The minimum charge for an EC2 instance is 60 seconds, but there is no minimum uptime requirement for an EC2 instance once it has been
             enabled <br />
+            - Exam tip: You can only change the tenancy of an instance from dedicated to host, or from host to dedicated after you've launched it
+            <br />
+            - Exam tip: If either Launch Configuration Tenancy or VPC Tenancy is set to dedicated, then the instance tenancy is also dedicated <br />
             <b>- Instance metadata: </b> is data about your instance that you can use to configure or manage the running instance (even
             programatically). <br />
             <br />
-            <b>- EC2 user data: </b> instance bootstraping script <br />
+            <b>- EC2 user data: </b> instance bootstraping script that run with root permissions <br />
             <br />
             <b>Amazon Machine Image (AMI)</b><br />
             AMIs are templates for EC2 instances. They are docker like images to be run in EC2 instances. The AMI must be in the same region as that
@@ -262,25 +265,65 @@
             </ul>
             <b>- Spot: </b> the most cost-efficient (up to 90% discount). They use available resources of other instances thus they can be terminated
             at any moment. Useful for any type of computing where you don't need persistent storage. When Amazon EC2 interrupts a Spot Instance, it
-            either terminates (default), stops, or hibernates the instance, depending on what you specified when you created the Spot request <br />
-            EC2 Spot Instance interruption notice: when Amazon EC2 is going to interrupt your Spot Instance, it emits an event two minutes prior to
-            the actual interruption (except for hibernation, which gets the interruption notice, but not two minutes in advance, because hibernation
-            begins immediately). The interruption notices are made available as a CloudWatch event and as items in the instance metadata on the Spot
+            either terminates (default), stops, or hibernates the instance, depending on what you specified when you created the Spot request. To use
+            Spot instances, you must first decide your masimum spot price. The instance will be provisioned so long as the spot price is below your
+            maximum spot price. The hourly spot price varies depending on capacity and region. You can see the historizal price for spot instances on
+            each region and AZ <br />
+            EC2 Spot Instance interruption notice: if the spot price goes above your maximum spot price, you have 2 minutes to choose wheter to stop
+            or terminate your instance. When Amazon EC2 is going to interrupt your Spot Instance, it emits an event two minutes prior to the actual
+            interruption (except for hibernation, which gets the interruption notice, but not two minutes in advance, because hibernation begins
+            immediately). The interruption notices are made available as a CloudWatch event and as items in the instance metadata on the Spot
             Instance. Interruption notices are emitted on a best effort basis <br />
-            Spot fleet: is a collection of spot instances and, optionally, on-demand instances <br />
+            Spot request: when we create a spot instance, we create a spot request where is defined the desired number of instances, the launch
+            specification (the details of the instances) and request type (see iamge):
+            <ul>
+              <li>
+                <b>One-time request type:</b> provision the instance one single time. As soon as the spot price goes over the maximum spot price we
+                set, it terminates/stop the instances
+              </li>
+              <li>
+                <b>Persistent request type:</b> to define a "valid from" and "valid until" parameters to control the time that the request is open. As
+                long as the request is open and the spot price y lower than the maximum spot price you set, the request is going to provision new
+                instances in order to meet the desired number of instances you have set in the request. Exam tip: cancel a persistent spot request
+                doesn't stop/terminate the instances provisioned by the request
+              </li>
+            </ul>
+            <br />
+            Spot fleet: is a collection of spot instances and, optionally, on-demand instances. The spot fleet attempts to launch the number of spot
+            instances and on-demand instances to meet the target capacity you specified in the spot fleet request. the request for spot instances is
+            fulfilled if there is available capacity and the maximum price you specified in the request exceeds the current spot price. The spot fleet
+            also attempts to maintain its target capacity fleet if your spot instances are interrupted. With spot fleet you can setup different pools,
+            where you define things like EC2 instances type, operating system and AZ. You can have multiple pools,and the fleet will choose the best
+            way to implement depending on the strategy you define (see image). Spot fleet will stop launching instances once you reach your price
+            threshold or capacity desire. Exam tip: lowestPrice is the default spot fleet strategy<br />
+            Spot block: you may use a spot block to stop your spot intances from being terminated, even if the spot price goes over your max spot
+            price. You can set spot blocks for between 1 to 6 hours currently <br />
             Exam tip: Spot Instances with a defined duration (also known as spot blocks) are no longer available to new customers as of July 1, 2021
             <br />
+            Exam tip: in a scenario based question, never choose spot instance for "persistent workloads" (critical jobs, databases, etc) <br />
+            Exam tip: spot instance mostly come up at the exam around high-performance computing
+            <br />
             <b>- Dedicated Instance: </b>hardware dedicated to your use but you don't have control over instance placement.<br />
-            <b>- Dedicated Host: </b>physical server fully dedicated to your use. You need to commit for a 3 years period. Any question that talks
-            about special licensing requirements refers to this instance type.<br />
+            <b>- Dedicated Host: </b>physical server fully dedicated to your use. Exam tip: you need to commit for a 3 years period. Any question that
+            talks about special licensing requirements refers to this instance type.<br />
             <br />
             <b>AWS Outposts: </b> <br />
             - Are server racks that offers the same AWS structure, services, APIs and tools to build your own applications on-premises just as in the
             cloud, so you can use the AWS cloud resources directly in your facilities <br />
             - AWS will setup and manage "Outposts racks" with your on-premise infrastructure and you can start leveraging AWS services on-premises
             <br />
+            - It creates a hybrid cloud where you can leverage AWS services inside your own data center <br />
+            - You can have Outpost in sizes suchs as 1U and 2U servers, all the way up to 42U racks and multiple-rack deployments <br />
             - You are responsible for the security of the racks <br />
-            - Outposts racks are for large deployments and Outpost servers are for smaller deployments <br />
+            - Outposts Famili Member: Outposts racks are for large deployments and Outpost servers are for smaller deployments (see image) <br />
+            - The process to setup Outpost is the following:
+            <ul>
+              <li><b>Order:</b> your outpost configuration in the AWS management console</li>
+              <li><b>Install:</b> AWS staff will come on-site to install and deploy the hardware, including power, networking and connectivity</li>
+              <li><b>Launch:</b> using the AWS management console, you can launch instances on your outpost on-site</li>
+              <li><b>Build:</b> start building your on-site AWS environment</li>
+            </ul>
+            - Exam tip: for a scenario base question about extending AWS to your data center, think of AWS Outposts <br />
             <br />
             <b>AWS Wavelength</b> <br />
             - It consist of infrastrcture deployments embedded within the telecommunication provider's datacenters at the edge of the 5G network
@@ -363,13 +406,35 @@
             - Exam tip: questions about servic alerts or notifications of EC2 hardware maintenance reboots will leverage AWS Health in some manner
           </td>
           <td>
+            <span>EC2 instance types</span>
             <img src="../assets/04-EC2-instance-types.png" alt="EC2 instance types" />
             <hr />
+            <span>EC2 purchase options</span>
             <img src="../assets/05-ec2-purchasing-options.png" alt="EC2 purchase options" />
             <hr />
+            <span>EC2 instance types table</span>
             <img src="../assets/47.-EC2-instance-types-table.png" alt="EC2 instance types table" />
             <hr />
+            <span>EC2 instance types</span>
             <img src="../assets/48.-EC2-instance-types-Mnemonic.png" alt="EC2 instance types Mnemonic" />
+            <hr />
+            <span>Virtual Networking Cards</span>
+            <img src="../assets/316.-virtual-networking-cards.png" alt="Virtual Networking Cards" />
+            <hr />
+            <span>ENA vs VF</span>
+            <img src="../assets/317.-ena-vs-vf.png" alt="ENA vs VF" />
+            <hr />
+            <span>EC2 Placement Groups</span>
+            <img src="../assets/318.-ec2-placement-groups.png" alt="EC2 Placement Groups" />
+            <hr />
+            <span>Spot Request Termination</span>
+            <img src="../assets/319.-spot-request-termination.png" alt="Spot Request Termination" />
+            <hr />
+            <span>Spot Fleet Strategies</span>
+            <img src="../assets/320.-spot-fleet-strategies.png" alt="Spot Fleet Strategies" />
+            <hr />
+            <span>Outposts Family Members</span>
+            <img src="../assets/321.-outposts-family-members.png" alt="Outposts Family Members" />
           </td>
         </tr>
         <tr>
@@ -848,10 +913,10 @@
               <li>AAAA: maps a hostname to IPv6</li>
               <li>CNAME: maps a hostname to another hostname. The target must have an A or AAAA record. Only works fot NON root domains</li>
               <li>
-                Alias: is a record specific for Route53. Points a hostname to an AWS Resource.It works for root domains and non root domains. It's
-                free of charge and offers native health check. An alias record is always of type A or AAAA for AWS resources. You can't set the TTL
-                for this type of record, it's set automatically by Route53. You cannot set an alias for an EC2 DNS alias. See image for a list of
-                possible targets for this type of record
+                Alias: is a record specific for Route53. Points a hostname to an AWS Resource (including another record in the same Route53 hosted
+                zone). It works for root domains and non root domains. It's free of charge and offers native health check. An alias record is always
+                of type A or AAAA for AWS resources. You can't set the TTL for this type of record, it's set automatically by Route53. You cannot set
+                an alias for an EC2 DNS alias. See image for a list of possible targets for this type of record
               </li>
               <li>
                 SOA: start of authority record includes administrative information (TTL, etc) about your zone, as defined by the domain name system
@@ -863,6 +928,8 @@
                 want to responds to the received queries for your hosted zone
               </li>
             </ul>
+            - Exam tip: you cannot create a CNAME record for the top node of the DNS namespace. If you register the name example.com, you can't create
+            a CNAME record for example.com, but you can create a record to another-domain.com <br />
             - Exam tip: given the choice, always choose an alias record over a CNAME record <br />
             - Health Checks: they are mainly for public resource. Health checks only pass when receive 2xx or 3xx status codes. Health checks can be
             set to pass / fail based on text in the first 5120 bytes of the response. Your firewall (e.g. security groups) needs to allow the Route53
@@ -1042,15 +1109,16 @@
             account. Copying is asynchronous. It's worth mentioning that files that already exist in the bucket before enabling the replication aren't
             going to be copied to the new bucket. To replicate existing objects you can use S3 Batch Replication (the console gives you the option
             when enabling replication). The replication feature has no "chaining" of replication; it means that if bucket 1 is replicated into bucket
-            2, which has replication into bucket 3, then object created in bucket 1 are not replicated in bucket 3. If you want to restore an
-            versioned object you can do so deleting the "delete marker" version, by defualt the delete markers are not replicated but you can enable
-            the delete markers to be replicated (this doesn't apply to a permanent delete of an object)<br />
+            2, which has replication into bucket 3, then object created in bucket 1 are not replicated in bucket 3. If you want to restore a versioned
+            object you can do so deleting the "delete marker" version, by defualt the delete markers are not replicated but you can enable the delete
+            markers to be replicated (this doesn't apply to a permanent delete of an object)<br />
             - Amazon S3 security options:
             <ul>
               <li>IAM policies (user-based): which API calls should be allowed for a specific user from IAM</li>
               <li>
                 Bucket Policies: bucket wide rules. Allow cross-account rules. Explicit DENY in an IAM Policy will take precedence over an S3 bucket
-                policy.
+                policy. Exam tip: Bucket Policies can be used to enforce server-side encryption by denying all PUT requests that don't include the
+                x-amz-server-side-encryption parameter.
               </li>
               <li>Object Access Control List (ACL): finer grain control (can be disabled)</li>
               <li>Bucket Access Control List (ACL): less common (can be disabled)</li>
@@ -1169,7 +1237,7 @@
             Perform bulk operations on existing S3 objects with a single request. You can do any kind of operation (modify object metadata or
             properties, encrypt/unencrypt objects, invoke lambda functions to perform custom actions on each object, etc) on a list of objects. A job
             consist of a list of objects, the action to perform, and optional parameters. S3 batch operations manages retries, tracks progress, sends
-            completion notifications, geenrate reports, etc. You can use S3 Inventory to get object list and use S3 Select to filter your objects
+            completion notifications, generate reports, etc. You can use S3 Inventory to get object list and use S3 Select to filter your objects
           </td>
           <td>
             <span>S3 Lifecycle Rules - Example 1</span>
@@ -1534,7 +1602,10 @@
                 - Your storage is backed up by EBS snapshots which can help on-premises volumes <br />
                 - There are two types of Volume Gateway:
                 <ul>
-                  <li><b>Cached volumes: </b> low latency access to most recent data</li>
+                  <li>
+                    <b>Cached volumes: </b> low latency access to most recent data. Only the most frequently accessed data is available as cached data
+                    locally
+                  </li>
                   <li><b>Stored volumes: </b> entire dataset is on premise with scheduled backups to S3</li>
                 </ul>
               </li>
@@ -2691,7 +2762,7 @@
             - Event buses can be accessed by other AWS accounts using resource-based policies (manage permission for a specific event bus). Without a
             resource-based policy only the owner of the event bus can send event to it <br />
             - You can archive events (all/filter) sent to an event bus (indefinitely or set period) <br />
-            - Cana nalyze the event in your event bus and infer the schema. The Schema registry allows yu to geenrate code for your application, that
+            - Cana nalyze the event in your event bus and infer the schema. The Schema registry allows yu to generate code for your application, that
             will know in advance how data is structured in the event bus. Schema (the format of the event) can be versioned <br />
             <br />
             <b>CloudWatch Insights</b> <br />
@@ -3500,11 +3571,11 @@
             - Security grouop of the EC2 instances in the private subnet must allow the security group of the Bastion Host, or the private IP of the
             Bastion Host <br />
             <br />
-            <b>NAT instance (outdated, but still at the exam</b> <br />
+            <b>NAT instance (outdated, but still at the exam)</b> <br />
             - NAT = Network Address Translation <br />
             - A NAT is used to allow devices (e.e. EC2 intances) in private subnets to connect to the internet <br />
             - A NAT instance must be launch in a public subnet <br />
-            - In order to set your EC2 instance a a NAT instance, there is a setting that must be disabled: source/destination check. This is because
+            - In order to set your EC2 instance as a NAT instance, there is a setting that must be disabled: source/destination check. This is because
             the source/setination IPs must be rewritten by the NAT instance (see image) <br />
             - The EC2 instance must have an Elastic IP attached to it <br />
             - Route tables must be configured to route traffic from private subnets to the NAT instance <br />
@@ -4387,7 +4458,7 @@
               <li>Supports EC2 instances and on-premises servers</li>
               <li>Supports Linux, macOS, and Windows</li>
               <li>Patch on-demand or on a schedule using Maintenane Windows</li>
-              <li>It can san your instances and geenrate patch compliance report (missing patches)</li>
+              <li>It can san your instances and generate patch compliance report (missing patches)</li>
             </ul>
             - SSM Maintenance Windows: defines a schedule for when to perform actions on your instances (Os patching, updating drivers, installing
             software). A maintenances windows contains: schedule, duration, set of registered instances, and set of registered tasks. See image <br />
