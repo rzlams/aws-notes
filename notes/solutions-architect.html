@@ -673,7 +673,11 @@
             case <br />
             - Auto Scaling will balance your EC2 count across the AZs you list (high availability) <br />
             - You can create an ASG using a launch template, you must create a launch template with the parameters required to launch an EC2 instance.
-            These parameters include the ID of the Amazon Machine Image (AMI) and an instance type <br />
+            These parameters could include the ID of the Amazon Machine Image (the AMI is required to use the template in an ASG), the instance type,
+            networking setting, storage volumes, tags, user data, etc.
+            <br />
+            - If you include networking information in the launch template, It can't be used in an auto scaling group <br />
+            - The values included in the launch template, can be overwritten when usin the template on an ASG <br />
             - A launch template provides full functionality for Amazon EC2 Auto Scaling and also newer features of Amazon EC2 such as the current
             generation of Amazon EBS Provisioned IOPS volumes (io2), EBS volume tagging, T2 Unlimited instances, Elastic Inference, and Dedicated
             Hosts <br />
@@ -2409,6 +2413,7 @@
             - You can share your analysis or dasboards with with users and groups within QuickSight. Users who see the dashboard can also see the
             underlying data. You mus first publish your dashboard <br />
             - Use cases: business analytics, building visualizations, perform ad-hoc analysis, get business insights using data <br />
+            Exam tip: if the question talks about a BI tool to visualize your data, think of QuickSight <br />
             <br />
             <b>AWS Glue</b> <br />
             - Managed and fully serverless extract, transform and load (ETL) service. Useful to rpepare and transform data for analytics <br />
