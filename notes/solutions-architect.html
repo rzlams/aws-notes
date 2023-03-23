@@ -393,17 +393,17 @@
             stack definition for their code deployments. AWS Proton automatically provisions the resources, configures the CI/CD pipeline, and deploys
             the code into the defined infrastructure <br />
             <br />
-            <b>AWS Health </b> <br />
+            <b>AWS Health (former AWS Personal Health Dashboard)</b> <br />
             - It provides ongoing visibility into your resource performance and the availability of your AWS services and accounts <br />
             - You can use AWS Health events to learn how service and resource changes might affect your applications running on AWS <br />
             - AWS Health provides relevant and timely information to help you manage events in progress <br />
             - AWS Health also helps you be aware of and to prepare for planned activities <br />
-            - The service delivers alerts and notifications triggered by changes in the health of AWS resources, so that you get near-instant event
-            visibility and guidance to help accelerate troubleshooting<br />
+            - The service delivers alerts and notifications (only via EventBridge) triggered by changes in the health of AWS resources, so that you
+            get near-instant event visibility and guidance to help accelerate troubleshooting<br />
             - The AWS Health Dashboard is available for all AWS customers at no additional cost <br />
             - If you have a Business, Enterprise On-Ramp, or Enterprise Support plan, you can use the AWS Health API to integrate with in-house and
             third-party systems <br />
-            - Exam tip: questions about servic alerts or notifications of EC2 hardware maintenance reboots will leverage AWS Health in some manner
+            - Exam tip: questions about service alerts or notifications of EC2 hardware maintenance reboots will leverage AWS Health in some manner
           </td>
           <td>
             <span>EC2 instance types</span>
@@ -2975,11 +2975,13 @@
             approach than a single account with multiple VPCs; CloudTrail and CloudWatch logs of several accounts can be aggregated in a single S3
             bucket for the entire organization; configure cross account admin roles <br />
             - Service Control Policy (SCP): are IAM policies applied to OUs o accounts to restrict users and roles. Like any other IAM policy, they
-            need to explicitly allow or deny access. They can apply to an}nything but the (main) management account that always has full admin access.
-            The SCPs are inherited and also the higher hierarchy SCPs prevails over the lower hierarchy SCPs (in the image the AuthorizedRedshift have
-            no effect because of the DenyRedshift SCP on the Prod OU). You can use an Blocklist (allow anything but the resources explicitly denied)
-            or Allowslist (only allow specific resources) strategy for SCPs, see image. SCPs are the only way to restrict what the root account can
-            do.
+            need to explicitly allow or deny access. They can apply to anything (even to root accounts) but the (main) management account of the
+            organization that always has full admin access. The SCPs are inherited and also the higher hierarchy SCPs prevails over the lower
+            hierarchy SCPs (in the image the AuthorizedRedshift have no effect because of the DenyRedshift SCP on the Prod OU). You can use an
+            Blocklist (allow anything but the resources explicitly denied) or Allowslist (only allow specific resources) strategy for SCPs, see image.
+            SCPs are the only way to restrict what the root account can do. For CSPs a Deny statement simply deny access to the specified resources,
+            but an Allow statement allow the specified resource while implicitly deny all the resources not included (SCPs will never give additional
+            permissions, they only take permissions away)
             <br />
             <b>IAM Policy Conditions</b> <br />
             - The Condition element (or Condition block) lets you specify conditions for when a policy is in effect. The Condition element is
@@ -3037,6 +3039,12 @@
             - It's supported by users and roles (not groups) <br />
             - IAM Policy Evaluation Logic (see image): in short, if you have an explicit deny for any action you can't perform the action even if you
             also have an explicit allow <br />
+            <br />
+            <b>Resource Access Manage - RAM</b><br />
+            - Is a free service that allows you to share AWS resources with other accounts and within your organization <br />
+            - It allows you to easily share resources rather than having to create duplicate copies in your different accounts<br />
+            - With RAM you can share almost everything in your account, including: transit gateways, VPC subnets, License Manager, Route53 resolvers,
+            dedidcated hosts, etc <br />
             <br />
             <b>Amazon Cognito</b><br />
             - Exam tip: whenever they ask about auth for "hundreds of users", "mobile users", or "authenticate with SAML", they are talking about
