@@ -1464,6 +1464,14 @@
             - CloudFront Cache Invalidation: in case you update the backend origin, CloudFront doesn't now about it and will only get the refreshed
             content after the TTL has expired. However, you can force an entire or partial cache refresh (thus bypassing the TTL) by performing a
             lLoudFront Invalidation. You can invalidate all files (*) or a specific path (images/*)<br />
+            - CloudFront signed cookies: allow you to control who can access your content when you don't want to change your current URLs or when you
+            want to provide access to multiple restricted files, for example, all of the files in the subscribers' area of a website. When you create
+            a signed cookie, you write a policy statement in JSON format that specifies the restrictions on the signed cookie, for example, how long
+            the cookie is valid. You can use canned policies or custom policies (see image) <br />
+            - CloudFront signed URL: includes additional information, for example, an expiration date and time, that gives you more control over
+            access to your content. This additional information appears in a policy statement, which is based on either a canned policy or a custom
+            policy. When you create a signed URL, you write a policy statement in JSON format that specifies the restrictions on the signed URL, for
+            example, how long the URL is valid. (see image)<br />
             <br />
             <b>AWS Global Accelerator</b> <br />
             - Global Accelerator is a global service that supports endpoints in multiple AWS Regions <br />
@@ -1497,6 +1505,15 @@
             <hr />
             <span>CloudFront Price Classes</span>
             <img src="../assets/92.-cloudfront-price-class.png" alt="CloudFront Price Classes" />
+            <hr />
+            <span>CloudFront Signed Cookies - Canned vs Custom Policies</span>
+            <img
+              src="../assets/378.-cloudfront-signed-cookies-canned-vs-custom-policies.png"
+              alt="CloudFront Signed Cookies - Canned vs Custom Policies"
+            />
+            <hr />
+            <span>CloudFront Signed URL - Canned vs Custom Policies</span>
+            <img src="../assets/392.-cloudfront-signed-url-canned-vs-custom-policies.png" alt="CloudFront Signed URL - Canned vs Custom Policies" />
             <hr />
             <span>AWS Global Accelerator Features</span>
             <img src="../assets/333.-global-accelerator-features.png" alt="AWS Global Accelerator Features" />
